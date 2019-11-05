@@ -1,0 +1,26 @@
+{
+  "name": "contest-project",
+  "version": "1.0.0",
+  "description": "TODO",
+  "main": "test.js",
+  "scripts": {
+    "start": "webpack-dev-server --config webpack.config.js --env development",
+    "build": "webpack --config webpack.config.js --env production"
+  },
+  "author": "Picroc",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.6.4",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/polyfill": "^7.6.0",
+    "@babel/preset-env": "^7.6.3",
+    "babel-loader": "^8.0.6",
+    "html-webpack-plugin": "^3.2.0",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0",
+    "webpack-merge": "^4.2.2"
+  }
+}
