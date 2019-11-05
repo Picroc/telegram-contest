@@ -45,6 +45,11 @@ const common = {
                         plugins: ['@babel/plugin-proposal-class-properties']
                     }
                 }
+            },
+            {
+                test: /\.html$/,
+                exclude: /node_modules/,
+                use: {loader: 'html-loader'}
             }
         ]
     },
