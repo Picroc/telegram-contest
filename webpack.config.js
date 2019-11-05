@@ -24,6 +24,13 @@ const common = {
                 ]
             },
             {
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    'css-loader'
+                ]
+            },
+            {
                 test: /\.(woff(2)?|ttf|eot|svg|otf)(\?v=\d+\.\d+\.\d+)?$/,
                 use: [
                     {
@@ -49,7 +56,7 @@ const common = {
             {
                 test: /\.html$/,
                 exclude: /node_modules/,
-                use: {loader: 'html-loader'}
+                use: { loader: 'html-loader' }
             }
         ]
     },
