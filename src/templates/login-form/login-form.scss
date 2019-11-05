@@ -21,6 +21,9 @@
     margin-block-end: 0;
 
     margin-top: 45px;
+
+    font-size: 30px;
+    font-weight: normal;
   }
 
   &__description {
@@ -29,6 +32,14 @@
     margin-bottom: 0;
 
     max-width: 230px;
+
+    color: rgb(106, 108, 111);
+
+    font-size: 0.95em;
+    font-weight: normal;
+    line-height: 1.4em;
+
+    text-align: center;
   }
 
   &__country {
@@ -36,11 +47,67 @@
   }
 
   &__phone {
-    margin-top: 25px;
+    margin-top: 22px;
   }
 
   &__keep {
-    margin-top: 25px;
+    display: flex;
+    margin-top: 26px;
+    width: 360px;
+    padding-left: 32px;
+    position: relative;
+
+    overflow: hidden;
+
+    & input {
+      -webkit-appearance: none;
+      background-color: white;
+      border: 1px solid rgba(218, 220, 224, 0.75);
+      padding: 8px;
+      border-radius: 3px;
+      display: inline-block;
+      position: relative;
+      top: -3px;
+
+      &:active,
+      &:checked:active,
+      &:focus {
+        outline: none;
+      }
+
+      &:checked {
+        background: rgba(79, 164, 246, 1);
+      }
+
+      &:checked:before {
+        content: "";
+        border: 2px solid white;
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-left: 6px solid white;
+        border-bottom: 10px solid white;
+
+        transform: rotate(45deg);
+      }
+
+      &:checked:after {
+        content: "";
+        border: 2px solid rgba(79, 164, 246, 1);
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-left: 3px solid rgba(79, 164, 246, 1);
+        border-bottom: 7px solid rgba(79, 164, 246, 1);
+
+        transform: rotate(45deg);
+      }
+    }
+
+    & label {
+      display: inline-block;
+      margin-left: 32px;
+    }
   }
 }
 
