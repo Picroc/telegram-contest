@@ -18,12 +18,17 @@
     "@babel/preset-env": "^7.6.3",
     "babel-loader": "^8.0.6",
     "css-loader": "^3.2.0",
+<<<<<<< HEAD
     "file-loader": "^4.2.0",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "node-sass": "^4.13.0",
     "sass-loader": "^8.0.0",
     "scss-loader": "^0.0.1",
+=======
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
+>>>>>>> 0e754bf8af81622b40ed9587e0f749aa911b5443
     "style-loader": "^1.0.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",

@@ -1,4 +1,5 @@
 import Login from './templates/login-form';
+import './assets/fonts.css';
 
 const q = (elem) => document.querySelector(elem);
 const App = q('.root');

@@ -24,7 +24,18 @@ const common = {
                 ]
             },
             {
+<<<<<<< HEAD
                 test: /\.(woff(2)?|ttf|eot|svg|png|jpe?g|gif|otf)(\?v=\d+\.\d+\.\d+)?$/,
+=======
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    'css-loader'
+                ]
+            },
+            {
+                test: /\.(woff(2)?|ttf|eot|svg|otf)(\?v=\d+\.\d+\.\d+)?$/,
+>>>>>>> 0e754bf8af81622b40ed9587e0f749aa911b5443
                 use: [
                     {
                         loader: 'file-loader',
