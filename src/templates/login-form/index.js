@@ -1,4 +1,4 @@
-import './login-form.sass';
+import './login-form.scss';
 import template from './login-form.html';
 
 export default (elem) => {
