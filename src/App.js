@@ -1,4 +1,7 @@
-const App = document.querySelector('.root');
+import Login from './templates/login-form';
+
+const q = (elem) => document.querySelector(elem);
+const App = q('.root');
 
 let state = {
     username: 'Picroc',
@@ -14,8 +17,6 @@ const changeState = (transform) => {
             ...oldState,
             ...newState
         }
-
-        render();
     }
 }
 
@@ -23,39 +24,8 @@ const subscribe = (element) => {
     return function (...args) { document.querySelector(element).addEventListener(...args); }
 }
 
-function loginForm(loginData) {
-    return `
-            <div class='login-form'>
-                <h3>Login<h3>
-                <label>User name:<label>
-                <input class='login-form__name' type='text' placeholder='Write your name' value='${loginData.username}'>
-                <br>
-                <label>Password</label>
-                <input class='login-form__pass' type='text' placeholder='${loginData.password || ''}'>
-                <label>Your password is: ${loginData.password}</label>
-                <button id='bt1' class='login-form__submit'>Push</button>
-            </div>
-        `
-}
-
-function onNameChange(value) {
-    return { username: value };
-}
-
-function onPassChange(value) {
-    return { password: value };
-}
-
-function onSubmitClick() {
-    console.log(state);
-}
-
 function render() {
-    App.innerHTML = loginForm(state);
-
-    subscribe('.login-form__name')('input', changeState(onNameChange));
-    subscribe('.login-form__pass')('input', onPassChange);
-    subscribe('.login-form__submit')('click', onSubmitClick);
+    Login(App);
 }
 
 function onDocumentReady(callback) {
