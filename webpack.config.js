@@ -4,7 +4,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 
 
-
 const common = {
     entry: {
         index: path.join(__dirname, 'src') + '/App.js'
