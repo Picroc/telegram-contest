@@ -1,5 +1,7 @@
 import Login from './templates/login-form';
 import './assets/fonts.css';
+import ChatPage from './templates/chat-page';
+import './assets/globals.scss';
 
 telegramApi.setConfig({
     app: {
@@ -26,7 +28,7 @@ telegramApi.setConfig({
 });
 
 telegramApi.getUserInfo().then(res => { console.log("User info:", res); });
-telegramApi.sendCode('+79821759743');
+// telegramApi.sendCode('+79821759743');
 
 const q = (elem) => document.querySelector(elem);
 const App = q('.root');
@@ -53,7 +55,7 @@ const subscribe = (element) => {
 }
 
 function render() {
-    Login(App);
+    ChatPage(App);
 }
 
 function onDocumentReady(callback) {
