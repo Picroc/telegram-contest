@@ -1,5 +1,7 @@
 import Login from './templates/login-form';
 import './assets/fonts.css';
+import ChatPage from './templates/chat-page';
+import './assets/globals.scss';
 
 // telegramApi.setConfig({
 //     app: {
@@ -52,7 +54,7 @@ const subscribe = (element) => {
 }
 
 function render() {
-    Login(App);
+    ChatPage(App);
 }
 
 function onDocumentReady(callback) {
