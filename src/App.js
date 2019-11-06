@@ -3,32 +3,33 @@ import './assets/fonts.css';
 import ChatPage from './templates/chat-page';
 import './assets/globals.scss';
 
-telegramApi.setConfig({
-    app: {
-        id: 1166576, /* App ID */
-        hash: '99db6db0082e27973ee4357e4637aadc', /* App hash */
-        version: '0.0.1' /* App version */
-    },
-    server: {
-        test: [
-            {
-                id: 2, /* DC ID */
-                host: '149.154.167.40',
-                port: 443
-            }
-        ],
-        production: [
-            {
-                id: 2, /* DC ID */
-                host: '149.154.167.50',
-                port: 443
-            }
-        ]
-    }
-});
+// import 'telegram-api-js/dist/telegramApi';
 
-telegramApi.getUserInfo().then(res => { console.log("User info:", res); });
-// telegramApi.sendCode('+79821759743');
+// telegramApi.setConfig({
+//     app: {
+//         id: 1166576, /* App ID */
+//         hash: '99db6db0082e27973ee4357e4637aadc', /* App hash */
+//         version: '0.0.1' /* App version */
+//     },
+//     server: {
+//         test: [
+//             {
+//                 id: 2, /* DC ID */
+//                 host: '149.154.167.40',
+//                 port: 443
+//             }
+//         ],
+//         production: [
+//             {
+//                 id: 2, /* DC ID */
+//                 host: '149.154.167.50',
+//                 port: 443
+//             }
+//         ]
+//     }
+// });
+
+// telegramApi.getUserInfo().then(res => { console.log("User info:", res); });
 
 const q = (elem) => document.querySelector(elem);
 const App = q('.root');
