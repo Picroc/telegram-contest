@@ -1,8 +1,6 @@
 import Login from './templates/login-form';
 import './assets/fonts.css';
 
-// import 'telegram-api-js/dist/telegramApi';
-
 // telegramApi.setConfig({
 //     app: {
 //         id: 1166576, /* App ID */
