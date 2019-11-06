@@ -1,31 +1,64 @@
 import './chat-page.scss';
 import template from './chat-page.html';
-import user from './user';
+import dialog from './dialog';
+import menu from './menu';
 
-function htmlToElement(html) {
-    var template = document.createElement('template');
-    html = html.trim(); // Never return a text node of whitespace as the result
-    template.innerHTML = html;
-    return template.content.firstChild;
+const startLoading = (elem) => {
+    const loader = document.createElement('div');
+    loader.className = 'spinner';
+    elem.innerHTML = loader;
+    elem.classList.add('loading');
 }
 
-const loadData = (timeout) => setTimeout(() => {
-    const data = [{
-        avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-        name: 'Antoha',
-        shortMsg: 'Dorowa',
-        meta: 'kek'
-    }];
-    const fragment = document.createDocumentFragment();
+const stopLoading = (elem) => {
+    elem.innerHTML = '';
+    elem.classList.remove('loading');
+}
 
-    data.forEach(({ avatar, name, shortMsg, meta }) => {
-        fragment.appendChild(htmlToElement(user(avatar, name, shortMsg, meta)));
-    });
+const data = [{
+    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
+    name: 'Antoha',
+    shortMsg: 'Dorowa',
+    meta: 'kek'
+}, {
+    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
+    name: 'DRUG-DEALER',
+    shortMsg: 'Dorowa',
+    meta: 'kek'
+}, {
+    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
+    name: 'DRUGAN',
+    shortMsg: 'Dorowa',
+    meta: 'kek'
+}, {
+    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
+    name: 'Mama',
+    shortMsg: 'Dorowa',
+    meta: 'kek'
+}, {
+    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
+    name: 'Bro',
+    shortMsg: 'Dorowa',
+    meta: 'kek'
+}, {
+    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
+    name: 'Batya',
+    shortMsg: 'Dorowa',
+    meta: 'kek'
+},
+];
+
+const loadData = (timeout) => setTimeout(() => {
+    const userDialogs = document.createElement('div');
+    userDialogs.id = 'user-dialogs';
+    userDialogs.innerHTML = data.map(info => dialog(...Object.values(info))).join('');
+    
     const left = document.getElementById('left');
-    left.innerHTML = '';
-    left.classList.remove('loading');
-    left.appendChild(fragment);
+    stopLoading(left);
+    menu(left);
+    left.appendChild(userDialogs);
 }, timeout);
+
 
 export default (elem) => {
     elem.innerHTML = template;
