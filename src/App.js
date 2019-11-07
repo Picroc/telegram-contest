@@ -3,6 +3,8 @@ import LoginCode from './templates/login-code';
 
 import './assets/fonts.css';
 import { ApiService } from './utils/services';
+import ChatPage from './templates/chat-page';
+import './assets/globals.scss';
 
 // const apiService = new ApiService();
 // apiService.init();
