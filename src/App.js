@@ -1,46 +1,25 @@
 import Login from './templates/login-form';
+import LoginCode from './templates/login-code';
+
 import './assets/fonts.css';
+import { ApiService } from './utils/services';
 import ChatPage from './templates/chat-page';
 import './assets/globals.scss';
 
-// telegramApi.setConfig({
-//     app: {
-//         id: 1166576, /* App ID */
-//         hash: '99db6db0082e27973ee4357e4637aadc', /* App hash */
-//         version: '0.0.1' /* App version */
-//     },
-//     server: {
-//         test: [
-//             {
-//                 id: 2, /* DC ID */
-//                 host: '149.154.167.40',
-//                 port: 443
-//             }
-//         ],
-//         production: [
-//             {
-//                 id: 2, /* DC ID */
-//                 host: '149.154.167.50',
-//                 port: 443
-//             }
-//         ]
-//     }
-// });
-
-// telegramApi.getUserInfo().then(res => { console.log("User info:", res); });
+// const apiService = new ApiService();
+// apiService.init();
+// apiService._debugAuth('+79821759743');
 
 const q = (elem) => document.querySelector(elem);
 const App = q('.root');
 
 let state = {
-    username: 'Picroc',
-    password: '1234456',
-    phone: '89821759743'
+    history: ['login']
 };
 
 const changeState = (transform) => {
-    return function (event) {
-        const [oldState, newState] = [state, transform(event.target.value)];
+    return function (...args) {
+        const [oldState, newState] = [state, transform(...args)];
 
         state = {
             ...oldState,
@@ -53,8 +32,21 @@ const subscribe = (element) => {
     return function (...args) { document.querySelector(element).addEventListener(...args); }
 }
 
+const switchPage = (page) => {
+    switch (page) {
+        case 'login': return Login;
+        case 'login_code': return LoginCode;
+        default: return () => { throw new ReferenceError('No such page') };
+    }
+}
+
+const routePage = (page, ...args) => {
+    changeState(() => ({ history: [...state.history, page] }))();
+    switchPage(page)(App, routePage, ...args);
+}
+
 function render() {
-    ChatPage(App);
+    Login(App, routePage);
 }
 
 function onDocumentReady(callback) {
