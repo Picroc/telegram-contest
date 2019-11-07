@@ -221,6 +221,7 @@ export class ApiService {
 
         if (localStorage.getItem('authInfo')) {
             console.log('[DEBUG_AUTH] You have already logged in! Proceed as normal.');
+            //TODO Change to normal
             window.phone_code_hash = localStorage.getItem('userPhoneHash');
         } else {
             if (localStorage.getItem('sendCodeTimeout')) {
@@ -232,6 +233,7 @@ export class ApiService {
             }
             await telegramApi.sendCode(phone)
                 .then(code => {
+                    //TODO Change to normal
                     window.phone_code_hash = code.phone_code_hash;
                     localStorage.setItem('sendCodeTimeout', new Date().toISOString());
                 })
