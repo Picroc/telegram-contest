@@ -44,7 +44,7 @@ const routePage = (page, ...args) => {
 }
 
 function render() {
-    Login(App, routePage);
+    LoginCode(App, routePage, { phone: 'kek' });
 }
 
 function onDocumentReady(callback) {

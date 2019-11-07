@@ -67,7 +67,7 @@ const common = {
             [
                 {
                     filepath: require.resolve("./node_modules/telegram-api-js/dist/telegramApi.min.js"),
-                },
+                }
             ]
         ),
     ]
