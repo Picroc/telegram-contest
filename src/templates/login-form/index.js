@@ -120,7 +120,11 @@ const onCountryOut = () => {
     elem.remove();
 }
 
-export default (elem) => {
+const getCurrentPhone = () => {
+    return document.querySelector('.login-form__phone').value;
+}
+
+export default (elem, router) => {
     elem.innerHTML = template;
 
     const subCountry = subscribe('.login-form__country');
@@ -129,4 +133,5 @@ export default (elem) => {
     subscribe('body')('click', onCountryOut);
     subCountry('click', (event) => { event.stopPropagation(); });
     subCountry('input', onCountryChange);
+    subscribe('.login-form__submit')('click', () => router('login_code', { phone: getCurrentPhone() }))
 }
