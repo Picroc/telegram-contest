@@ -1,8 +1,14 @@
+$spinner-color: rgba(79, 164, 246, 1);
+$right-background: #e6ebee;
+$secondary: #777b7f;
+$hover-color: #f1f3f4;
+
 #left {
-  width: 18%;
+  width: 20%;
   height: 100vh;
   display: flex;
   flex-direction: column;
+  min-width: 260px;
 }
 .loading {
   justify-content: center;
@@ -12,10 +18,12 @@
   height: 6vh;
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  margin: 0 6px;
+  padding: 0 6px;
+  border-radius: 8px;
 
   &:hover {
-    background-color: #f1f3f4;
+    background-color: $hover-color;
     cursor: pointer;
   }
 
@@ -43,14 +51,14 @@
   }
 
   &__short-msg {
-    color: #777b7f;
+    color: $secondary;
     margin-top: 4px;
     font-style: 14px;
   }
 
   &__meta {
     margin-left: auto;
-    color: #777b7f;
+    color: $secondary;
   }
 }
 .chat-page {
@@ -58,9 +66,10 @@
 }
 
 #right {
+  min-width: 35%;
   width: 80%;
   height: 100vh;
-  background-color: #e6ebee;
+  background-color: $right-background;
 }
 
 .spinner {
@@ -69,19 +78,19 @@
   height: 50px;
   border: 3px solid transparent;
   border-radius: 50%;
-  border-bottom-color: rgba(79, 164, 246, 1);
-  border-right-color: rgba(79, 164, 246, 1);
-  border-top-color: rgba(79, 164, 246, 1);
+  border-bottom-color: $spinner-color;
+  border-right-color: $spinner-color;
+  border-top-color: $spinner-color;
   animation: spin 1s ease-in-out infinite;
 }
 
 @keyframes spin {
   to {
-    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
   }
 }
 @-webkit-keyframes spin {
   to {
-    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
   }
 }

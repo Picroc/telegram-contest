@@ -10,14 +10,37 @@ export const htmlToElement = (html) => {
     return template.content.firstChild;
 };
 
-const startLoading = (elem) => {
+export const startLoading = (elem) => {
     const loader = document.createElement('div');
     loader.className = 'spinner';
     elem.innerHTML = loader;
     elem.classList.add('loading');
 }
 
-const stopLoading = (elem) => {
+export const stopLoading = (elem) => {
     elem.innerHTML = '';
     elem.classList.remove('loading');
+}
+
+
+export const createElement = type => className => {
+    const elem = document.createElement(type);
+    elem.className = className;
+    return elem;
+}
+
+export const createDiv = createElement('div');
+export const createSpan = createElement('span');
+
+export const createImg = (src, className) => {
+    const elem = createElement('img')(className);
+    elem.src = src;
+    return elem;
+}
+
+export const createInput = (type, className, placeholder) => {
+    const elem = createElement('input')(className);
+    elem.type = type;
+    elem.placeholder = placeholder;
+    return elem;
 }
