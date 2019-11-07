@@ -1,5 +1,6 @@
 import './login-form.scss';
 import template from './login-form.html';
+import { subscribe } from '../../helpers';
 
 const cntr = [
     {
@@ -51,10 +52,6 @@ const cntr = [
         code: '+8 772'
     }
 ]
-
-const subscribe = (element) => {
-    return function (...args) { document.querySelector(element).addEventListener(...args); }
-}
 
 const countriesPopup = (coutries) => {
     return coutries.map(country => {
