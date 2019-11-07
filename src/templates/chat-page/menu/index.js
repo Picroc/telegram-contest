@@ -1,7 +1,8 @@
 import './menu.scss';
 import template from './menu.html';
-import { subscribe } from '../../../helpers';
-import img from './search.svg';
+import { subscribe, createInput, createDiv, htmlToElement } from '../../../helpers';
+import img from './search.js';
+import { createElement } from '../../../helpers';
 
 export default (elem) => {
     const nav = document.createElement('nav');
@@ -11,24 +12,6 @@ export default (elem) => {
     elem.appendChild(nav);
 };
 
-const createDiv = (className) => {
-    const elem = document.createElement('div');
-    elem.className = className;
-    return elem
-}
-
-const createSpan = className => {
-    const elem = document.createElement('span');
-    elem.className = className;
-    return elem;
-}
-
-const createImg = (src, className) => {
-    const elem = document.createElement('img');
-    elem.className = className;
-    elem.src = src;
-    return elem;
-}
 
 export const onType = event => {
     const userDialogs = document.getElementById('user-dialogs');
@@ -45,13 +28,11 @@ export const onType = event => {
 
 const search = () => {
     const searchWrapper = createDiv('menu__search-wrapper');
-    const searchIcon = createImg(img, 'menu__search-icon');
-    searchWrapper.appendChild(searchIcon);
-    const search = document.createElement('input');
-    search.type = 'search';
-    search.className = 'menu__search';
-    search.placeholder = 'Search';
+    const searchIcon = createDiv('menu__search-icon');
+    searchIcon.innerHTML = img()
+    const search = createInput('search', 'menu__search', 'Search');
     searchWrapper.appendChild(search);
+    searchWrapper.appendChild(searchIcon);
     subscribe(search)('input', onType)
     return searchWrapper;
 }
