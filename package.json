@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/runtime": "^7.7.1",
+    "airgram": "^2.1.1",
     "lottie-web": "^5.5.9",
     "pbkdf2": "^3.0.17",
     "sha-256": "^1.0.3",
@@ -36,14 +37,19 @@
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "jquery": "^3.4.1",
+    "localforage": "^1.7.3",
+    "mtproto-storage-browser": "^0.1.5",
     "node-sass": "^4.13.0",
+    "reflect-metadata": "^0.1.13",
     "sass-loader": "^8.0.0",
     "scss-loader": "^0.0.1",
     "sjcl": "^1.0.8",
     "style-loader": "^1.0.0",
+    "telegram-mtproto": "^3.2.10",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.9.0",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^4.2.2",
+    "worker-loader": "^2.0.0"
   }
 }

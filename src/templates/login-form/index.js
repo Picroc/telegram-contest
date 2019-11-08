@@ -1,57 +1,52 @@
 import './login-form.scss';
 import template from './login-form.html';
-import { subscribe } from '../../helpers';
 
 const cntr = [
     {
         name: 'Kek',
-        code: '+7 982'
+        code: '+7'
     },
     {
         name: 'Ahahaha',
-        code: '+8 772'
+        code: '+22'
     },
     {
         name: 'Opa',
-        code: '+6 123'
+        code: '+389'
     },
     {
         name: 'Ahahaha',
-        code: '+8 772'
+        code: '+200'
     },
     {
         name: 'Ahahaha',
-        code: '+8 772'
-    },
-    {
-        name: 'Ahahaha',
-        code: '+8 772'
-    },
-    {
-        name: 'Ahahaha',
-        code: '+8 772'
-    },
-    {
-        name: 'Ahahaha',
-        code: '+8 772'
-    },
-    {
-        name: 'Ahahaha',
-        code: '+8 772'
-    },
-    {
-        name: 'Ahahaha',
-        code: '+8 772'
-    },
-    {
-        name: 'Ahahaha',
-        code: '+8 772'
-    },
-    {
-        name: 'Ahahaha',
-        code: '+8 772'
+        code: '+3567'
     }
 ]
+
+const getMaskedValue = (text) => {
+    const newText = text.replace(/\D/g, '').slice(0, 15);
+    const idx = Math.max(newText.length - 10, 1);
+    const code = newText.slice(0, idx);
+    const number = newText.slice(idx);
+    if (number.length >= 9) return `+${code} ${number.slice(0, 3)} ${number.slice(3, 6)} ${number.slice(6, 8)} ${number.slice(8)}`;
+    if (number.length >= 7) return `+${code} ${number.slice(0, 3)} ${number.slice(3, 6)} ${number.slice(6)}`;
+    if (number.length >= 5) return `+${code} ${number.slice(0, 3)} ${number.slice(3)}`;
+    if (number.length >= 1) return `+${code} ${number.slice(0)}`;
+    return `+${code}`;
+
+}
+
+const handleMaskedInput = (event) => {
+    const value = event.target.value;
+    if (!value) return;
+
+    event.target.value = getMaskedValue(value);
+}
+
+const subscribe = (element) => {
+    return function (...args) { document.querySelector(element).addEventListener(...args); }
+}
 
 const countriesPopup = (coutries) => {
     return coutries.map(country => {
@@ -74,7 +69,7 @@ const onCodeChoice = (event) => {
         event.target.querySelector('.popup-item__name').innerText :
         event.target.parentNode.querySelector('.popup-item__name').innerText;
 
-    document.querySelector('.login-form__phone').value = code;
+    document.querySelector('.login-form__phone').value = getMaskedValue(code);
     document.querySelector('.login-form__country').value = name;
     onCountryOut();
 }
@@ -117,10 +112,6 @@ const onCountryOut = () => {
     elem.remove();
 }
 
-const getCurrentPhone = () => {
-    return document.querySelector('.login-form__phone').value;
-}
-
 export default (elem, router) => {
     elem.innerHTML = template;
 
@@ -130,5 +121,7 @@ export default (elem, router) => {
     subscribe('body')('click', onCountryOut);
     subCountry('click', (event) => { event.stopPropagation(); });
     subCountry('input', onCountryChange);
-    subscribe('.login-form__submit')('click', () => router('login_code', { phone: getCurrentPhone() }))
+
+    subscribe('.login-form__phone')('input', handleMaskedInput);
+    subscribe('.login-form__submit')('click', () => { router('login_code', { phone: document.querySelector('.login-form__phone').value }) });
 }

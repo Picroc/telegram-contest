@@ -4,32 +4,62 @@ import 'sjcl/core/ecc';
 import 'sjcl/core/srp';
 import 'sjcl/core/sha1';
 
+import schema from '../helpers/apiSchema.json';
+
+import MTProto from 'telegram-mtproto';
+import BrowserStorage from 'mtproto-storage-browser';
+import localforage from 'localforage';
+
 export class ApiService {
 
     init() {
-        telegramApi.setConfig({
-            app: {
-                id: 1166576, /* App ID */
-                hash: '99db6db0082e27973ee4357e4637aadc', /* App hash */
-                version: '0.0.1' /* App version */
-            },
-            server: {
-                test: [
-                    {
-                        id: 2, /* DC ID */
-                        host: '149.154.167.40',
-                        port: 443
-                    }
-                ],
-                production: [
-                    {
-                        id: 2, /* DC ID */
-                        host: '149.154.167.50',
-                        port: 443
-                    }
-                ]
-            }
-        });
+        // WARNING! DO NOT USE THE APP_ID AND HASH POSTED BELOW
+        // OR YOUR APP WILL BE BLOCKED
+
+        // CONFIGURATION
+        this.app = {
+            id: 1166576,
+            hash: '99db6db0082e27973ee4357e4637aadc'
+        };
+        const api = {
+            layer: 74,
+            api_id: this.app.id
+        }
+
+        const server = {
+            dev: true
+        }
+
+        // CHECKING IF ALREADY LOGGED IN
+        this.savedData = {
+            dc2_auth_id: JSON.parse(localStorage.getItem(`localforage/dc2_auth_id`)) || null,
+            dc2_auth_key: JSON.parse(localStorage.getItem(`localforage/dc2_auth_key`)) || null,
+            dc2_server_salt: JSON.parse(localStorage.getItem(`localforage/dc2_server_salt`)) || null
+        }
+
+        if (!Object.values(this.savedData).filter(val => val !== null).length) {
+            this.authRequired = true;
+        }
+
+        if (this.authRequired) {
+            this.client = MTProto({
+                server,
+                api,
+                schema,
+                app: { storage: new BrowserStorage() }
+            });
+        } else {
+            this.client = MTProto({
+                server,
+                api,
+                schema,
+                app: {
+                    storage: new BrowserStorage(
+                        localforage.createInstance(this.savedData)
+                    )
+                }
+            });
+        }
     }
 
     errorHandle = (err) => {
@@ -37,38 +67,47 @@ export class ApiService {
         return false;
     }
 
-    getAuthToken = () => {
-        return localStorage.getItem('userPhoneHash');
-    }
-
-    pendUser = async (phone) => {
-        const data = await telegramApi.sendCode(phone);
-
-        localStorage.setItem('userPhoneHash', data.phone_code_hash);
-
-        return {
-            isRegistered: data.phone_registered
-        }
-    }
-
-    userLogin = async (phone, code) => {
-        if (!code) {
-            console.log('You should pass the code!');
-            return;
-        }
-        const authToken = this.getAuthToken();
-        if (!authToken) {
-            console.log('User is not promted to sing in!');
+    _getUserInfo = () => {
+        if (this.authRequired) {
+            console.log('There is not authorized user now');
             return;
         }
 
-        const data = await telegramApi.signIn(phone, authToken, code)
-            .catch(err => {
-                if (err.type === 'SESSION_PASSWORD_NEEDED') {
-                    console.log("BOY you need a password magic!");
-                }
-            });
+        return JSON.parse(localStorage.getItem('userInfo'));
     }
+
+    authUser = async (phone) => {
+        if (!this.authRequired) {
+            console.log('Already logged as', this._getUserInfo());
+            return;
+        }
+
+        if (!phone) {
+            console.log('Please provide phone number!');
+        }
+
+        const { phone_code_hash } = await this.client('auth.sendCode', {
+            phone_number: phone,
+            api_id: this.app.id,
+            api_hash: this.app.hash
+        }).catch(err => { throw new Error(err) });
+
+        this.codeRequested = true;
+
+        return { phone_code_hash, phone };
+    }
+
+    signInUser = async ({ phone, phone_code_hash, code }) => {
+        return await this.client('auth.SignIn', {
+            phone_number: phone,
+            phone_code_hash: phone_code_hash,
+            phone_code: code
+        })
+            .then(res => { localStorage.setItem('userInfo', JSON.stringify(res)); this.authRequired = false; return res; })
+            .catch(err => { throw new Error(err); }); // TODO PASS TO SIGNUP OR 2FA
+    }
+
+    // FUNCTIONS FOR SRP with Pbkdf2 password calculations
 
     _H = (data) => {
         return sjcl.hash.sha256.hash(data);
@@ -138,13 +177,19 @@ export class ApiService {
         return { M1, A: g_a };
     }
 
-    _checkPassword = async (data) => {
-        return await telegramApi.invokeApi('auth.checkPassword', data)
-            .catch(this.errorHandle);
+    _checkPassword = async ({ srp_id, A, M1 }) => {
+        return await this.client('auth.checkPassword', {
+            "password": {
+                _: "inputCheckPasswordSRP",
+                srp_id,
+                A,
+                M1
+            }
+        }).catch(this.errorHandle);
     }
 
     _perform2FA = async () => {
-        const firstData = await telegramApi.invokeApi('account.getPassword')
+        const firstData = await this.client('account.getPassword')
             .catch(this.errorHandle);
         if (!firstData) return;
 
@@ -165,14 +210,7 @@ export class ApiService {
             loadedInfo.p === p
         ) {
             const { M1, A } = loadedInfo;
-            const auth = this._checkPassword({
-                "password": {
-                    _: "inputCheckPasswordSRP",
-                    srp_id,
-                    A,
-                    M1
-                }
-            });
+            const auth = this._checkPassword({ srp_id, A, M1 });
 
             if (!auth) return;
             console.log(auth);
@@ -192,14 +230,7 @@ export class ApiService {
                 }
             ));
 
-            const auth = this._checkPassword({
-                "password": {
-                    _: "inputCheckPasswordSRP",
-                    srp_id,
-                    A,
-                    M1
-                }
-            });
+            const auth = this._checkPassword({ srp_id, A, M1 });
             if (!auth) return;
             console.log(auth);
         }
@@ -214,51 +245,15 @@ export class ApiService {
         console.log('[DEBUG_AUTH] THINK WHAT YOU DOING PAL');
         console.log('[DEBUG_AUTH] This is not optimized and may cause some freezes. CryptoAlgo is really slow');
 
-        console.log('[DEBUG_API] ', Object.getOwnPropertyNames(telegramApi));
-        // localStorage.setItem('sendCodeTimeout', new Date().toISOString());
+        const authData = await this.authUser(phone);
+        if (!this.codeRequested) return;
 
-        let code = '';
+        const { phone_code_hash } = authData;
+        const code = prompt('Type in your code');
 
-        if (localStorage.getItem('authInfo')) {
-            console.log('[DEBUG_AUTH] You have already logged in! Proceed as normal.');
-            //TODO Change to normal
-            window.phone_code_hash = localStorage.getItem('userPhoneHash');
-        } else {
-            if (localStorage.getItem('sendCodeTimeout')) {
-                const timePassed = new Date() - this._parseISOString(localStorage.getItem('sendCodeTimeout'));
-                if (timePassed / 1000 < 300) {
-                    console.log('[DEBUG_AUTH] You cannot send code now! Wait for', 300 - timePassed / 1000, 'seconds');
-                    return;
-                }
-            }
-            await telegramApi.sendCode(phone)
-                .then(code => {
-                    //TODO Change to normal
-                    window.phone_code_hash = code.phone_code_hash;
-                    localStorage.setItem('sendCodeTimeout', new Date().toISOString());
-                })
-                .catch(err => {
-                    if (err.type.includes('FLOOD')) {
-                        console.log('[DEBUG_AUTH] Ooops. You have flooded the Telegram API. Wait for',
-                            err.type.split('_')[2],
-                            'seconds (', err.type.split('_')[2] / 60 / 60, 'hours ) or use different app_id');
-                        window.phone_code_hash = null;
-                        return;
-                    }
-                });
+        const { user } = await this.signInUser(phone, phone_code_hash, code);
 
-            if (window.phone_code_hash === null) return;
-            code = prompt('CODE');
-        }
-
-        const code_hash = window.phone_code_hash;
-
-        await telegramApi.signIn(phone, code_hash, code)
-            .catch(err => {
-                if (err.type === 'SESSION_PASSWORD_NEEDED') {
-                    this._perform2FA();
-                }
-            });
+        console.log('You have logged in as', user);
     }
 
 }
