@@ -10,6 +10,29 @@ const subscribe = (element) => {
     return function (...args) { document.querySelector(element).addEventListener(...args); }
 }
 
+let telegramApi;
+let router;
+let phone;
+
+const validateCode = (event) => {
+    const code = event.target.value;
+
+    const newText = code.replace(/\D/g, '').slice(0, 5);
+
+    if (newText.length === 5) {
+        telegramApi.signInUser(phone, code)
+            .then(() => {
+                router('chat_page', { telegramApi });
+            })
+            .catch(err => {
+                alert("Code invalid!");
+                console.log(err);
+            })
+    }
+
+    event.target.value = newText;
+}
+
 const getAnimationItem = (elem, data, options) => () => lottie.loadAnimation({
     container: document.querySelector(elem),
     renderer: 'svg',
@@ -32,17 +55,23 @@ const translateAnimation = (to, time) => {
     }, 500);
 }
 
-export default (elem, router, data) => {
+export default (elem, rt, data) => {
     elem.innerHTML = template;
 
-    elem.querySelector('.login-code__title').innerHTML = data.phone;
+    telegramApi = data.telegramApi;
+    router = rt;
+    phone = data.phone;
+
+    elem.querySelector('.login-code__title').innerHTML = phone;
 
     const monkey_idle = getAnimationItem('.cd-tgsticker', idle, { auto: true, loop: true });
     const monkey_peek = getAnimationItem('.cd-tgsticker', peek, { auto: false });
 
     window.current_animation = monkey_idle();
+    const loginCode = subscribe('.login-code__code');
 
-    subscribe('.login-code__code')('focus', ({ target }) => { translateAnimation(monkey_peek, (Math.max(target.value.length, 1) + 25)) });
-    subscribe('.login-code__code')('focusout', () => { translateAnimation(monkey_idle) });
-    subscribe('.login-code__code')('input', (event) => { window.current_animation.goToAndStop(Math.max(event.target.value.length, 1) + 25, true); });
+    loginCode('focus', ({ target }) => { translateAnimation(monkey_peek, (Math.max(target.value.length, 1) + 25)) });
+    loginCode('focusout', () => { translateAnimation(monkey_idle) });
+    loginCode('input', (event) => { window.current_animation.goToAndStop(Math.max(event.target.value.length, 1) + 25, true); });
+    loginCode('input', validateCode)
 }

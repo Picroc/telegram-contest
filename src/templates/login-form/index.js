@@ -1,28 +1,12 @@
 import './login-form.scss';
 import template from './login-form.html';
+import { CountryApiService, ApiService } from '../../utils/services';
 
-const cntr = [
-    {
-        name: 'Kek',
-        code: '+7'
-    },
-    {
-        name: 'Ahahaha',
-        code: '+22'
-    },
-    {
-        name: 'Opa',
-        code: '+389'
-    },
-    {
-        name: 'Ahahaha',
-        code: '+200'
-    },
-    {
-        name: 'Ahahaha',
-        code: '+3567'
-    }
+let cntr = [
+
 ]
+
+let router;
 
 const getMaskedValue = (text) => {
     const newText = text.replace(/\D/g, '').slice(0, 15);
@@ -52,8 +36,9 @@ const countriesPopup = (coutries) => {
     return coutries.map(country => {
         return `
             <li class='popup-item'>
+                <img src='${country.flagUrl}' ></img>
                 <span class='popup-item__name'>${country.name}</span>
-                <span class='popup-item__code'>${country.code}</span>
+                <span class='popup-item__code'>+ ${country.code}</span>
             </li>
         `
     })
@@ -112,7 +97,34 @@ const onCountryOut = () => {
     elem.remove();
 }
 
-export default (elem, router) => {
+const routeToNewPage = () => {
+    router('login_code', { phone: document.querySelector('.login-form__phone').value, telegramApi });
+}
+
+const showInvalid = () => {
+    alert('Invalid phone');
+}
+
+const logIn = () => {
+    const phone = document.querySelector('.login-form__phone').value;
+
+    if (!phone || phone.length < 11) {
+        showInvalid();
+        return;
+    }
+
+    telegramApi.init()
+        .then(() => telegramApi.authUser(phone))
+        .then(() => {
+            routeToNewPage();
+        });
+}
+
+const telegramApi = new ApiService();
+const countyApi = new CountryApiService();
+
+export default (elem, rt) => {
+    router = rt;
     elem.innerHTML = template;
 
     const subCountry = subscribe('.login-form__country');
@@ -123,5 +135,10 @@ export default (elem, router) => {
     subCountry('input', onCountryChange);
 
     subscribe('.login-form__phone')('input', handleMaskedInput);
-    subscribe('.login-form__submit')('click', () => { router('login_code', { phone: document.querySelector('.login-form__phone').value }) });
+    subscribe('.login-form__submit')('click', () => { logIn(); });
+
+    countyApi.getAllCountries()
+        .then(countries => {
+            cntr = countries;
+        });
 }

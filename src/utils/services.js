@@ -12,7 +12,7 @@ import localforage from 'localforage';
 
 export class ApiService {
 
-    init() {
+    init = async () => {
         // WARNING! DO NOT USE THE APP_ID AND HASH POSTED BELOW
         // OR YOUR APP WILL BE BLOCKED
 
@@ -27,39 +27,77 @@ export class ApiService {
         }
 
         const server = {
-            dev: true
+            dev: true,
+            webogram: true
         }
+
+        localforage.config({
+            storeName: 'authData',
+            driver: localforage.LOCALSTORAGE
+        });
+
+        console.log(
+            localforage.keys()
+        )
 
         // CHECKING IF ALREADY LOGGED IN
-        this.savedData = {
-            dc2_auth_id: JSON.parse(localStorage.getItem(`localforage/dc2_auth_id`)) || null,
-            dc2_auth_key: JSON.parse(localStorage.getItem(`localforage/dc2_auth_key`)) || null,
-            dc2_server_salt: JSON.parse(localStorage.getItem(`localforage/dc2_server_salt`)) || null
+        this.authRequired = true;
+
+        // CHECKING IF ALREADY LOGGED IN
+        if (localStorage.getItem('keepSignIn')) {
+            this.authRequired = false;
         }
 
-        if (!Object.values(this.savedData).filter(val => val !== null).length) {
-            this.authRequired = true;
+        this.data = {
+            dc2_auth_id: await localforage.getItem('recover/dc2_auth_id'),
+            dc2_auth_key: await localforage.getItem('recover/dc2_auth_key'),
+            dc2_server_salt: await localforage.getItem('recover/dc2_server_salt')
         }
 
-        if (this.authRequired) {
-            this.client = MTProto({
-                server,
-                api,
-                schema,
-                app: { storage: new BrowserStorage() }
-            });
-        } else {
-            this.client = MTProto({
-                server,
-                api,
-                schema,
-                app: {
-                    storage: new BrowserStorage(
-                        localforage.createInstance(this.savedData)
-                    )
-                }
-            });
+        console.log('DATA IS HERE');
+        console.log(this.data);
+
+        await this._updateSession(true);
+
+        this.client = MTProto({
+            server,
+            api,
+            schema,
+            app: {
+                debug: true,
+                storage: new BrowserStorage(localforage)
+            }
+        });
+    }
+
+    _updateSession = async (anyway) => {
+        if (this.authRequired && !anyway) return;
+        if (this.data["dc2_auth_id"]) await localforage.setItem('dc2_auth_id', this.data.dc2_auth_id);
+        if (this.data["dc2_auth_key"]) await localforage.setItem('dc2_auth_key', this.data.dc2_auth_key);
+        if (this.data["dc2_server_salt"]) await localforage.setItem('dc2_server_salt', this.data.dc2_server_salt);
+    }
+
+    _saveSession = async () => {
+        const savedData = {
+            dc2_auth_id: await localforage.getItem('dc2_auth_id'),
+            dc2_auth_key: await localforage.getItem('dc2_auth_key'),
+            dc2_server_salt: await localforage.getItem('dc2_server_salt')
         }
+
+        await localforage.setItem('recover/dc2_auth_id', savedData.dc2_auth_id);
+        await localforage.setItem('recover/dc2_auth_key', savedData.dc2_auth_key);
+        await localforage.setItem('recover/dc2_server_salt', savedData.dc2_server_salt);
+    }
+
+    _monitorStorage = async (message = "Printing current state") => {
+        console.log(message);
+        return await localforage.iterate(function (value, key, iterationNumber) {
+            console.log([key, value]);
+        });
+    }
+
+    _flushLocalData = () => {
+        return localforage.clear();
     }
 
     errorHandle = (err) => {
@@ -93,18 +131,29 @@ export class ApiService {
         }).catch(err => { throw new Error(err) });
 
         this.codeRequested = true;
+        this.phone_code_hash = phone_code_hash;
 
         return { phone_code_hash, phone };
     }
 
-    signInUser = async ({ phone, phone_code_hash, code }) => {
-        return await this.client('auth.SignIn', {
-            phone_number: phone,
-            phone_code_hash: phone_code_hash,
+    signInUser = async (phone, code) => {
+        await this._saveSession();
+        if (!this.codeRequested) { console.log('No code to validate!'); return; }
+
+        return await this.client('auth.signIn', {
+            phone_number: phone.toString(),
+            phone_code_hash: this.phone_code_hash,
             phone_code: code
         })
-            .then(res => { localStorage.setItem('userInfo', JSON.stringify(res)); this.authRequired = false; return res; })
-            .catch(err => { throw new Error(err); }); // TODO PASS TO SIGNUP OR 2FA
+            .then(res => {
+                // localStorage.setItem('keepSignIn', 'yes'); // May be will not work
+                this.authRequired = false;
+                return res;
+            })
+            .catch(err => {
+                this.passwordNeeded = true;
+                throw new Error(err);
+            }); // TODO PASS TO SIGNUP OR 2FA
     }
 
     // FUNCTIONS FOR SRP with Pbkdf2 password calculations
@@ -251,13 +300,58 @@ export class ApiService {
         const { phone_code_hash } = authData;
         const code = prompt('Type in your code');
 
-        const { user } = await this.signInUser(phone, phone_code_hash, code);
+        const user = await this.signInUser(phone, code);
+        if (this.passwordNeeded) await this._perform2FA();
+
+        await this._monitorStorage('after sign in');
 
         console.log('You have logged in as', user);
     }
 
+    _debugInvokeApi = (...args) => this.client(...args);
+
+    // Telegram methods
+
+    getAllChats = async (exclude_ids) => {
+        console.log('Trying to get all chats');
+
+        const res = await this.client('messages.getAllChats', {
+            except_ids: exclude_ids ? [...exclude_ids] : []
+        });
+
+        console.log(res);
+    }
+
+
+
 }
 
 export class CountryApiService {
+    _apiBase = 'https://restcountries.eu/rest/v2';
 
+    _transformCountry = (countryData) => {
+        return {
+            flagUrl: countryData.flag,
+            name: countryData.name,
+            code: countryData.callingCodes[0]
+        }
+    }
+
+    getResource = async (url) => {
+        const res = await fetch(`${this._apiBase}${url}`, {
+            method: 'GET'
+        });
+
+        if (!res.ok) {
+            throw new Error(`Couldn't fetch ${url}, received ${res.status}`);
+        }
+
+        return res.json();
+    }
+
+    getAllCountries = async () => {
+        const res = await this.getResource('/all');
+
+        return res.map(this._transformCountry);
+    }
 }

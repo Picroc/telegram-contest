@@ -4,14 +4,7 @@ import LoginPassword from './templates/login-password';
 
 import './assets/fonts.css';
 import './assets/globals.scss';
-import { ApiService } from './utils/services';
-
-
-const apiService = new ApiService();
-apiService.init();
-
-apiService._debugAuth('+79821759743');
-
+import chatPage from './templates/chat-page';
 
 
 const q = (elem) => document.querySelector(elem);
@@ -41,6 +34,7 @@ const switchPage = (page) => {
         case 'login': return Login;
         case 'login_code': return LoginCode;
         case 'login_password': return LoginPassword;
+        case 'chat_page': return chatPage;
         default: return () => { throw new ReferenceError('No such page') };
     }
 }

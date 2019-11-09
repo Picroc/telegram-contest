@@ -9,6 +9,10 @@
   margin: auto;
   margin-top: 186px;
 
+  &__submit {
+    margin-top: 24px;
+  }
+
   &__popup {
     position: absolute;
     list-style: none;
@@ -35,6 +39,10 @@
       width: 0 !important;
     }
 
+    & img {
+      height: 40px;
+    }
+
     & li {
       box-sizing: border-box;
       display: inline-flex;
@@ -49,6 +57,14 @@
 
       &:hover {
         background: rgb(244, 244, 245);
+      }
+
+      & span {
+        display: inline-block;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }
