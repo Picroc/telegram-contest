@@ -210,9 +210,10 @@
   & input:focus ~ label,
   & input:valid ~ label {
     bottom: 45px;
-    font-size: 14px;
+    font-size: 12px;
 
     background: white;
+    color: rgba(79, 164, 246, 1);
     padding: 2px;
   }
 
@@ -247,7 +248,7 @@
 
 .submit {
   width: 360px;
-  height: 64px;
+  height: 54px;
 
   background: rgb(79, 164, 246);
 
@@ -255,4 +256,7 @@
   border-radius: 10px;
 
   color: white;
+
+  font-size: 15px;
+  font-weight: 500;
 }

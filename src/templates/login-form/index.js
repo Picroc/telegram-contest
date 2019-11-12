@@ -113,10 +113,13 @@ const logIn = () => {
         return;
     }
 
-    telegramApi.init()
-        .then(() => telegramApi.authUser(phone))
-        .then(() => {
-            routeToNewPage();
+    telegramApi.sendCode(phone)
+        .then((res) => {
+            if (res.status === 'SENT')
+                routeToNewPage();
+            else {
+                console.log('ERROR', res);
+            }
         });
 }
 
@@ -124,21 +127,28 @@ const telegramApi = new ApiService();
 const countyApi = new CountryApiService();
 
 export default (elem, rt) => {
-    router = rt;
-    elem.innerHTML = template;
+    telegramApi.isAuth()
+        .then(res => {
+            if (res.status === 'AUTHORIZED') {
+                rt('chat_page', { telegramApi });
+            } else {
+                router = rt;
+                elem.innerHTML = template;
 
-    const subCountry = subscribe('.login-form__country');
-    subCountry('focus', onCountyClick);
-    // subCountry('focusout', onCountryOut);
-    subscribe('body')('click', onCountryOut);
-    subCountry('click', (event) => { event.stopPropagation(); });
-    subCountry('input', onCountryChange);
+                const subCountry = subscribe('.login-form__country');
+                subCountry('focus', onCountyClick);
+                // subCountry('focusout', onCountryOut);
+                subscribe('body')('click', onCountryOut);
+                subCountry('click', (event) => { event.stopPropagation(); });
+                subCountry('input', onCountryChange);
 
-    subscribe('.login-form__phone')('input', handleMaskedInput);
-    subscribe('.login-form__submit')('click', () => { logIn(); });
+                subscribe('.login-form__phone')('input', handleMaskedInput);
+                subscribe('.login-form__submit')('click', () => { logIn(); });
 
-    countyApi.getAllCountries()
-        .then(countries => {
-            cntr = countries;
+                countyApi.getAllCountries()
+                    .then(countries => {
+                        cntr = countries;
+                    });
+            }
         });
 }

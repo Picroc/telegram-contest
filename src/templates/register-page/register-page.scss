@@ -1,0 +1,67 @@
+.register-page {
+  display: flex;
+
+  max-width: 370px;
+
+  flex-direction: column;
+  align-items: center;
+
+  margin: auto;
+  margin-top: 186px;
+
+  &__icon {
+    width: 160px;
+    height: 160px;
+    display: flex;
+
+    background: rgb(79, 164, 246);
+    border-radius: 80px;
+
+    & img {
+      margin: auto;
+      vertical-align: middle;
+
+      filter: invert(1);
+
+      width: 48px;
+    }
+  }
+
+  &__title {
+    display: inline-block;
+    margin-block-start: 0;
+    margin-block-end: 0;
+
+    margin-top: 31px;
+
+    font-size: 30px;
+  }
+
+  &__description {
+    display: inline-block;
+    margin-top: 13px;
+    margin-bottom: 0;
+
+    max-width: 230px;
+
+    color: rgb(106, 108, 111);
+
+    font-size: 16px;
+    font-weight: normal;
+    line-height: 1.4em;
+
+    text-align: center;
+  }
+
+  &__name {
+    margin-top: 50px;
+  }
+
+  &__surname {
+    margin-top: 24px;
+  }
+
+  &__submit {
+    margin-top: 24px;
+  }
+}

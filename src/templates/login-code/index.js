@@ -19,15 +19,24 @@ const validateCode = (event) => {
 
     const newText = code.replace(/\D/g, '').slice(0, 5);
 
+    console.log(code, newText);
+
     if (newText.length === 5) {
-        telegramApi.signInUser(phone, code)
-            .then(() => {
-                router('chat_page', { telegramApi });
+        telegramApi.signIn(newText)
+            .then(res => {
+                if (res.status === 'AUTHORIZED')
+                    router('chat_page', { telegramApi });
+                else if (res.status === 'NOT_REGISTERED') {
+                    router('register_page', { telegramApi });
+                }
+                else {
+                    console.log('Err', res);
+                }
             })
             .catch(err => {
                 alert("Code invalid!");
                 console.log(err);
-            })
+            });
     }
 
     event.target.value = newText;
@@ -73,5 +82,5 @@ export default (elem, rt, data) => {
     loginCode('focus', ({ target }) => { translateAnimation(monkey_peek, (Math.max(target.value.length, 1) + 25)) });
     loginCode('focusout', () => { translateAnimation(monkey_idle) });
     loginCode('input', (event) => { window.current_animation.goToAndStop(Math.max(event.target.value.length, 1) + 25, true); });
-    loginCode('input', validateCode)
+    loginCode('input', validateCode);
 }

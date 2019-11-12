@@ -5,6 +5,7 @@ import LoginPassword from './templates/login-password';
 import './assets/fonts.css';
 import './assets/globals.scss';
 import chatPage from './templates/chat-page';
+import RegisterPage from './templates/register-page/index';
 
 
 const q = (elem) => document.querySelector(elem);
@@ -34,6 +35,7 @@ const switchPage = (page) => {
         case 'login': return Login;
         case 'login_code': return LoginCode;
         case 'login_password': return LoginPassword;
+        case 'register_page': return RegisterPage;
         case 'chat_page': return chatPage;
         default: return () => { throw new ReferenceError('No such page') };
     }
@@ -46,6 +48,26 @@ const routePage = (page, ...args) => {
 
 function render() {
     Login(App, routePage);
+
+    // DO NOT DELETE, DEBUG EXAMPLE OF UPLOADING FILE!!!!!!!!!!!
+
+    // const test_elem = document.createElement('div')
+    // test_elem.innerHTML = '<input class="test_inp" type="file"><button class="test_btn">Submit</button>';
+    // document.body.appendChild(test_elem);
+
+    // document.querySelector('.test_btn').addEventListener('click', () => {
+    //     const filedata = document.querySelector('.test_inp').files;
+    //     const payload = new FormData();
+    //     payload.append('attach', filedata.item(0));
+
+    //     fetch('http://localhost:5000/uploadFile', {
+    //         method: 'POST',
+    //         credentials: 'include',
+    //         body: payload
+    //     })
+    //         .then(() => { console.log('SENT') })
+    //         .catch(err => { console.log(err) });
+    // });
 }
 
 function onDocumentReady(callback) {

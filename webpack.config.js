@@ -52,7 +52,12 @@ const common = {
                 test: /\.html$/,
                 exclude: /node_modules/,
                 use: { loader: 'html-loader' }
-            }
+            },
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
         ]
     },
     plugins: [
