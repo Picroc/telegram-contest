@@ -1,5 +1,5 @@
 export class ApiService {
-    _apiBase = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : "http://localhost:5000";
+    _apiBase = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : "http://3.123.224.41:5000";
 
     getResource = async (url) => {
         const res = await fetch(`${this._apiBase}${url}`, {

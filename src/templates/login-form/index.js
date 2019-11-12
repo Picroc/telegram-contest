@@ -127,28 +127,33 @@ const telegramApi = new ApiService();
 const countyApi = new CountryApiService();
 
 export default (elem, rt) => {
+    router = rt;
+    elem.innerHTML = template;
+
+    const subCountry = subscribe('.login-form__country');
+    subCountry('focus', onCountyClick);
+    // subCountry('focusout', onCountryOut);
+    subscribe('body')('click', onCountryOut);
+    subCountry('click', (event) => { event.stopPropagation(); });
+    subCountry('input', onCountryChange);
+
+    subscribe('.login-form__phone')('input', handleMaskedInput);
+    subscribe('.login-form__submit')('click', () => { logIn(); });
+
+    countyApi.getAllCountries()
+        .then(countries => {
+            cntr = countries;
+        });
+
     telegramApi.isAuth()
         .then(res => {
             if (res.status === 'AUTHORIZED') {
                 rt('chat_page', { telegramApi });
             } else {
-                router = rt;
-                elem.innerHTML = template;
-
-                const subCountry = subscribe('.login-form__country');
-                subCountry('focus', onCountyClick);
-                // subCountry('focusout', onCountryOut);
-                subscribe('body')('click', onCountryOut);
-                subCountry('click', (event) => { event.stopPropagation(); });
-                subCountry('input', onCountryChange);
-
-                subscribe('.login-form__phone')('input', handleMaskedInput);
-                subscribe('.login-form__submit')('click', () => { logIn(); });
-
-                countyApi.getAllCountries()
-                    .then(countries => {
-                        cntr = countries;
-                    });
+                throw new Error(res);
             }
+        })
+        .catch(err => {
+            console.log(err);
         });
 }
