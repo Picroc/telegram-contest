@@ -52,3 +52,37 @@ export class CountryApiService {
         return res.map(this._transformCountry);
     }
 }
+
+class TelegramApiWrapper {
+    getDialogs = async (limit) => {
+        const { result } = await telegramApi.getDialogs(0, limit);
+        console.log('CHATS', result);
+
+        const { chats, dialogs, messages, users } = result;
+
+        const dialog_items = [];
+
+        await messages.forEach((message, idx) => {
+            const { first_name, last_name, status } = users[idx];
+            // console.log(from_user);
+            dialog_items.push({
+                dialogTitle: first_name + " " + last_name,
+                isOnline: status._ === "userStatusOnline" ? true : false,
+                text: message.message,
+                time: message.date,
+                dialog_id: dialogs[idx].peer.user_id
+            });
+        });
+
+        console.log(dialog_items);
+
+        dialog_items.sort((a, b) => a.time - b.time);
+
+        console.log(dialog_items);
+
+        return dialog_items;
+    }
+}
+
+const tWrapper = new TelegramApiWrapper();
+tWrapper.getDialogs(20);
