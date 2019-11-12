@@ -10,7 +10,6 @@ const subscribe = (element) => {
     return function (...args) { document.querySelector(element).addEventListener(...args); }
 }
 
-let telegramApi;
 let router;
 let phone;
 
@@ -22,20 +21,17 @@ const validateCode = (event) => {
     console.log(code, newText);
 
     if (newText.length === 5) {
-        telegramApi.signIn(newText)
+        telegramApi.signIn(phone, window.phone_code_hash, newText)
             .then(res => {
-                if (res.status === 'AUTHORIZED')
-                    router('chat_page', { telegramApi });
-                else if (res.status === 'NOT_REGISTERED') {
-                    router('register_page', { telegramApi });
-                }
-                else {
-                    console.log('Err', res);
-                }
+                router('chat_page');
             })
             .catch(err => {
-                alert("Code invalid!");
-                console.log(err);
+                if (err.type === 'PHONE_NUMBER_UNOCCUPIED') {
+                    router('register_page', { phone, code });
+                } else {
+                    alert("Code invalid!");
+                    console.log(err);
+                }
             });
     }
 
@@ -67,7 +63,6 @@ const translateAnimation = (to, time) => {
 export default (elem, rt, data) => {
     elem.innerHTML = template;
 
-    telegramApi = data.telegramApi;
     router = rt;
     phone = data.phone;
 

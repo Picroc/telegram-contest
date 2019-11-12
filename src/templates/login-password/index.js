@@ -65,6 +65,10 @@ const animFromCloseToIdle = (reverse) => {
     }
 }
 
+const handlePassword = () => {
+
+}
+
 export default (elem, router) => {
     elem.innerHTML = template;
 
@@ -72,4 +76,5 @@ export default (elem, router) => {
 
     subscribe('.login-password__password')('focus', () => { animFromCloseToIdle(true) });
     subscribe('.login-password__password')('focusout', () => { animFromCloseToIdle(false) });
+    subscribe('.login-password__submit')('click', () => { })
 }

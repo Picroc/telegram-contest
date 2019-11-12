@@ -1,6 +1,7 @@
 import './login-form.scss';
 import template from './login-form.html';
-import { CountryApiService, ApiService } from '../../utils/services';
+import { CountryApiService } from '../../utils/services';
+import * as emojiFlags from 'emoji-flags';
 
 let cntr = [
 
@@ -34,9 +35,10 @@ const subscribe = (element) => {
 
 const countriesPopup = (coutries) => {
     return coutries.map(country => {
+        // console.log(emojiFlags[country.alpha])
         return `
             <li class='popup-item'>
-                <img src='${country.flagUrl}' ></img>
+                <span class='popup-item__flag'>${emojiFlags[country.alpha] ? emojiFlags[country.alpha].emoji : 'NONE'}</span>
                 <span class='popup-item__name'>${country.name}</span>
                 <span class='popup-item__code'>+ ${country.code}</span>
             </li>
@@ -115,40 +117,43 @@ const logIn = () => {
 
     telegramApi.sendCode(phone)
         .then((res) => {
-            if (res.status === 'SENT')
-                routeToNewPage();
-            else {
-                console.log('ERROR', res);
-            }
+            telegramApi.sendSms(phone, res.phone_code_hash, res.next_type)
+                .then(() => {
+                    window.phone_code_hash = res.phone_code_hash;
+                    router('login_code', { phone: phone });
+                });
         });
 }
 
-const telegramApi = new ApiService();
 const countyApi = new CountryApiService();
 
 export default (elem, rt) => {
-    telegramApi.isAuth()
-        .then(res => {
-            if (res.status === 'AUTHORIZED') {
-                rt('chat_page', { telegramApi });
-            } else {
-                router = rt;
-                elem.innerHTML = template;
+    router = rt;
+    elem.innerHTML = template;
 
-                const subCountry = subscribe('.login-form__country');
-                subCountry('focus', onCountyClick);
-                // subCountry('focusout', onCountryOut);
-                subscribe('body')('click', onCountryOut);
-                subCountry('click', (event) => { event.stopPropagation(); });
-                subCountry('input', onCountryChange);
+    const subCountry = subscribe('.login-form__country');
+    subCountry('focus', onCountyClick);
+    // subCountry('focusout', onCountryOut);
+    subscribe('body')('click', onCountryOut);
+    subCountry('click', (event) => { event.stopPropagation(); });
+    subCountry('input', onCountryChange);
 
-                subscribe('.login-form__phone')('input', handleMaskedInput);
-                subscribe('.login-form__submit')('click', () => { logIn(); });
+    subscribe('.login-form__phone')('input', handleMaskedInput);
+    subscribe('.login-form__submit')('click', () => { logIn(); });
 
-                countyApi.getAllCountries()
-                    .then(countries => {
-                        cntr = countries;
-                    });
-            }
+    window.updateRipple();
+
+    countyApi.getAllCountries()
+        .then(countries => {
+            cntr = countries;
+        });
+
+    telegramApi.getUserInfo().then((user) => {
+        if (user.id) {
+            router('chat_page');
+        }
+    })
+        .catch(err => {
+            console.log(err);
         });
 }

@@ -7,8 +7,9 @@ const subscribe = (element) => {
     return function (...args) { document.querySelector(element).addEventListener(...args); }
 }
 
-let telegramApi;
 let router;
+let phone;
+let code;
 
 const handleRegister = () => {
     const name = document.querySelector('.register-page__name').value;
@@ -19,13 +20,9 @@ const handleRegister = () => {
         return;
     }
 
-    telegramApi.signUp(name, surname)
+    telegramApi.signUp(phone, window.phone_code_hash, code, name, surname)
         .then(res => {
-            if (res.status === 'USER_CREATED') {
-                router('chat_page', { telegramApi });
-            } else {
-                alert('Code is wrong!');
-            }
+            router('chat_page');
         })
         .catch(err => {
             console.log('ERROR: ', err);
@@ -35,7 +32,8 @@ const handleRegister = () => {
 export default (elem, rt, data) => {
     elem.innerHTML = template;
 
-    telegramApi = data.telegramApi;
+    phone = data.phone;
+    code = data.code;
     router = rt;
 
     subscribe('.register-page__icon')('click', () => {
