@@ -1,6 +1,7 @@
 import './login-form.scss';
 import template from './login-form.html';
-import { CountryApiService, ApiService } from '../../utils/services';
+import { CountryApiService } from '../../utils/services';
+import * as emojiFlags from 'emoji-flags';
 
 let cntr = [
 
@@ -34,9 +35,10 @@ const subscribe = (element) => {
 
 const countriesPopup = (coutries) => {
     return coutries.map(country => {
+        // console.log(emojiFlags[country.alpha])
         return `
             <li class='popup-item'>
-                <img src='${country.flagUrl}' ></img>
+                <span class='popup-item__flag'>${emojiFlags[country.alpha] ? emojiFlags[country.alpha].emoji : 'NONE'}</span>
                 <span class='popup-item__name'>${country.name}</span>
                 <span class='popup-item__code'>+ ${country.code}</span>
             </li>
@@ -115,15 +117,14 @@ const logIn = () => {
 
     telegramApi.sendCode(phone)
         .then((res) => {
-            if (res.status === 'SENT')
-                routeToNewPage();
-            else {
-                console.log('ERROR', res);
-            }
+            telegramApi.sendSms(phone, res.phone_code_hash, res.next_type)
+                .then(() => {
+                    window.phone_code_hash = res.phone_code_hash;
+                    router('login_code', { phone: phone });
+                });
         });
 }
 
-const telegramApi = new ApiService();
 const countyApi = new CountryApiService();
 
 export default (elem, rt) => {
@@ -140,19 +141,18 @@ export default (elem, rt) => {
     subscribe('.login-form__phone')('input', handleMaskedInput);
     subscribe('.login-form__submit')('click', () => { logIn(); });
 
+    window.updateRipple();
+
     countyApi.getAllCountries()
         .then(countries => {
             cntr = countries;
         });
 
-    telegramApi.isAuth()
-        .then(res => {
-            if (res.status === 'AUTHORIZED') {
-                rt('chat_page', { telegramApi });
-            } else {
-                throw new Error(res);
-            }
-        })
+    telegramApi.getUserInfo().then((user) => {
+        if (user.id) {
+            router('chat_page');
+        }
+    })
         .catch(err => {
             console.log(err);
         });

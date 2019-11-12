@@ -1,61 +1,26 @@
-export class ApiService {
-    _apiBase = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : "http://3.123.224.41:5000";
-
-    getResource = async (url) => {
-        const res = await fetch(`${this._apiBase}${url}`, {
-            method: 'GET',
-            "credentials": "include"
-        });
-
-        if (!res.ok) {
-            throw new Error(`Couldn't fetch ${url}, received ${res.status}`);
-        }
-
-        return res.json();
+telegramApi.setConfig({
+    app: {
+        id: 1166576, /* App ID */
+        hash: '99db6db0082e27973ee4357e4637aadc', /* App hash */
+        version: '0.0.1' /* App version */
+    },
+    server: {
+        test: [
+            {
+                id: 2, /* DC ID */
+                host: '149.154.167.40',
+                port: 443
+            }
+        ],
+        production: [
+            {
+                id: 2, /* DC ID */
+                host: '149.154.167.40',
+                port: 443
+            }
+        ]
     }
-
-    postResource = async (url, data) => {
-        const res = await fetch(`${this._apiBase}${url}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": 'application/json',
-                "Access-Control-Request-Headers": "session"
-            },
-            body: JSON.stringify(data),
-            "credentials": "include"
-        });
-
-        if (!res.ok) {
-            throw new Error(`Couldn't fetch ${url}, received ${res.status}`);
-        }
-
-        return res.json();
-    }
-
-    sendCode = async (phone) => {
-        return await this.postResource('/sendCode', {
-            phone_number: phone.replace(/\s/g, '')
-        });
-    }
-
-    signIn = async (code, password) => {
-        return await this.postResource('/signIn', {
-            code: code,
-            password: password || ''
-        });
-    }
-
-    signUp = async (name, surname) => {
-        return await this.postResource('/signUp', {
-            name: name,
-            surname: surname || ''
-        });
-    }
-
-    isAuth = async () => {
-        return await this.getResource('/isAuthorized');
-    }
-}
+});
 
 export class CountryApiService {
     _apiBase = 'https://restcountries.eu/rest/v2';
@@ -64,7 +29,8 @@ export class CountryApiService {
         return {
             flagUrl: countryData.flag,
             name: countryData.name,
-            code: countryData.callingCodes[0]
+            code: countryData.callingCodes[0],
+            alpha: countryData.alpha2Code
         }
     }
 

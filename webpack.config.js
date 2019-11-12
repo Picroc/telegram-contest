@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 const merge = require('webpack-merge');
 
 
@@ -65,7 +66,14 @@ const common = {
             filename: 'index.html',
             template: path.join(__dirname, '/public/index.html'),
             inject: true
-        })
+        }),
+        new AddAssetHtmlPlugin(
+            [
+                {
+                    filepath: require.resolve("./src/utils/telegramApi.min.js"),
+                },
+            ]
+        )
     ]
 }
 
