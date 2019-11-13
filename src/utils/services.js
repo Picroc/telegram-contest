@@ -85,4 +85,4 @@ class TelegramApiWrapper {
 }
 
 const tWrapper = new TelegramApiWrapper();
-tWrapper.getDialogs(20);
+// tWrapper.getDialogs(20);
