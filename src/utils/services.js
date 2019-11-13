@@ -53,7 +53,7 @@ export class CountryApiService {
     }
 }
 
-class TelegramApiWrapper {
+export class TelegramApiWrapper {
     getDialogs = async (limit) => {
         const { result } = await telegramApi.getDialogs(0, limit);
         console.log('CHATS', result);
@@ -74,8 +74,6 @@ class TelegramApiWrapper {
             });
         });
 
-        console.log(dialog_items);
-
         dialog_items.sort((a, b) => a.time - b.time);
 
         console.log(dialog_items);
@@ -83,6 +81,3 @@ class TelegramApiWrapper {
         return dialog_items;
     }
 }
-
-const tWrapper = new TelegramApiWrapper();
-// tWrapper.getDialogs(20);
