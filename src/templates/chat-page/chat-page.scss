@@ -15,7 +15,8 @@ $hover-color: #f1f3f4;
   align-items: center;
 }
 .dialog {
-  height: 6vh;
+  max-height: 10vh;
+  min-height: 50px;
   display: flex;
   align-items: center;
   margin: 0 6px;
@@ -30,6 +31,7 @@ $hover-color: #f1f3f4;
   &__main {
     display: flex;
     flex-direction: column;
+    width: 60%;
   }
 
   &__avatar-wrapper {
@@ -54,6 +56,9 @@ $hover-color: #f1f3f4;
     color: $secondary;
     margin-top: 4px;
     font-style: 14px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   &__meta {

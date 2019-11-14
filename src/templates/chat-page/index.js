@@ -2,6 +2,7 @@ import './chat-page.scss';
 import template from './chat-page.html';
 import dialog from './dialog';
 import menu from './menu';
+import { TelegramApiWrapper } from '../../utils/services';
 
 const startLoading = (elem) => {
     const loader = document.createElement('div');
@@ -51,8 +52,12 @@ const data = [{
 const loadData = (timeout) => setTimeout(() => {
     const userDialogs = document.createElement('div');
     userDialogs.id = 'user-dialogs';
-    userDialogs.innerHTML = data.map(info => dialog(...Object.values(info))).join('');
-    
+    // userDialogs.innerHTML = data.map(info => dialog(...Object.values(info))).join('');
+    const ta = new TelegramApiWrapper();
+    ta.getDialogs(2).then(data => {
+        console.log(data[0].title)
+        userDialogs.innerHTML = data.map(({avatar, title, text, time}) => dialog(avatar, title, text, time)).join('')
+    })
     const left = document.getElementById('left');
     stopLoading(left);
     menu(left);

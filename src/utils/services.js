@@ -54,6 +54,32 @@ export class CountryApiService {
 }
 
 export class TelegramApiWrapper {
+
+    _convertDate = (date) => {
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+        let time = new Date(date * 1000);
+        const currentTime = new Date();
+
+        const startOfTheWeek = (date) => {
+            const now = date ? new Date(date) : new Date();
+            now.setHours(0, 0, 0, 0);
+            const monday = new Date(now);
+            monday.setDate(monday.getDate() - monday.getDay() + 1);
+            return monday
+        }
+
+        if (time.getDay() - currentTime.getDay() === 0) {
+            time = `${time.getHours()}:${time.getMinutes()}`
+        } else if (time.getDay() > startOfTheWeek(time)) {
+            time = days[time.getDay()]
+        } else {
+            time = time.toLocaleDateString().replace(/[/]/g, '.');
+        }
+
+        return time;
+    }
+
     getDialogs = async (limit) => {
         const { result } = await telegramApi.getDialogs(0, limit);
         console.log('CHATS', result);
@@ -64,13 +90,14 @@ export class TelegramApiWrapper {
 
         await messages.forEach((message, idx) => {
             const { first_name, last_name, status } = users[idx];
-            // console.log(from_user);
+            const { date } = message;
+
             dialog_items.push({
-                dialogTitle: first_name + " " + last_name,
+                title: first_name + " " + last_name,
                 isOnline: status._ === "userStatusOnline" ? true : false,
                 text: message.message,
-                time: message.date,
-                dialog_id: dialogs[idx].peer.user_id
+                time: this._convertDate(date),
+                id: dialogs[idx].peer.user_id
             });
         });
 
