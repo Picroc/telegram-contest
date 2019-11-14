@@ -49,24 +49,25 @@ const stopLoading = (elem) => {
 // },
 // ];
 
-const loadData = (timeout) => setTimeout(() => {
+const loadData = () => {
     const userDialogs = document.createElement('div');
     userDialogs.id = 'user-dialogs';
     // userDialogs.innerHTML = data.map(info => dialog(...Object.values(info))).join('');
     const ta = new TelegramApiWrapper();
     ta.getDialogs(2).then(data => {
         console.log(data[0].title)
-        userDialogs.innerHTML = data.map(({avatar, title, text, time}) => dialog(avatar, title, text, time)).join('')
-    })
-    const left = document.getElementById('left');
-    // ta.spamMyself('dorowa baran');
-    stopLoading(left);
-    menu(left);
-    left.appendChild(userDialogs);
-}, timeout);
+        userDialogs.innerHTML = data.map(({ avatar, title, text, time }) => dialog(avatar, title, text, time)).join('');
+        const left = document.getElementById('left');
+        telegramApi.getUserPhoto('base64', 'small').then(data => console.log(data));
+        stopLoading(left);
+        menu(left);
+        left.appendChild(userDialogs);
+        window.updateRipple();
+    });
+};
 
 
 export default (elem) => {
     elem.innerHTML = template;
-    loadData(1000);
+    loadData();
 }

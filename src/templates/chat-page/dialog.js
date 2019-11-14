@@ -1,5 +1,5 @@
 export default (avatar = 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg', title, text, time) => `
-<div class="dialog" name=${title}>
+<div class="dialog" anim="ripple" name=${title}>
     <div class="dialog__avatar-wrapper">
         <img src="${avatar}" alt="avatar" class="dialog__avatar">
     </div>

@@ -24,6 +24,10 @@ $hover-color: #f1f3f4;
   margin: 0 8px;
   border-radius: 8px;
 
+  --ripple-background: black;
+  --ripple-opacity: 0.08;
+  --ripple-duration: 600ms;
+
   &:hover {
     background-color: $hover-color;
     cursor: pointer;
@@ -65,7 +69,7 @@ $hover-color: #f1f3f4;
   }
 
   &__meta {
-    padding-left: 4px;
+    padding: 0 8px 0 4px;
     justify-self: right;
     color: $secondary;
     font-size: 12px;
