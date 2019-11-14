@@ -65,7 +65,7 @@ export class TelegramApiWrapper {
             const now = date ? new Date(date) : new Date();
             now.setHours(0, 0, 0, 0);
             const monday = new Date(now);
-            monday.setDate(monday.getDate() - monday.getDay() + 1);
+            monday.setDate(1);
             return monday
         }
 
@@ -75,9 +75,20 @@ export class TelegramApiWrapper {
             time = days[time.getDay()]
         } else {
             time = time.toLocaleDateString().replace(/[/]/g, '.');
+            time = time.slice(0, 6) + time.slice(8)
         }
 
         return time;
+    }
+
+    spamMyself = async (message) => {
+        telegramApi.invokeApi('messages.sendMessage', {
+            peer: {
+                _: 'inputPeerSelf'
+            },
+            message,
+            random_id: Math.round(Math.random() * 100000)
+        })
     }
 
     getDialogs = async (limit) => {

@@ -16,38 +16,38 @@ const stopLoading = (elem) => {
     elem.classList.remove('loading');
 }
 
-const data = [{
-    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-    name: 'Antoha',
-    shortMsg: 'Dorowa',
-    meta: 'kek'
-}, {
-    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-    name: 'DRUG-DEALER',
-    shortMsg: 'Dorowa',
-    meta: 'kek'
-}, {
-    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-    name: 'DRUGAN',
-    shortMsg: 'Dorowa',
-    meta: 'kek'
-}, {
-    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-    name: 'Mama',
-    shortMsg: 'Dorowa',
-    meta: 'kek'
-}, {
-    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-    name: 'Bro',
-    shortMsg: 'Dorowa',
-    meta: 'kek'
-}, {
-    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-    name: 'Batya',
-    shortMsg: 'Dorowa',
-    meta: 'kek'
-},
-];
+// const data = [{
+//     avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
+//     name: 'Antoha',
+//     shortMsg: 'Dorowa',
+//     meta: 'kek'
+// }, {
+//     avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
+//     name: 'DRUG-DEALER',
+//     shortMsg: 'Dorowa',
+//     meta: 'kek'
+// }, {
+//     avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
+//     name: 'DRUGAN',
+//     shortMsg: 'Dorowa',
+//     meta: 'kek'
+// }, {
+//     avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
+//     name: 'Mama',
+//     shortMsg: 'Dorowa',
+//     meta: 'kek'
+// }, {
+//     avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
+//     name: 'Bro',
+//     shortMsg: 'Dorowa',
+//     meta: 'kek'
+// }, {
+//     avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
+//     name: 'Batya',
+//     shortMsg: 'Dorowa',
+//     meta: 'kek'
+// },
+// ];
 
 const loadData = (timeout) => setTimeout(() => {
     const userDialogs = document.createElement('div');
@@ -59,6 +59,7 @@ const loadData = (timeout) => setTimeout(() => {
         userDialogs.innerHTML = data.map(({avatar, title, text, time}) => dialog(avatar, title, text, time)).join('')
     })
     const left = document.getElementById('left');
+    // ta.spamMyself('dorowa baran');
     stopLoading(left);
     menu(left);
     left.appendChild(userDialogs);
