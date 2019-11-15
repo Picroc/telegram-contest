@@ -6,7 +6,6 @@ import './assets/fonts.css';
 import './assets/globals.scss';
 import chatPage from './templates/chat-page';
 import RegisterPage from './templates/register-page/index';
-import { TelegramApiWrapper } from './utils/services';
 
 
 const q = (elem) => document.querySelector(elem);
@@ -59,9 +58,9 @@ window.updateRipple = () => {
 }
 
 function render() {
-    Login(App, routePage);
-    const tWrapper = new TelegramApiWrapper();
-    tWrapper.getDialogs(10);
+    LoginPassword(App, routePage);
+    // const tWrapper = new TelegramApiWrapper();
+    // tWrapper.getDialogs(10);
 
     // DO NOT DELETE, DEBUG EXAMPLE OF UPLOADING FILE!!!!!!!!!!!
 

@@ -4,11 +4,11 @@ const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 const merge = require('webpack-merge');
 
 
-
 const common = {
     entry: {
         index: path.join(__dirname, 'src') + '/App.js'
     },
+    devtool: 'source-map',
     output: {
         filename: '[name].bundle.js',
         path: path.join(__dirname, 'build')

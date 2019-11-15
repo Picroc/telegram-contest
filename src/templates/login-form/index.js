@@ -70,7 +70,8 @@ const subscribePopupItems = () => {
 }
 
 const filterCountries = (value) => {
-    return cntr.filter(el => el.name.includes(value));
+    const filValue = value.toLowerCase();
+    return cntr.filter(el => el.name.toLowerCase().includes(filValue));
 }
 
 const onCountyClick = (event) => {

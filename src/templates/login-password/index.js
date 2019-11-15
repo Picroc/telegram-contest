@@ -4,10 +4,15 @@ import './login-password.scss';
 import lottie from 'lottie-web';
 
 import idle from '../../static/animation/monkey_idle.json';
-import close from '../../static/animation/monkey_close.json';
 import peek from '../../static/animation/monkey_peek.json';
-import close_idle from '../../static/animation/monkey_close_idle.json';
-import close_peek from '../../static/animation/monkey_close_peek.json'
+import close_peek from '../../static/animation/monkey_close_peek.json';
+
+let router;
+
+const state = {
+    password: true,
+    closed: false
+}
 
 const subscribe = (element) => {
     return function (...args) { document.querySelector(element).addEventListener(...args); }
@@ -28,20 +33,11 @@ const animFromCloseToPeek = (reverse) => {
 
     if (!reverse) {
 
-        window.current_animation = getAnimationItem(elem, close_peek, { auto: true })();
-        window.current_animation.addEventListener('onComplete', () => {
-            window.current_animation.destroy();
-
-            window.current_animation = getAnimationItem(elem, peek, { auto: true, loop: true })();
-        });
+        window.current_animation = getAnimationItem(elem, peek, { auto: true })();
+        window.current_animation.playSegments([32, 20], true);
     } else {
-        window.current_animation = getAnimationItem(elem, close_peek, { auto: true })();
-        window.current_animation.setDirection(-1);
-        window.current_animation.addEventListener('onComplete', () => {
-            window.current_animation.destroy();
-
-            window.current_animation = getAnimationItem(elem, close, { auto: true, loop: true })();
-        });
+        window.current_animation = getAnimationItem(elem, peek, { auto: true })();
+        window.current_animation.playSegments([20, 32], true);
     }
 }
 
@@ -52,29 +48,47 @@ const animFromCloseToIdle = (reverse) => {
 
     if (!reverse) {
 
-        window.current_animation = getAnimationItem(elem, close, { auto: true })();
-        window.current_animation.goToAndPlay(50, true);
+        window.current_animation = getAnimationItem(elem, close_peek, { auto: true })();
+        window.current_animation.playSegments([25, 0], true);
         window.current_animation.addEventListener('complete', () => {
             window.current_animation.destroy();
 
             window.current_animation = getAnimationItem(elem, idle, { auto: true, loop: true })();
         });
     } else {
-        window.current_animation = getAnimationItem(elem, close, { auto: true })();
-        window.current_animation.playSegments([10, 50], true);
+        window.current_animation = getAnimationItem(elem, close_peek, { auto: true })();
+        window.current_animation.playSegments([0, 25], true);
+        window.current_animation.addEventListener('complete', () => {
+            window.current_animation.destroy();
+            window.current_animation = getAnimationItem(elem, peek, { auto: true })();
+            window.current_animation.goToAndStop(0, true);
+        });
     }
 }
 
-const handlePassword = () => {
-
+const handlePassword = (password) => {
+    telegramApi.signIn2FA(password)
+        .then(res => { console.log(res); router('chat_page'); })
+        .catch(err => { console.log(err); alert('Wrong password!'); });
 }
 
-export default (elem, router) => {
+export default (elem, rt) => {
     elem.innerHTML = template;
+    router = rt;
 
     window.current_animation = getAnimationItem('.cd-tgsticker', idle, { auto: true, loop: true })();
 
-    subscribe('.login-password__password')('focus', () => { animFromCloseToIdle(true) });
-    subscribe('.login-password__password')('focusout', () => { animFromCloseToIdle(false) });
-    subscribe('.login-password__submit')('click', () => { })
+    subscribe('.login-password__password')('focus', () => { if (!state.closed) { animFromCloseToIdle(true); state.closed = true; } });
+    // subscribe('.login-password__password')('focusout', () => { if (state.closed) { animFromCloseToIdle(false); state.closed = false; } });
+    subscribe('.login-password__submit')('click', () => {
+        handlePassword(document.querySelector('.login-password__password').value);
+    });
+    subscribe('.login-password__eye')('click', () => {
+        document.querySelector('.login-password__password').setAttribute('type', state.password ? 'text' : 'password');
+        animFromCloseToPeek(!state.password);
+        state.password = !state.password;
+        state.closed = true;
+    });
+
+    window.updateRipple();
 }

@@ -23,11 +23,16 @@ const validateCode = (event) => {
     if (newText.length === 5) {
         telegramApi.signIn(phone, window.phone_code_hash, newText)
             .then(res => {
+                if (res.type === 'SESSION_PASSWORD_NEEDED') {
+                    router('login_password');
+                }
                 router('chat_page');
             })
             .catch(err => {
                 if (err.type === 'PHONE_NUMBER_UNOCCUPIED') {
                     router('register_page', { phone, code });
+                } else if (err.type === 'SESSION_PASSWORD_NEEDED') {
+                    router('login_password');
                 } else {
                     alert("Code invalid!");
                     console.log(err);
