@@ -2,6 +2,7 @@ import './login-form.scss';
 import template from './login-form.html';
 import { CountryApiService } from '../../utils/services';
 import * as emojiFlags from 'emoji-flags';
+import { htmlToElement } from '../../helpers/index';
 
 let cntr = [
 
@@ -139,7 +140,6 @@ export default (elem, rt) => {
     subscribe('body')('click', onCountryOut);
     subCountry('click', (event) => { event.stopPropagation(); });
     subCountry('input', onCountryChange);
-
     subscribe('.login-form__phone')('input', handleMaskedInput);
     subscribe('.login-form__submit')('click', () => { logIn(); });
 

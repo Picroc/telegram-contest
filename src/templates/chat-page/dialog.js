@@ -1,11 +1,9 @@
-export default (avatar, name, shortMsg, meta) => `
-<div class="dialog" name=${name}>
-    <div class="dialog__avatar-wrapper">
+export default ({ avatar = 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg', title, isOnline, text, time }) => `
+<div class="dialog" anim="ripple">
+    <div class="dialog__avatar-wrapper${isOnline ? ' dialog__avatar_online' : ''}">
         <img src="${avatar}" alt="avatar" class="dialog__avatar">
     </div>
-    <div class="dialog__main">
-        <div class="dialog__name">${name}</div>
-        <div class="dialog__short-msg">${shortMsg}</div>
-    </div>
-    <div class="dialog__meta">${meta}</div>
+    <div class="dialog__name">${title}</div>
+    <div class="dialog__short-msg">${text}</div>
+    <div class="dialog__meta">${time}</div>
 </div>`

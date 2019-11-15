@@ -54,6 +54,43 @@ export class CountryApiService {
 }
 
 export class TelegramApiWrapper {
+
+    _convertDate = (date) => {
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+        let time = new Date(date * 1000);
+        const currentTime = new Date();
+
+        const startOfTheWeek = (date) => {
+            const now = date ? new Date(date) : new Date();
+            now.setHours(0, 0, 0, 0);
+            const monday = new Date(now);
+            monday.setDate(1);
+            return monday
+        }
+
+        if (time.getDay() - currentTime.getDay() === 0) {
+            time = `${time.getHours()}:${time.getMinutes()}`
+        } else if (time.getDay() > startOfTheWeek(time)) {
+            time = days[time.getDay()]
+        } else {
+            time = time.toLocaleDateString().replace(/[/]/g, '.');
+            time = time.slice(0, 6) + time.slice(8)
+        }
+
+        return time;
+    }
+
+    spamMyself = async (message) => {
+        telegramApi.invokeApi('messages.sendMessage', {
+            peer: {
+                _: 'inputPeerSelf'
+            },
+            message,
+            random_id: Math.round(Math.random() * 100000)
+        })
+    }
+
     getDialogs = async (limit) => {
         const { result } = await telegramApi.getDialogs(0, limit);
         console.log('CHATS', result);
@@ -64,12 +101,13 @@ export class TelegramApiWrapper {
 
         await messages.forEach((message, idx) => {
             const { first_name, last_name, status } = users[idx];
-            // console.log(from_user);
+            const { date } = message;
+
             dialog_items.push({
-                dialogTitle: first_name + " " + last_name,
+                title: first_name + " " + last_name,
                 isOnline: status._ === "userStatusOnline" ? true : false,
                 text: message.message,
-                time: message.date,
+                time: this._convertDate(date),
                 dialog_peer: dialogs[idx].peer
             });
         });

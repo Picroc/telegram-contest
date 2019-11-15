@@ -2,11 +2,14 @@ import './chat-page.scss';
 import template from './chat-page.html';
 import dialog from './dialog';
 import menu from './menu';
+import { TelegramApiWrapper } from '../../utils/services';
+import { subscribe, htmlToElement } from '../../helpers/index';
 
 const startLoading = (elem) => {
     const loader = document.createElement('div');
+    elem.innerHTML = '';
     loader.className = 'spinner';
-    elem.innerHTML = loader;
+    elem.appendChild(loader);
     elem.classList.add('loading');
 }
 
@@ -15,52 +18,35 @@ const stopLoading = (elem) => {
     elem.classList.remove('loading');
 }
 
-const data = [{
-    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-    name: 'Antoha',
-    shortMsg: 'Dorowa',
-    meta: 'kek'
-}, {
-    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-    name: 'DRUG-DEALER',
-    shortMsg: 'Dorowa',
-    meta: 'kek'
-}, {
-    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-    name: 'DRUGAN',
-    shortMsg: 'Dorowa',
-    meta: 'kek'
-}, {
-    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-    name: 'Mama',
-    shortMsg: 'Dorowa',
-    meta: 'kek'
-}, {
-    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-    name: 'Bro',
-    shortMsg: 'Dorowa',
-    meta: 'kek'
-}, {
-    avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-    name: 'Batya',
-    shortMsg: 'Dorowa',
-    meta: 'kek'
-},
-];
+const loadDialog = ({ id }) => {
+    console.log(id);
+    const right = document.getElementById('right');
+    startLoading(right);
+};
 
-const loadData = (timeout) => setTimeout(() => {
+const loadData = () => {
     const userDialogs = document.createElement('div');
     userDialogs.id = 'user-dialogs';
-    userDialogs.innerHTML = data.map(info => dialog(...Object.values(info))).join('');
-    
+    const ta = new TelegramApiWrapper();
     const left = document.getElementById('left');
-    stopLoading(left);
-    menu(left);
-    left.appendChild(userDialogs);
-}, timeout);
+    ta.getDialogs(2).then(data => {
+        data.map((user) => {
+            const d = htmlToElement(dialog(user));
+            const { id } = user;
+            subscribe(d)('click', () => loadDialog({ id }));
+            userDialogs.appendChild(d);
+        });
+        const left = document.getElementById('left');
+        stopLoading(left);
+        menu(left);
+        left.appendChild(userDialogs);
+        window.updateRipple();
+    });
+    return left;
+};
 
 
 export default (elem) => {
     elem.innerHTML = template;
-    loadData(1000);
+    loadData();
 }
