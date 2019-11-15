@@ -82,11 +82,24 @@ export class TelegramApiWrapper {
     }
 
     mapPeerToTruePeer = (peer) => {
-        if (peer._ === 'peerUser') {
+        const type = peer._;
+        if (type === 'peerUser') {
             return {
                 ...peer,
                 _: 'inputPeerUser',
                 user_id: peer.user_id.toString()
+            }
+        } else if (type === 'peerChat') {
+            return {
+                ...peer,
+                _: 'inputPeerChat',
+                chat_id: peer.chat_id.toString()
+            }
+        } else if (type === 'peerChannel') {
+            return {
+                ...peer,
+                _: 'inputPeerChannel',
+                channel_id: peer.channel_id.toString()
             }
         }
         return peer;
