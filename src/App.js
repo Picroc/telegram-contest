@@ -61,28 +61,16 @@ window.updateRipple = () => {
 
 function render() {
     Login(App, routePage);
-    const tWrapper = new TelegramApiWrapper();
-    tWrapper.getDialogs(10);
-
-    // DO NOT DELETE, DEBUG EXAMPLE OF UPLOADING FILE!!!!!!!!!!!
-
-    // const test_elem = document.createElement('div')
-    // test_elem.innerHTML = '<input class="test_inp" type="file"><button class="test_btn">Submit</button>';
-    // document.body.appendChild(test_elem);
-
-    // document.querySelector('.test_btn').addEventListener('click', () => {
-    //     const filedata = document.querySelector('.test_inp').files;
-    //     const payload = new FormData();
-    //     payload.append('attach', filedata.item(0));
-
-    //     fetch('http://localhost:5000/uploadFile', {
-    //         method: 'POST',
-    //         credentials: 'include',
-    //         body: payload
-    //     })
-    //         .then(() => { console.log('SENT') })
-    //         .catch(err => { console.log(err) });
-    // });
+    const tApi = new TelegramApiWrapper();
+    tApi.getDialogs(10)
+        .then(dialogs => {
+            dialogs.forEach(dialog => {
+                tApi.getMessagesFromPeer(dialog.dialog_peer, 15)
+                    .then(history => {
+                        console.log(history);
+                    })
+            })
+        })
 }
 
 function onDocumentReady(callback) {

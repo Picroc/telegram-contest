@@ -7,7 +7,7 @@
   align-items: center;
 
   margin: auto;
-  margin-top: 186px;
+  margin-top: 120px;
 
   &__submit {
     margin-top: 24px;
@@ -27,9 +27,10 @@
     padding: 0;
     margin-top: 10px;
     padding-top: 10px;
-    padding-bottom: 10px;
 
-    max-height: 300px;
+    margin-top: 10px;
+
+    max-height: 270px;
     overflow: scroll;
     overflow-y: -moz-scrollbars-none;
     -ms-overflow-style: none;

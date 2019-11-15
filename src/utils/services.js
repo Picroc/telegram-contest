@@ -108,7 +108,7 @@ export class TelegramApiWrapper {
                 isOnline: status._ === "userStatusOnline" ? true : false,
                 text: message.message,
                 time: this._convertDate(date),
-                id: dialogs[idx].peer.user_id
+                dialog_peer: dialogs[idx].peer
             });
         });
 
@@ -117,5 +117,36 @@ export class TelegramApiWrapper {
         console.log(dialog_items);
 
         return dialog_items;
+    }
+
+    mapPeerToTruePeer = (peer) => {
+        const type = peer._;
+        if (type === 'peerUser') {
+            return {
+                ...peer,
+                _: 'inputPeerUser',
+                user_id: peer.user_id.toString()
+            }
+        } else if (type === 'peerChat') {
+            return {
+                ...peer,
+                _: 'inputPeerChat',
+                chat_id: peer.chat_id.toString()
+            }
+        } else if (type === 'peerChannel') {
+            return {
+                ...peer,
+                _: 'inputPeerChannel',
+                channel_id: peer.channel_id.toString()
+            }
+        }
+        return peer;
+    }
+
+    getMessagesFromPeer = async (peer, limit = 10) => {
+        return await telegramApi.invokeApi('messages.getHistory', {
+            peer: this.mapPeerToTruePeer(peer),
+            limit
+        });
     }
 }
