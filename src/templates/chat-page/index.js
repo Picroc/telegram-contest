@@ -21,7 +21,6 @@ const stopLoading = (elem) => {
 const loadDialog = ({ id }) => {
     console.log(id);
     const right = document.getElementById('right');
-    telegramApi.getFullChat(id).then(data => console.log(data));
     startLoading(right);
 };
 
