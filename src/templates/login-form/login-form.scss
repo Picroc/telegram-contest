@@ -144,10 +144,8 @@
         position: absolute;
         top: 0;
         left: 0;
-        border-left: 6px solid white;
-        border-bottom: 10px solid white;
+        background-image: url('./check_svg.svg');
 
-        transform: rotate(45deg);
       }
 
       &:checked:after {

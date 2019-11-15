@@ -10,10 +10,6 @@ $hover-color: #f1f3f4;
   flex-direction: column;
   min-width: 260px;
 }
-.loading {
-  justify-content: center;
-  align-items: center;
-}
 .dialog {
   max-height: 10vh;
   min-height: 50px;
@@ -23,7 +19,6 @@ $hover-color: #f1f3f4;
   align-items: center;
   margin: 0 8px;
   border-radius: 8px;
-
   --ripple-background: black;
   --ripple-opacity: 0.08;
   --ripple-duration: 600ms;
@@ -46,6 +41,20 @@ $hover-color: #f1f3f4;
     border-radius: 50%;
     width: 100%;
     height: 100%;
+    &_online {
+      position: relative;
+      &::before {
+        position: absolute;
+        content: "";
+        height: 8px;
+        width: 8px;
+        border-radius: 50%;
+        background: lawngreen;
+        border: 1px solid white;
+        right: 2px;
+        bottom: 0;
+      }
+    }
   }
 
   &__name {

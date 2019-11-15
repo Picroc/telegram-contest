@@ -3,11 +3,13 @@ import template from './chat-page.html';
 import dialog from './dialog';
 import menu from './menu';
 import { TelegramApiWrapper } from '../../utils/services';
+import { subscribe, htmlToElement } from '../../helpers/index';
 
 const startLoading = (elem) => {
     const loader = document.createElement('div');
+    elem.innerHTML = '';
     loader.className = 'spinner';
-    elem.innerHTML = loader;
+    elem.appendChild(loader);
     elem.classList.add('loading');
 }
 
@@ -16,54 +18,32 @@ const stopLoading = (elem) => {
     elem.classList.remove('loading');
 }
 
-// const data = [{
-//     avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-//     name: 'Antoha',
-//     shortMsg: 'Dorowa',
-//     meta: 'kek'
-// }, {
-//     avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-//     name: 'DRUG-DEALER',
-//     shortMsg: 'Dorowa',
-//     meta: 'kek'
-// }, {
-//     avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-//     name: 'DRUGAN',
-//     shortMsg: 'Dorowa',
-//     meta: 'kek'
-// }, {
-//     avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-//     name: 'Mama',
-//     shortMsg: 'Dorowa',
-//     meta: 'kek'
-// }, {
-//     avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-//     name: 'Bro',
-//     shortMsg: 'Dorowa',
-//     meta: 'kek'
-// }, {
-//     avatar: 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-//     name: 'Batya',
-//     shortMsg: 'Dorowa',
-//     meta: 'kek'
-// },
-// ];
+const loadDialog = ({ id }) => {
+    console.log(id);
+    const right = document.getElementById('right');
+    telegramApi.getFullChat(id).then(data => console.log(data));
+    startLoading(right);
+};
 
 const loadData = () => {
     const userDialogs = document.createElement('div');
     userDialogs.id = 'user-dialogs';
-    // userDialogs.innerHTML = data.map(info => dialog(...Object.values(info))).join('');
     const ta = new TelegramApiWrapper();
+    const left = document.getElementById('left');
     ta.getDialogs(2).then(data => {
-        console.log(data[0].title)
-        userDialogs.innerHTML = data.map(({ avatar, title, text, time }) => dialog(avatar, title, text, time)).join('');
+        data.map((user) => {
+            const d = htmlToElement(dialog(user));
+            const { id } = user;
+            subscribe(d)('click', () => loadDialog({ id }));
+            userDialogs.appendChild(d);
+        });
         const left = document.getElementById('left');
-        telegramApi.getUserPhoto('base64', 'small').then(data => console.log(data));
         stopLoading(left);
         menu(left);
         left.appendChild(userDialogs);
         window.updateRipple();
     });
+    return left;
 };
 
 
