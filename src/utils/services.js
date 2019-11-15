@@ -70,7 +70,7 @@ export class TelegramApiWrapper {
                 isOnline: status._ === "userStatusOnline" ? true : false,
                 text: message.message,
                 time: message.date,
-                dialog_id: dialogs[idx].peer.user_id
+                dialog_peer: dialogs[idx].peer
             });
         });
 
@@ -79,5 +79,23 @@ export class TelegramApiWrapper {
         console.log(dialog_items);
 
         return dialog_items;
+    }
+
+    mapPeerToTruePeer = (peer) => {
+        if (peer._ === 'peerUser') {
+            return {
+                ...peer,
+                _: 'inputPeerUser',
+                user_id: peer.user_id.toString()
+            }
+        }
+        return peer;
+    }
+
+    getMessagesFromPeer = async (peer, limit = 10) => {
+        return await telegramApi.invokeApi('messages.getHistory', {
+            peer: this.mapPeerToTruePeer(peer),
+            limit
+        });
     }
 }
