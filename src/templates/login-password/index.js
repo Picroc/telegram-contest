@@ -18,6 +18,11 @@ const subscribe = (element) => {
     return function (...args) { document.querySelector(element).addEventListener(...args); }
 }
 
+const showInvalid = () => {
+    document.querySelector('.login-password__password').classList.add('input-field_invalid');
+    document.querySelector('.login-password__password ~ label').value = 'Invalid Password';
+}
+
 const getAnimationItem = (elem, data, options) => () => lottie.loadAnimation({
     container: document.querySelector(elem),
     renderer: 'svg',

@@ -10,6 +10,11 @@ const subscribe = (element) => {
     return function (...args) { document.querySelector(element).addEventListener(...args); }
 }
 
+const showInvalid = () => {
+    document.querySelector('.login-code__code').classList.add('input-field_invalid');
+    document.querySelector('.login-code__code ~ label').innerHTML = 'Invalid Code';
+}
+
 let router;
 let phone;
 
@@ -34,7 +39,7 @@ const validateCode = (event) => {
                 } else if (err.type === 'SESSION_PASSWORD_NEEDED') {
                     router('login_password');
                 } else {
-                    alert("Code invalid!");
+                    showInvalid();
                     console.log(err);
                 }
             });
@@ -65,13 +70,34 @@ const translateAnimation = (to, time) => {
     }, 500);
 }
 
+const getSegments = (value) => {
+    switch (value) {
+        case 0:
+            return [0, 15];
+        case 1:
+            return [15, 30];
+        case 2:
+            return [30, 45];
+        case 3:
+            return [45, 60];
+        case 4:
+            return [60, 75];
+        case 5:
+            return [75, 90];
+        case 6:
+            return [90, 100];
+    }
+}
+
+let prev_input = -1;
+
 export default (elem, rt, data) => {
     elem.innerHTML = template;
 
     router = rt;
-    phone = data.phone;
+    // phone = data.phone;
 
-    elem.querySelector('.login-code__title').innerHTML = phone;
+    // elem.querySelector('.login-code__title').innerHTML = phone;
 
     const monkey_idle = getAnimationItem('.cd-tgsticker', idle, { auto: true, loop: true });
     const monkey_peek = getAnimationItem('.cd-tgsticker', peek, { auto: false });
@@ -81,6 +107,11 @@ export default (elem, rt, data) => {
 
     loginCode('focus', ({ target }) => { translateAnimation(monkey_peek, (Math.max(target.value.length, 1) + 25)) });
     loginCode('focusout', () => { translateAnimation(monkey_idle) });
-    loginCode('input', (event) => { window.current_animation.goToAndStop(Math.max(event.target.value.length, 1) + 25, true); });
+    loginCode('input', (event) => {
+        const segments = event.target.value.length > prev_input ? getSegments(event.target.value.length) :
+            getSegments(event.target.value.length).reverse();
+        window.current_animation.playSegments(segments, true);
+        prev_input = event.target.value.length;
+    });
     loginCode('input', validateCode);
 }

@@ -59,17 +59,7 @@ window.updateRipple = () => {
 }
 
 function render() {
-    Login(App, routePage);
-    const tApi = new TelegramApiWrapper();
-    tApi.getDialogs(10)
-        .then(dialogs => {
-            dialogs.forEach(dialog => {
-                tApi.getMessagesFromPeer(dialog.dialog_peer, 15)
-                    .then(history => {
-                        console.log(history);
-                    })
-            })
-        })
+    LoginCode(App, routePage);
 }
 
 function onDocumentReady(callback) {

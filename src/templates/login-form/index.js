@@ -105,7 +105,8 @@ const routeToNewPage = () => {
 }
 
 const showInvalid = () => {
-    alert('Invalid phone');
+    document.querySelector('.login-form__phone').classList.add('input-field_invalid');
+    document.querySelector('.login-form__phone ~ label').innerHTML = 'Invalid phone';
 }
 
 const logIn = () => {
