@@ -1,0 +1,47 @@
+.bubble {
+  margin: 5px;
+  padding: 10px;
+  position: relative;
+
+}
+
+.incoming {
+  margin-left: 20px;
+  border-radius: .5em .5em .5em 0;
+  align-self: flex-start;
+  float: left;
+  background-color: #FFFFFF;
+  border: 0 solid #FFFFFF;
+
+  &:after {
+    content: " ";
+    position: absolute;
+    left: -15px;
+    border: 20px solid transparent;
+    border-right-color: inherit;
+    border-left: 0;
+    border-bottom: 0;
+    bottom: 0;
+  }
+}
+
+.outgoing {
+  margin: 5px 20px 5px 5px;
+  padding: 5px;
+  border-radius: .5em .5em 0 .5em;
+  align-self: flex-end;
+  float: right;
+  background-color: #EEFFDF;
+  border: 0 solid #EEFFDF;
+
+  &:after {
+    content: " ";
+    position: absolute;
+    right: -15px;
+    border: 20px solid transparent;
+    border-left-color: inherit;
+    border-right: 0;
+    border-bottom: 0;
+    bottom: 0;
+  }
+}
