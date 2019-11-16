@@ -26,5 +26,5 @@ export default (elem, info) => {
         subscribe('.settings-list__logout')('click', () => logout());
     } 
     
-    show(cashed);
+    setTimeout(() => show(cashed), 0);
 };

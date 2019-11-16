@@ -5,6 +5,7 @@ import img from './search.js';
 import { TelegramApiWrapper } from '../../../utils/services';
 import settings from './settings/index';
 
+
 export default (elem, type, callback) => {
 	const nav = document.createElement('nav');
 	nav.className = 'menu';
@@ -12,7 +13,7 @@ export default (elem, type, callback) => {
 	nav.appendChild(search(type, callback));
 	elem.appendChild(nav);
 	const menu = document.querySelector('.menu-list');
-	subscribe('#menu__checkbox')('click', () => menu.classList.toggle('hidden'));
+	subscribe('#menu__checkbox')('click', () => menu.classList.toggle('menu-list_hidden'));
 	subscribe('.menu-list__settings')('click', () => settings(elem, { name: 'Doge Dogeson', phone: '88005553535' }));
 };
 
@@ -61,6 +62,7 @@ const search = (type, searchCallback) => {
 	const search = createInput('search', 'menu__search', 'Search');
 	searchWrapper.appendChild(search);
 	searchWrapper.appendChild(searchIcon);
+	search.id = 'search';
 	if (type === 'contacts') {
 		subscribe(search)('input', event => { onType(event); onTypeContacts(event.target.value, searchCallback) });
 	} else {

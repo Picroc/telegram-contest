@@ -16,8 +16,8 @@
   &__popup {
     max-width: 360px;
     max-height: 270px;
-    overflow: scroll;
-
+    overflow: auto;
+    overflow-x: hidden;
     box-shadow: -2px 10px 26px -7px rgba(0, 0, 0, 0.75);
 
     &::-webkit-scrollbar {

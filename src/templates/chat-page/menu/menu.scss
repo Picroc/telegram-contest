@@ -8,6 +8,8 @@ $hover-color: #f4f4f5;
   margin-bottom: 10px;
   padding-top: 10px;
   align-items: center;
+  transition: 0.4s;
+
   &__search-wrapper {
     height: 90%;
     width: 95%;
@@ -73,6 +75,12 @@ $hover-color: #f4f4f5;
     max-width: 200px;
     overflow: hidden;
     box-shadow: 1px 5px 14px -7px rgba(0, 0, 0, 0.75);
+    transition: 0.4s;
+
+    &_hidden {
+      opacity: 0;
+      z-index: -1;
+    }
 
     & li {
       &:first-child {
@@ -89,10 +97,6 @@ $hover-color: #f4f4f5;
         padding-right: 25px;
       }
     }
-  }
-
-  .hidden {
-    display: none;
   }
 
   &__icon {
