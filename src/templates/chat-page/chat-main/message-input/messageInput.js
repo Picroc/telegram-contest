@@ -4,7 +4,7 @@ import emojiSvg from './emoji';
 import './messageInput.scss';
 import sendArrow from './sendArrow.svg';
 
-export default (message = "") => `
+export default (message = '') => `
     <div class="message-input">
         <div class="text-input">
             <div class="svg emoji-set">${emojiSvg()}</div>

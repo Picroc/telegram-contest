@@ -14,7 +14,7 @@ const loadDialog = (peer, dialog) => {
 		subscribe('.top-bar__search')('click', () => {
 			const search = document.getElementById('search');
 			search.focus();
-		})
+		});
 	});
 };
 

@@ -2,6 +2,7 @@ import './menu.scss';
 import template from './menu.html';
 import { subscribe, createInput, createDiv } from '../../../helpers';
 import img from './search.js';
+import settings from './settings/index';
 
 export default elem => {
 	const nav = document.createElement('nav');
@@ -11,6 +12,7 @@ export default elem => {
 	elem.appendChild(nav);
 	const menu = document.querySelector('.menu-list');
 	subscribe('#menu__checkbox')('click', () => menu.classList.toggle('hidden'));
+	subscribe('.menu-list__settings')('click', () => settings(elem, { name: 'Doge Dogeson', phone: '88005553535' }));
 };
 
 export const onType = event => {
