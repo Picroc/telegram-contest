@@ -6,13 +6,16 @@ import { TelegramApiWrapper } from '../../utils/services';
 import { subscribe, htmlToElement, startLoading, stopLoading } from '../../helpers/index';
 import ChatMain from './chat-main';
 
-const loadDialog = peer => {
-    console.log(peer);
+const loadDialog = (peer, dialog) => {
     const right = document.getElementById('right');
     startLoading(right);
-    ChatMain(peer).then(chatMain => {
-        stopLoading(right);
-        right.appendChild(chatMain)
+    ChatMain(peer, dialog).then(chatMain => {
+		stopLoading(right);
+		right.appendChild(chatMain);
+		subscribe('.top-bar__search')('click', () => {
+			const search = document.getElementById('search');
+			search.focus();
+		})
     });
 };
 
@@ -25,7 +28,7 @@ const loadData = () => {
 		data.map(user => {
 			const d = htmlToElement(dialog(user));
 			const { dialog_peer } = user;
-			subscribe(d)('click', () => loadDialog(dialog_peer));
+			subscribe(d)('click', () => loadDialog(dialog_peer, user));
 			userDialogs.appendChild(d);
 		});
 		const left = document.getElementById('left');
@@ -42,6 +45,6 @@ export default elem => {
 	loadData();
 	setTimeout(() => {
 		const dialog = document.getElementById('user-dialogs').childNodes[0];
-		// dialog.dispatchEvent(new Event('click'));
+		dialog.dispatchEvent(new Event('click'));
 	}, 500);
 };

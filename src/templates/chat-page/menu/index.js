@@ -39,6 +39,6 @@ const search = () => {
 	searchWrapper.appendChild(search);
 	searchWrapper.appendChild(searchIcon);
 	subscribe(search)('input', onType);
-
+	search.id = 'search';
 	return searchWrapper;
 };

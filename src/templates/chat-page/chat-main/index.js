@@ -3,13 +3,14 @@ import InputMessage from './message-input';
 import { TelegramApiWrapper } from '../../../utils/services';
 import { createDiv } from '../../../helpers';
 import './messages.scss';
+import topBar from './top-bar';
 
 const loadMessages = peer => {
 	const ta = new TelegramApiWrapper();
 	return ta.getMessagesFromPeer(peer);
 };
 
-export default async peer => {
+export default async (peer, dialog) => {
 	const chatMain = createDiv('chat-main');
 	const statusInfo = createDiv('status-info');
 	const chatMessage = createDiv('chat-messages');
@@ -28,6 +29,9 @@ export default async peer => {
 		});
 		console.log(messages);
 	});
+
+	console.log(dialog);
+	topBar(chatMain, dialog);
 
 	return chatMain;
 };
