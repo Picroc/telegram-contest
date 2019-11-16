@@ -3,29 +3,16 @@ import template from './chat-page.html';
 import dialog from './dialog';
 import menu from './menu';
 import { TelegramApiWrapper } from '../../utils/services';
-import { subscribe, htmlToElement } from '../../helpers/index';
+import { subscribe, htmlToElement, startLoading, stopLoading } from '../../helpers/index';
 import ChatMain from './chat-main'
-
-const startLoading = (elem, peer = {}) => {
-    // const loader = document.createElement('div');
-    const loader = document.createElement('div');
-    const chatMain = ChatMain(peer);
-    loader.append(chatMain);
-    elem.innerHTML = '';
-    // loader.className = 'spinner';
-    elem.appendChild(loader);
-    elem.classList.add('loading');
-};
-
-const stopLoading = (elem) => {
-    elem.innerHTML = '';
-    elem.classList.remove('loading');
-};
 
 const loadDialog = peer => {
     console.log(peer);
     const right = document.getElementById('right');
-    startLoading(right, peer);
+    startLoading(right);
+    const chatMain = ChatMain(peer);
+    stopLoading(right);
+    right.appendChild(chatMain)
 };
 
 const loadData = () => {
