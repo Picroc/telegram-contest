@@ -22,27 +22,38 @@ export const loadDialog = (peer, dialog) => {
 	});
 };
 
-const loadData = () => {
+const loadData = async () => {
 	const userDialogs = document.createElement('div');
 	userDialogs.id = 'user-dialogs';
 	const ta = new TelegramApiWrapper();
 	const left = document.getElementById('left');
-	ta.getDialogs(2).then(data => {
-		data.map(user => {
+	let cached = [];
+	
+	const load = data => {
+		data.forEach(user => {
+			if (cached.filter(({ title }) => user.title === title).length > 0) {
+				return;
+			}
 			const d = htmlToElement(dialog(user));
 			const { dialog_peer } = user;
 			subscribe(d)('click', () => loadDialog(dialog_peer, user));
 			userDialogs.appendChild(d);
 		});
+
 		const left = document.getElementById('left');
-		stopLoading(left);
-		menu(left, 'contacts', updateSearchResults);
 
-		// subscribe(document.querySelector('.menu-list__contacts'))('click', () => { loadContacts() });
+		if (cached.length === 0) {
+			stopLoading(left);
+			menu(left, 'contacts', updateSearchResults);
+		}
 
+		cached = data;
 		left.appendChild(userDialogs);
 		window.updateRipple();
-	});
+	}
+
+	await ta.getDialogs(5).then(load)
+	await ta.getDialogs(100).then(load);
 	return left;
 };
 

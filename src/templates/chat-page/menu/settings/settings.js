@@ -1,11 +1,11 @@
-import back from '../svg/back_svg.svg';
-import edit from '../svg/edit_svg.svg';
-import language from '../svg/language_svg.svg';
-import privacy from '../svg/lock_svg.svg';
-import notification from '../svg/unmute_svg.svg';
-import generalSettings from '../svg/settings_svg.svg';
-import more from '../svg/more_svg.svg';
-import logout from '../svg/logout_svg.svg';
+import back from '../svg/back.svg';
+import edit from '../svg/edit.svg';
+import language from '../svg/language.svg';
+import privacy from '../svg/lock.svg';
+import notification from '../svg/unmute.svg';
+import generalSettings from '../svg/settings.svg';
+import more from '../svg/more.svg';
+import logout from '../svg/logout.svg';
 
 export default ({
 	avatar = 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',

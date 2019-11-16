@@ -133,7 +133,7 @@
         z-index: 1;
         top: -2px;
         left: 0;
-        background-image: url("./check_svg.svg");
+        background-image: url("./check.svg");
       }
     }
 
@@ -174,7 +174,7 @@
 }
 
 .login-form__country:focus ~ .input-group__img {
-  background: url("./up_svg.svg");
+  background: url("./up.svg");
 }
 
 .input-group {
@@ -184,7 +184,7 @@
     position: absolute;
     width: 31px;
     height: 31px;
-    background: url("./down_svg.svg");
+    background: url("./down.svg");
     background-size: 31px;
     bottom: 11px;
     right: 10px;

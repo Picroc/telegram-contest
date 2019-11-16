@@ -69,7 +69,7 @@ export class TelegramApiWrapper {
         };
 
         const formatTime = t => t < 10 ? "0" + t : t;
-        
+
         if (time.getDay() - currentTime.getDay() === 0) {
             time = `${formatTime(time.getHours())}:${formatTime(time.getMinutes())}`;
         } else if (time.getDay() > startOfTheWeek(time)) {
@@ -93,7 +93,7 @@ export class TelegramApiWrapper {
     };
 
     getDialogs = async limit => {
-        const { result } = await telegramApi.getDialogs(0, 1000);
+        const { result } = await telegramApi.getDialogs(0, limit);
         console.log('CHATS', result);
 
         const { chats, dialogs, messages, users } = result;
@@ -103,7 +103,7 @@ export class TelegramApiWrapper {
 
         await dialogs.forEach(async (dialog) => {
             let peer = dialog.peer;
-            let title, status;
+            let title, status, onlineInfo;
             if (peer._ === 'peerChat') {
                 title = chats[chats.findIndex(el => el.id === peer.chat_id)].title;
             } else if (peer._ === 'peerChannel') {
@@ -209,7 +209,8 @@ export class TelegramApiWrapper {
                 };
             } else {
                 const user = users[users.findIndex(el => el.id === result.user_id)];
-                title = user.first_name + ' ' + user.last_name;
+                const last_name = user.last_name ? ' ' + user.last_name : ''
+                title = user.first_name + last_name;
                 status = user.status;
                 text = '@' + user.username;
                 peer = user.access_hash ? {
