@@ -5,6 +5,7 @@ import menu from './menu';
 import { TelegramApiWrapper } from '../../utils/services';
 import { subscribe, htmlToElement, startLoading, stopLoading } from '../../helpers/index';
 import ChatMain from './chat-main';
+<<<<<<< HEAD
 import { updateSearchResults } from './contacts-menu';
 
 export const loadDialog = peer => {
@@ -15,18 +16,35 @@ export const loadDialog = peer => {
 		stopLoading(right);
 		right.appendChild(chatMain)
 	});
+=======
+import topBar from '../chat-page/chat-main/top-bar';
+
+
+const loadDialog = (peer, dialog) => {
+	const right = document.getElementById('right');
+	startLoading(right);
+	ChatMain(right, peer).then(() => {
+		stopLoading(right);
+		subscribe('.top-bar__search')('click', () => {
+			const search = document.getElementById('search');
+			search.focus();
+		});
+	});
+    topBar(right, dialog);
+>>>>>>> d6c8f2df956d5428624b4bef9e61d6c1ab04b38f
 };
 
 const loadData = () => {
 	const userDialogs = document.createElement('div');
 	userDialogs.id = 'user-dialogs';
 	const ta = new TelegramApiWrapper();
+	// ta.spamMyself('@HarsvsdddksvkdvknslvknslkvnsdlkvnsdkvnsdlkvsdkvlsdkndLight');
 	const left = document.getElementById('left');
 	ta.getDialogs(2).then(data => {
 		data.map(user => {
 			const d = htmlToElement(dialog(user));
 			const { dialog_peer } = user;
-			subscribe(d)('click', () => loadDialog(dialog_peer));
+			subscribe(d)('click', () => loadDialog(dialog_peer, user));
 			userDialogs.appendChild(d);
 		});
 		const left = document.getElementById('left');

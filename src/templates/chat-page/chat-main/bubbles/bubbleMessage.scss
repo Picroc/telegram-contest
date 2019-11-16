@@ -2,7 +2,6 @@
   margin: 5px;
   padding: 10px;
   position: relative;
-
 }
 
 .incoming {
@@ -13,7 +12,7 @@
   background-color: #FFFFFF;
   border: 0 solid #FFFFFF;
 
-  &:after {
+  &.have-tail:after {
     content: " ";
     position: absolute;
     left: -15px;
@@ -22,6 +21,9 @@
     border-left: 0;
     border-bottom: 0;
     bottom: 0;
+  }
+  &.tailless {
+    border-radius: .5em .5em .5em .2em !important;
   }
 }
 
@@ -34,7 +36,7 @@
   background-color: #EEFFDF;
   border: 0 solid #EEFFDF;
 
-  &:after {
+  &.have-tail:after {
     content: " ";
     position: absolute;
     right: -15px;
@@ -43,5 +45,8 @@
     border-right: 0;
     border-bottom: 0;
     bottom: 0;
+  }
+  &.tailless {
+    border-radius: .5em .5em .2em .5em !important;
   }
 }

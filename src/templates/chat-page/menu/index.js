@@ -3,6 +3,7 @@ import template from './menu.html';
 import { subscribe, createInput, createDiv } from '../../../helpers';
 import img from './search.js';
 import { TelegramApiWrapper } from '../../../utils/services';
+import settings from './settings/index';
 
 export default (elem, type, callback) => {
 	const nav = document.createElement('nav');
@@ -12,6 +13,7 @@ export default (elem, type, callback) => {
 	elem.appendChild(nav);
 	const menu = document.querySelector('.menu-list');
 	subscribe('#menu__checkbox')('click', () => menu.classList.toggle('hidden'));
+	subscribe('.menu-list__settings')('click', () => settings(elem, { name: 'Doge Dogeson', phone: '88005553535' }));
 };
 
 export const onType = event => {
