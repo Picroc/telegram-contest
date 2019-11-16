@@ -228,12 +228,13 @@ export class TelegramApiWrapper {
         return search_items;
     }
 
-    getMessagesFromPeer = async (peer, limit = 200) => {
+    getMessagesFromPeer = async (peer, limit = 200, offsetId = 0) => {
         console.log('Got peer', peer);
         console.log('Will try to send', this.mapPeerToTruePeer(peer));
         return await telegramApi.invokeApi('messages.getHistory', {
             peer: this.mapPeerToTruePeer(peer),
             limit,
+            offset_id: offsetId
         });
     };
 }
