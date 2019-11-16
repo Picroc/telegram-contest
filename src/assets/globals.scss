@@ -4,6 +4,26 @@ $hover-color: #f1f3f4;
 * {
   margin: 0;
   padding: 0;
+  &::-webkit-scrollbar-track {
+    border: none;
+    border-radius: 0.5em;
+    background-color: #f5f5f5;
+    position: absolute;
+    right: 25px;
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    background-color: #f5f5f5;
+    position: absolute;
+    right: 25px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #e3e3e3;
+    position: absolute;
+    right: 25px;
+  }
 }
 
 .loading {

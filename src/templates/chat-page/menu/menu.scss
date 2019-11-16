@@ -83,12 +83,6 @@ $hover-color: #f4f4f5;
     }
 
     & li {
-      &:first-child {
-        margin-top: 10px;
-      }
-      &:last-child {
-        margin-bottom: 10px;
-      }
       justify-content: flex-start;
       width: 200px;
       img {

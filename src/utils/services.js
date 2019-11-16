@@ -68,8 +68,10 @@ export class TelegramApiWrapper {
             return monday;
         };
 
+        const formatTime = t => t < 10 ? "0" + t : t;
+        
         if (time.getDay() - currentTime.getDay() === 0) {
-            time = `${time.getHours()}:${time.getMinutes()}`;
+            time = `${formatTime(time.getHours())}:${formatTime(time.getMinutes())}`;
         } else if (time.getDay() > startOfTheWeek(time)) {
             time = days[time.getDay()];
         } else {
@@ -121,14 +123,14 @@ export class TelegramApiWrapper {
                 }
             } else {
                 const user = users[users.findIndex(el => el.id === peer.user_id)];
-                title = user.first_name + ' ' + user.last_name;
+                const last_name = user.last_name ? ' ' + user.last_name : ''
+                title = user.first_name + last_name;
                 status = user.status;
                 peer = user.access_hash ? {
                     ...peer,
                     access_hash: user.access_hash
                 } : peer;
             }
-
             const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
             const { message: text, date } = message;
             const unread_count = dialog.unread_count;

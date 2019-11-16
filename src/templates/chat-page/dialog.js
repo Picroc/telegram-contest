@@ -3,10 +3,10 @@ export default ({
 	unreadCount,
 	title,
 	isOnline,
-	text,
+	text,   
 	time,
 }) => `
-<div class="dialog" name="${title}"anim="ripple">
+<div class="dialog" name="${title}" anim="ripple">
     <div class="dialog__avatar-wrapper${isOnline ? ' dialog__avatar_online' : ''}">
         <img src="${avatar}" alt="avatar" class="dialog__avatar">
     </div>

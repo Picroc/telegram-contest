@@ -47,27 +47,6 @@
   }
 }
 
-textarea::-webkit-scrollbar-track {
-  border: none;
-  border-radius: .5em;
-  background-color: #F5F5F5;
-  position: absolute;
-  right: 25px;
-}
-
-textarea::-webkit-scrollbar {
-  width: 6px;
-  background-color: #F5F5F5;
-  position: absolute;
-  right: 25px;
-}
-
-textarea::-webkit-scrollbar-thumb {
-  background-color: #e3e3e3;
-  position: absolute;
-  right: 25px;
-}
-
 
 .voice-message {
   cursor: pointer;
