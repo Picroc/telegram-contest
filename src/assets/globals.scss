@@ -1,3 +1,5 @@
+$spinner-color: rgba(79, 164, 246, 1);
+
 * {
   margin: 0;
   padding: 0;
@@ -7,8 +9,27 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border: 3px solid transparent;
+    border-radius: 50%;
+    border-bottom-color: $spinner-color;
+    border-right-color: $spinner-color;
+    border-top-color: $spinner-color;
+    animation: spin 1s ease-in-out infinite;
+  }
 }
 
-ul {
-  // padding-inline-start: 0;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
