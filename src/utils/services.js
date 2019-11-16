@@ -15,7 +15,7 @@ telegramApi.setConfig({
         production: [
             {
                 id: 2 /* DC ID */,
-                host: '149.154.167.40',
+                host: '149.154.167.50',
                 port: 443,
             },
         ],
@@ -92,7 +92,7 @@ export class TelegramApiWrapper {
 
     getDialogs = async limit => {
         const { result } = await telegramApi.getDialogs(0, 1000);
-        // console.log('CHATS', result);
+        console.log('CHATS', result);
 
         const { chats, dialogs, messages, users } = result;
         // console.log(users);
@@ -105,12 +105,20 @@ export class TelegramApiWrapper {
             if (peer._ === 'peerChat') {
                 title = chats[chats.findIndex(el => el.id === peer.chat_id)].title;
             } else if (peer._ === 'peerChannel') {
-                const channel = chats[chats.findIndex(el => el.id === peer.channel_id)];
+                const idx = chats.findIndex(el => el.id === peer.channel_id);
+                const channel = chats[idx];
                 title = channel.title;
                 peer = {
                     ...peer,
                     access_hash: channel.access_hash
                 };
+                console.log(channel);
+                if (chats[idx + 1]._ === 'chatForbidden') {
+                    peer = {
+                        ...peer,
+                        chatForbidden: true
+                    }
+                }
             } else {
                 const user = users[users.findIndex(el => el.id === peer.user_id)];
                 title = user.first_name + ' ' + user.last_name;
