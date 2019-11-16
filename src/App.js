@@ -52,7 +52,7 @@ const switchPage = page => {
     }
 };
 
-const routePage = (page, ...args) => {
+export const routePage = (page, ...args) => {
     changeState(() => ({ history: [...state.history, page] }))();
     switchPage(page)(App, routePage, ...args);
 };

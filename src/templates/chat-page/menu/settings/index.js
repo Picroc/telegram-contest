@@ -1,6 +1,7 @@
 import './settings.scss';
 import template from './settings';
 import { htmlToElement, subscribe } from '../../../../helpers/index';
+import { routePage } from '../../../../App';
 // info - { avatar, phone, name }
 
 const hide = (settings) => {
@@ -12,7 +13,9 @@ const show = (settings) => {
 }
 
 const logout = () => {
-    console.log("Save me, ma frend");
+    telegramApi.logOut()
+        .then(() => { routePage('login'); });
+
 };
 
 let cashed;
