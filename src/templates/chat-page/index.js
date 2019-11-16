@@ -7,12 +7,13 @@ import { subscribe, htmlToElement, startLoading, stopLoading } from '../../helpe
 import ChatMain from './chat-main';
 
 const loadDialog = peer => {
-	console.log(peer);
-	const right = document.getElementById('right');
-	startLoading(right);
-	const chatMain = ChatMain(peer);
-	stopLoading(right);
-	right.appendChild(chatMain);
+    console.log(peer);
+    const right = document.getElementById('right');
+    startLoading(right);
+    ChatMain(peer).then(chatMain => {
+        stopLoading(right);
+        right.appendChild(chatMain)
+    });
 };
 
 const loadData = () => {
