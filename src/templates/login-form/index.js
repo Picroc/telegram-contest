@@ -82,6 +82,7 @@ const onCountyClick = (event) => {
 
     const elem = document.createElement('ul');
     elem.classList.add('login-form__popup');
+    elem.classList.add('popup');
     elem.innerHTML = countriesPopup(event.target.value ? filterCountries(event.target.value) : cntr);
     event.target.parentNode.appendChild(elem);
 

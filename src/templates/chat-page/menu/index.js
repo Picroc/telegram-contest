@@ -1,13 +1,12 @@
 import './menu.scss';
-import template from './menu.js';
-import { subscribe, createInput, createDiv, htmlToElement } from '../../../helpers';
+import template from './menu.html';
+import { subscribe, createInput, createDiv } from '../../../helpers';
 import img from './search.js';
-import { createElement } from '../../../helpers';
 
 export default (elem) => {
     const nav = document.createElement('nav');
     nav.className = 'menu';
-    nav.innerHTML = template();
+    nav.innerHTML = template;
     nav.appendChild(search());
     elem.appendChild(nav);
     const menu = document.querySelector('.menu-list');
@@ -36,6 +35,6 @@ const search = () => {
     searchWrapper.appendChild(search);
     searchWrapper.appendChild(searchIcon);
     subscribe(search)('input', onType);
-    
+
     return searchWrapper;
 }

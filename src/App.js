@@ -4,6 +4,7 @@ import LoginPassword from './templates/login-password';
 
 import './assets/fonts.css';
 import './assets/globals.scss';
+import './assets/popup.scss';
 import chatPage from './templates/chat-page';
 import RegisterPage from './templates/register-page/index';
 import { TelegramApiWrapper } from './utils/services';
