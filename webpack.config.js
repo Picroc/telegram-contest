@@ -86,9 +86,9 @@ const common = {
 }
 
 const devServer = {
-    devServer: {
-        stats: 'errors-only'
-    }
+    // devServer: {
+    //     stats: 'errors-only'
+    // }
 }
 
 module.exports = env => {

@@ -5,10 +5,11 @@ import menu from './menu';
 import { TelegramApiWrapper } from '../../utils/services';
 import { subscribe, htmlToElement, startLoading, stopLoading } from '../../helpers/index';
 import ChatMain from './chat-main';
+import { updateSearchResults } from './contacts-menu';
 import topBar from '../chat-page/chat-main/top-bar';
 
 
-const loadDialog = (peer, dialog) => {
+export const loadDialog = (peer, dialog) => {
 	const right = document.getElementById('right');
 	startLoading(right);
 	ChatMain(right, peer).then(() => {
@@ -35,7 +36,10 @@ const loadData = () => {
 		});
 		const left = document.getElementById('left');
 		stopLoading(left);
-		menu(left);
+		menu(left, 'contacts', updateSearchResults);
+
+		// subscribe(document.querySelector('.menu-list__contacts'))('click', () => { loadContacts() });
+
 		left.appendChild(userDialogs);
 		window.updateRipple();
 	});
@@ -48,5 +52,5 @@ export default elem => {
 	setTimeout(() => {
 		const dialog = document.getElementById('user-dialogs').childNodes[0];
 		dialog.dispatchEvent(new Event('click'));
-	}, 500);
+	}, 2000);
 };
