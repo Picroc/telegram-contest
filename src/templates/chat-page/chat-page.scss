@@ -3,7 +3,7 @@ $secondary: #777b7f;
 $hover-color: #f1f3f4;
 
 #left {
-  width: 25%;
+  max-width: 25vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -108,8 +108,8 @@ $hover-color: #f1f3f4;
 
 #right {
   border-left: 1px solid #e6ebee;
-  min-width: 35%;
-  width: 80%;
+  max-width: 75%;
+  min-width: 60vw;
   height: 100vh;
   background-color: $right-background;
   position: relative;

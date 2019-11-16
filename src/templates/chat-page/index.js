@@ -13,19 +13,18 @@ const loadDialog = (peer, dialog) => {
 	startLoading(right);
 	ChatMain(right, peer).then(() => {
 		stopLoading(right);
+		topBar(right, dialog);
 		subscribe('.top-bar__search')('click', () => {
 			const search = document.getElementById('search');
 			search.focus();
 		});
 	});
-    topBar(right, dialog);
 };
 
 const loadData = () => {
 	const userDialogs = document.createElement('div');
 	userDialogs.id = 'user-dialogs';
 	const ta = new TelegramApiWrapper();
-	// ta.spamMyself('@HarsvsdddksvkdvknslvknslkvnsdlkvnsdkvnsdlkvsdkvlsdkndLight');
 	const left = document.getElementById('left');
 	ta.getDialogs(2).then(data => {
 		data.map(user => {
