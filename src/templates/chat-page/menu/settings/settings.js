@@ -11,7 +11,7 @@ export default ({
 	avatar = 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
 	name,
 	phone,
-}) => `<div class="sidebar sidebar_left settings">
+}) => `<div class="sidebar sidebar_left settings sidebar_hidden">
     <div class="settings__back settings__icon icon"><img src=${back} alt=""></div>
     <div class="sidebar__title settings__title">Settings</div>
     <div class="settings__more settings__icon icon"><img src=${more} alt=""></div>
