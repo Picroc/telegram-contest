@@ -1,5 +1,5 @@
 import makeBubble from './bubbles/bubbleMessage';
-import InputMessage from './message-input/messageInput';
+import InputMessage from './message-input';
 import { TelegramApiWrapper } from '../../../utils/services';
 import { createDiv } from '../../../helpers';
 import './messages.scss';
@@ -9,15 +9,14 @@ const loadMessages = peer => {
 	return ta.getMessagesFromPeer(peer);
 };
 
-export default peer => {
+export default async peer => {
 	const chatMain = createDiv('chat-main');
 	const statusInfo = createDiv('status-info');
 	const chatMessage = createDiv('chat-messages');
-	const messageInput = InputMessage();
-	chatMain.append(...[statusInfo, chatMessage]);
-	chatMain.insertAdjacentHTML('beforeEnd', messageInput);
+	const messageInput = InputMessage(peer);
+	chatMain.append(...[statusInfo, chatMessage, messageInput]);
 
-	loadMessages(peer).then(messages => {
+	await loadMessages(peer).then(messages => {
 		messages.messages.forEach(message => {
 			const {
 				from_id: fromId,

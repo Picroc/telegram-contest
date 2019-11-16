@@ -13,6 +13,7 @@ export const htmlToElement = html => {
 };
 
 export const startLoading = elem => {
+	elem.innerHTML = '';
 	const loader = document.createElement('div');
 	loader.className = 'spinner';
 	elem.appendChild(loader);
