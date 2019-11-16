@@ -5,22 +5,11 @@ import menu from './menu';
 import { TelegramApiWrapper } from '../../utils/services';
 import { subscribe, htmlToElement, startLoading, stopLoading } from '../../helpers/index';
 import ChatMain from './chat-main';
-<<<<<<< HEAD
 import { updateSearchResults } from './contacts-menu';
-
-export const loadDialog = peer => {
-	console.log(peer);
-	const right = document.getElementById('right');
-	startLoading(right);
-	ChatMain(peer).then(chatMain => {
-		stopLoading(right);
-		right.appendChild(chatMain)
-	});
-=======
 import topBar from '../chat-page/chat-main/top-bar';
 
 
-const loadDialog = (peer, dialog) => {
+export const loadDialog = (peer, dialog) => {
 	const right = document.getElementById('right');
 	startLoading(right);
 	ChatMain(right, peer).then(() => {
@@ -30,8 +19,7 @@ const loadDialog = (peer, dialog) => {
 			search.focus();
 		});
 	});
-    topBar(right, dialog);
->>>>>>> d6c8f2df956d5428624b4bef9e61d6c1ab04b38f
+	topBar(right, dialog);
 };
 
 const loadData = () => {
