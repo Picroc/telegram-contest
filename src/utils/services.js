@@ -123,14 +123,14 @@ export class TelegramApiWrapper {
                 }
             } else {
                 const user = users[users.findIndex(el => el.id === peer.user_id)];
-                title = user.first_name + ' ' + user.last_name;
+                const last_name = user.last_name ? ' ' + user.last_name : ''
+                title = user.first_name + last_name;
                 status = user.status;
                 peer = user.access_hash ? {
                     ...peer,
                     access_hash: user.access_hash
                 } : peer;
             }
-
             const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
             const { message: text, date } = message;
             const unread_count = dialog.unread_count;
