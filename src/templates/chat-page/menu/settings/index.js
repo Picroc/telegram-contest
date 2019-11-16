@@ -7,13 +7,24 @@ const hide = (settings) => {
     settings.classList.toggle('sidebar_hidden', true)
 };
 
+const show = (settings) => {
+    settings.classList.toggle('sidebar_hidden', false);
+}
+
 const logout = () => {
     console.log("Save me, ma frend");
 };
 
+let cashed;
+
 export default (elem, info) => {
-    const settings = htmlToElement(template(info));
-    elem.prepend(settings);
-    subscribe('.settings__back')('click', () => hide(settings))
-    subscribe('.settings-list__logout')('click', () => logout())
+    if (!cashed) {
+        const settings = htmlToElement(template(info));
+        elem.prepend(settings);
+        cashed = settings;
+        subscribe('.settings__back')('click', () => hide(settings));
+        subscribe('.settings-list__logout')('click', () => logout());
+    } 
+    
+    show(cashed);
 };
