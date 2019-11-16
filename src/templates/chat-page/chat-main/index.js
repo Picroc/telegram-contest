@@ -7,7 +7,7 @@ import './chatMain.scss'
 
 const loadMessages = peer => {
     const ta = new TelegramApiWrapper();
-    return ta.getMessagesFromPeer(peer, 15, 285161);
+    return ta.getMessagesFromPeer(peer, 15);
 };
 
 const makeDateBubble = date => `
