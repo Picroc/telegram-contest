@@ -1,0 +1,60 @@
+#message-input {
+  width: 600px;
+  min-height: 40px;
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.text-input {
+  align-items: center;
+  flex: auto;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5px 10px 5px 10px;
+  background-color: #FFFFFF;
+  margin-right: 20px;
+  border-radius: .5em .5em 0 .5em;
+
+  &:after {
+    content: " ";
+    position: absolute;
+    right: -15px;
+    border: 20px solid transparent;
+    border-left-color: #FFFFFF;
+    border-right: 0;
+    border-bottom: 0;
+    bottom: 0;
+  }
+
+  &__input {
+    overflow-wrap: break-word;
+    resize:none;
+    flex: auto;
+    word-wrap: break-word;
+    word-break: break-all;
+    border: 0 solid transparent;
+    margin: 10px;
+    width: 470px;
+    min-height: 22px;
+    outline: none;
+  }
+}
+
+.voice-message {
+  background-color: #4ea4f6;
+  padding: 5px;
+  border-radius: 1.5em;
+  fill: #FFFFFF;
+  & svg {
+    opacity: 1 !important;
+  }
+}
+
+svg {
+  width: 24px;
+  height: 24px;
+  opacity: .5;
+}

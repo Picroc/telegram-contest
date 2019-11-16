@@ -32,7 +32,7 @@ export class CountryApiService {
             code: countryData.callingCodes[0],
             alpha: countryData.alpha2Code
         }
-    }
+    };
 
     getResource = async (url) => {
         const res = await fetch(`${this._apiBase}${url}`, {
@@ -44,7 +44,7 @@ export class CountryApiService {
         }
 
         return res.json();
-    }
+    };
 
     getAllCountries = async () => {
         const res = await this.getResource('/all');
@@ -67,7 +67,7 @@ export class TelegramApiWrapper {
             const monday = new Date(now);
             monday.setDate(1);
             return monday
-        }
+        };
 
         if (time.getDay() - currentTime.getDay() === 0) {
             time = `${time.getHours()}:${time.getMinutes()}`
@@ -79,7 +79,7 @@ export class TelegramApiWrapper {
         }
 
         return time;
-    }
+    };
 
     spamMyself = async (message) => {
         telegramApi.invokeApi('messages.sendMessage', {
@@ -89,13 +89,13 @@ export class TelegramApiWrapper {
             message,
             random_id: Math.round(Math.random() * 100000)
         })
-    }
+    };
 
     getDialogs = async (limit) => {
         const { result } = await telegramApi.getDialogs(0, limit);
         console.log('CHATS', result);
 
-        const { chats, dialogs, messages, users } = result;
+        const { dialogs, messages, users } = result;
 
         const dialog_items = [];
 
@@ -105,7 +105,7 @@ export class TelegramApiWrapper {
 
             dialog_items.push({
                 title: first_name + " " + last_name,
-                isOnline: status._ === "userStatusOnline" ? true : false,
+                isOnline: status._ === "userStatusOnline",
                 text: message.message,
                 time: this._convertDate(date),
                 unreadCount: dialogs[idx].unread_count,
@@ -118,7 +118,7 @@ export class TelegramApiWrapper {
         console.log(dialog_items);
 
         return dialog_items;
-    }
+    };
 
     mapPeerToTruePeer = (peer) => {
         const type = peer._;
@@ -142,7 +142,7 @@ export class TelegramApiWrapper {
             }
         }
         return peer;
-    }
+    };
 
     getMessagesFromPeer = async (peer, limit = 10) => {
         return await telegramApi.invokeApi('messages.getHistory', {

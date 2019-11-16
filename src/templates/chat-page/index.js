@@ -4,24 +4,28 @@ import dialog from './dialog';
 import menu from './menu';
 import { TelegramApiWrapper } from '../../utils/services';
 import { subscribe, htmlToElement } from '../../helpers/index';
+import ChatMain from './chat-main'
 
-const startLoading = (elem) => {
+const startLoading = (elem, peer = {}) => {
+    // const loader = document.createElement('div');
     const loader = document.createElement('div');
+    const chatMain = ChatMain(peer);
+    loader.append(chatMain);
     elem.innerHTML = '';
-    loader.className = 'spinner';
+    // loader.className = 'spinner';
     elem.appendChild(loader);
     elem.classList.add('loading');
-}
+};
 
 const stopLoading = (elem) => {
     elem.innerHTML = '';
     elem.classList.remove('loading');
-}
+};
 
-const loadDialog = ({ id }) => {
-    console.log(id);
+const loadDialog = peer => {
+    console.log(peer);
     const right = document.getElementById('right');
-    startLoading(right);
+    startLoading(right, peer);
 };
 
 const loadData = () => {
@@ -32,8 +36,8 @@ const loadData = () => {
     ta.getDialogs(2).then(data => {
         data.map((user) => {
             const d = htmlToElement(dialog(user));
-            const { id } = user;
-            subscribe(d)('click', () => loadDialog({ id }));
+            const { dialog_peer } = user;
+            subscribe(d)('click', () => loadDialog(dialog_peer));
             userDialogs.appendChild(d);
         });
         const left = document.getElementById('left');
@@ -49,4 +53,8 @@ const loadData = () => {
 export default (elem) => {
     elem.innerHTML = template;
     loadData();
+    setTimeout(() => {
+        const dialog = document.getElementById('user-dialogs').childNodes[0];
+        dialog.dispatchEvent(new Event('click'));
+    }, 500);
 }
