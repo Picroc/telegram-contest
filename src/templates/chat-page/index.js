@@ -4,16 +4,17 @@ import dialog from './dialog';
 import menu from './menu';
 import { TelegramApiWrapper } from '../../utils/services';
 import { subscribe, htmlToElement, startLoading, stopLoading } from '../../helpers/index';
-import ChatMain from './chat-main'
+import ChatMain from './chat-main';
+import { updateSearchResults } from './contacts-menu';
 
-const loadDialog = peer => {
-    console.log(peer);
-    const right = document.getElementById('right');
-    startLoading(right);
-    ChatMain(peer).then(chatMain => {
-        stopLoading(right);
-        right.appendChild(chatMain)
-    });
+export const loadDialog = peer => {
+	console.log(peer);
+	const right = document.getElementById('right');
+	startLoading(right);
+	ChatMain(peer).then(chatMain => {
+		stopLoading(right);
+		right.appendChild(chatMain)
+	});
 };
 
 const loadData = () => {
@@ -30,7 +31,10 @@ const loadData = () => {
 		});
 		const left = document.getElementById('left');
 		stopLoading(left);
-		menu(left);
+		menu(left, 'contacts', updateSearchResults);
+
+		// subscribe(document.querySelector('.menu-list__contacts'))('click', () => { loadContacts() });
+
 		left.appendChild(userDialogs);
 		window.updateRipple();
 	});
@@ -43,5 +47,5 @@ export default elem => {
 	setTimeout(() => {
 		const dialog = document.getElementById('user-dialogs').childNodes[0];
 		dialog.dispatchEvent(new Event('click'));
-	}, 500);
+	}, 2000);
 };

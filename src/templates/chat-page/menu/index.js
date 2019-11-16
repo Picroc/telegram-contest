@@ -2,12 +2,13 @@ import './menu.scss';
 import template from './menu.html';
 import { subscribe, createInput, createDiv } from '../../../helpers';
 import img from './search.js';
+import { TelegramApiWrapper } from '../../../utils/services';
 
-export default elem => {
+export default (elem, type, callback) => {
 	const nav = document.createElement('nav');
 	nav.className = 'menu';
 	nav.innerHTML = template;
-	nav.appendChild(search());
+	nav.appendChild(search(type, callback));
 	elem.appendChild(nav);
 	const menu = document.querySelector('.menu-list');
 	subscribe('#menu__checkbox')('click', () => menu.classList.toggle('hidden'));
@@ -31,14 +32,38 @@ export const onType = event => {
 	);
 };
 
-const search = () => {
+let currentSeacrhTimeout;
+const tApi = new TelegramApiWrapper();
+
+const onTypeContacts = (value, searchCallback = () => { }) => {
+	if (value.length == 0) {
+		clearTimeout(currentSeacrhTimeout);
+		return;
+	}
+
+	if (currentSeacrhTimeout) clearTimeout(currentSeacrhTimeout);
+
+	currentSeacrhTimeout = setTimeout(() => {
+		tApi.searchPeers(value, 20)
+			.then(res => {
+				console.log(res);
+				searchCallback(res);
+			});
+	}, 1000);
+}
+
+const search = (type, searchCallback) => {
 	const searchWrapper = createDiv('menu__search-wrapper');
 	const searchIcon = createDiv('menu__search-icon');
 	searchIcon.innerHTML = img();
 	const search = createInput('search', 'menu__search', 'Search');
 	searchWrapper.appendChild(search);
 	searchWrapper.appendChild(searchIcon);
-	subscribe(search)('input', onType);
+	if (type === 'contacts') {
+		subscribe(search)('input', event => { onType(event); onTypeContacts(event.target.value, searchCallback) });
+	} else {
+		subscribe(search)('input', onType);
+	}
 
 	return searchWrapper;
 };
