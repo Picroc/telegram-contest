@@ -1,3 +1,14 @@
+export const cc = (cls, condition) => ({ class: cls, condition });
+
+export const clsx = (...clss) => clss.map(item => {
+	if (typeof item == 'object') {
+		console.log(item);
+		return item.condition ? item.class : '';
+	}
+
+	return item;
+}).join(' ');
+
 export const subscribe = element => {
 	const el = typeof element === 'string' ? document.querySelector(element) : element;
 	return function (...args) {

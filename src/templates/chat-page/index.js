@@ -7,16 +7,15 @@ import { subscribe, htmlToElement, startLoading, stopLoading } from '../../helpe
 import ChatMain from './chat-main';
 
 const loadDialog = (peer, dialog) => {
-    const right = document.getElementById('right');
-    startLoading(right);
-    ChatMain(peer, dialog).then(chatMain => {
+	const right = document.getElementById('right');
+	startLoading(right);
+	ChatMain(right, peer, dialog).then(() => {
 		stopLoading(right);
-		right.appendChild(chatMain);
 		subscribe('.top-bar__search')('click', () => {
 			const search = document.getElementById('search');
 			search.focus();
 		})
-    });
+	});
 };
 
 const loadData = () => {
