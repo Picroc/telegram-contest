@@ -68,8 +68,10 @@ export class TelegramApiWrapper {
             return monday;
         };
 
+        const formatTime = t => t < 10 ? "0" + t : t;
+        
         if (time.getDay() - currentTime.getDay() === 0) {
-            time = `${time.getHours()}:${time.getMinutes()}`;
+            time = `${formatTime(time.getHours())}:${formatTime(time.getMinutes())}`;
         } else if (time.getDay() > startOfTheWeek(time)) {
             time = days[time.getDay()];
         } else {
