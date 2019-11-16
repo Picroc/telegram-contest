@@ -11,6 +11,7 @@ let cntr = [
 let router;
 
 const getMaskedValue = (text) => {
+    checkIsInvalid();
     const newText = text.replace(/\D/g, '').slice(0, 15);
     const idx = Math.max(newText.length - 10, 1);
     const code = newText.slice(0, idx);
@@ -108,6 +109,13 @@ const routeToNewPage = () => {
 const showInvalid = () => {
     document.querySelector('.login-form__phone').classList.add('input-field_invalid');
     document.querySelector('.login-form__phone ~ label').innerHTML = 'Invalid phone';
+}
+
+const checkIsInvalid = () => {
+    if (document.querySelector('.login-form__phone').classList.contains('input-field_invalid')) {
+        document.querySelector('.login-form__phone').classList.remove('input-field_invalid');
+        document.querySelector('.login-form__phone ~ label').innerHTML = 'Phone';
+    }
 }
 
 const logIn = () => {

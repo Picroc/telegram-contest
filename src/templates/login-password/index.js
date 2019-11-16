@@ -3,9 +3,7 @@ import './login-password.scss';
 
 import lottie from 'lottie-web';
 
-import idle from '../../static/animation/monkey_idle.json';
-import peek from '../../static/animation/monkey_peek.json';
-import close_peek from '../../static/animation/monkey_close_peek.json';
+import { idle, peek, close_peek } from '../../utils/anim-monkey';
 
 let router;
 
@@ -21,6 +19,13 @@ const subscribe = (element) => {
 const showInvalid = () => {
     document.querySelector('.login-password__password').classList.add('input-field_invalid');
     document.querySelector('.login-password__password ~ label').value = 'Invalid Password';
+}
+
+const checkIsInvalid = () => {
+    if (document.querySelector('.login-password__password').classList.contains('input-field_invalid')) {
+        document.querySelector('.login-password__password').classList.remove('input-field_invalid');
+        document.querySelector('.login-password__password ~ label').innerHTML = 'Password';
+    }
 }
 
 const getAnimationItem = (elem, data, options) => () => lottie.loadAnimation({
@@ -74,7 +79,7 @@ const animFromCloseToIdle = (reverse) => {
 const handlePassword = (password) => {
     telegramApi.signIn2FA(password)
         .then(res => { console.log(res); router('chat_page'); })
-        .catch(err => { console.log(err); alert('Wrong password!'); });
+        .catch(err => { console.log(err); showInvalid(); });
 }
 
 export default (elem, rt) => {
@@ -82,7 +87,7 @@ export default (elem, rt) => {
     router = rt;
 
     window.current_animation = getAnimationItem('.cd-tgsticker', idle, { auto: true, loop: true })();
-
+    subscribe('.login-password__password')('input', () => { checkIsInvalid(); })
     subscribe('.login-password__password')('focus', () => { if (!state.closed) { animFromCloseToIdle(true); state.closed = true; } });
     // subscribe('.login-password__password')('focusout', () => { if (state.closed) { animFromCloseToIdle(false); state.closed = false; } });
     subscribe('.login-password__submit')('click', () => {

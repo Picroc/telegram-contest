@@ -1,7 +1,6 @@
 import template from './login-code.html';
 import './login-code.scss';
-import idle from '../../static/animation/monkey_idle.json';
-import peek from '../../static/animation/monkey_track.json';
+import { idle, track as peek } from '../../utils/anim-monkey';
 
 import lottie from 'lottie-web';
 
@@ -15,10 +14,18 @@ const showInvalid = () => {
     document.querySelector('.login-code__code ~ label').innerHTML = 'Invalid Code';
 }
 
+const checkIsInvalid = () => {
+    if (document.querySelector('.login-code__code').classList.contains('input-field_invalid')) {
+        document.querySelector('.login-code__code').classList.remove('input-field_invalid');
+        document.querySelector('.login-code__code ~ label').innerHTML = 'Code';
+    }
+}
+
 let router;
 let phone;
 
 const validateCode = (event) => {
+    checkIsInvalid();
     const code = event.target.value;
 
     const newText = code.replace(/\D/g, '').slice(0, 5);
@@ -91,13 +98,13 @@ const getSegments = (value) => {
 
 let prev_input = -1;
 
-export default (elem, rt, data) => {
+export default (elem, rt, data = {}) => {
     elem.innerHTML = template;
 
     router = rt;
-    // phone = data.phone;
+    phone = data.phone;
 
-    // elem.querySelector('.login-code__title').innerHTML = phone;
+    elem.querySelector('.login-code__title').innerHTML = phone;
 
     const monkey_idle = getAnimationItem('.cd-tgsticker', idle, { auto: true, loop: true });
     const monkey_peek = getAnimationItem('.cd-tgsticker', peek, { auto: false });

@@ -60,7 +60,7 @@ window.updateRipple = () => {
 }
 
 function render() {
-    LoginCode(App, routePage);
+    Login(App, routePage);
 }
 
 function onDocumentReady(callback) {

@@ -1,17 +1,25 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
+const WebpackCopyPlugin = require('copy-webpack-plugin');
 const merge = require('webpack-merge');
 
 
 const common = {
     entry: {
-        index: path.join(__dirname, 'src') + '/App.js'
+        index: path.join(__dirname, 'src') + '/App.js',
+        anim: path.join(__dirname, 'src') + '/utils/anim-monkey.js'
     },
     devtool: 'source-map',
     output: {
         filename: '[name].bundle.js',
         path: path.join(__dirname, 'build')
+    },
+    optimization: {
+        runtimeChunk: 'single',
+        splitChunks: {
+            chunks: 'all',
+        },
     },
     module: {
         rules: [
@@ -71,7 +79,7 @@ const common = {
             [
                 {
                     filepath: require.resolve("./src/utils/telegramApi.min.js"),
-                },
+                }
             ]
         )
     ]
