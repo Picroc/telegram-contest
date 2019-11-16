@@ -49,7 +49,7 @@ $hover-color: #f1f3f4;
         height: 8px;
         width: 8px;
         border-radius: 50%;
-        background: lawngreen;
+        background: #4dcd5e;
         border: 1px solid white;
         right: 2px;
         bottom: 0;
@@ -77,11 +77,29 @@ $hover-color: #f1f3f4;
     overflow: hidden;
   }
 
-  &__meta {
+  &__time {
+    grid-row: 1;
+    grid-column: 3;
     padding: 0 8px 0 4px;
     justify-self: right;
     color: $secondary;
     font-size: 12px;
+  }
+
+  &__unread-count {
+    grid-row: 2;
+    grid-column: 3;
+    color: white;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    padding: 2px 6px;
+    font-size: 12px;
+    justify-self: flex-end;
+    margin-right: 8px;
+    align-self: flex-start;
+    border-radius: 24px;
+    background-color: #4dcd5e;
   }
 }
 .chat-page {

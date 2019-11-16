@@ -108,6 +108,7 @@ export class TelegramApiWrapper {
                 isOnline: status._ === "userStatusOnline" ? true : false,
                 text: message.message,
                 time: this._convertDate(date),
+                unreadCount: dialogs[idx].unread_count,
                 dialog_peer: dialogs[idx].peer
             });
         });
