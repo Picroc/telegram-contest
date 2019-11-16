@@ -113,4 +113,7 @@ $hover-color: #f1f3f4;
   height: 100vh;
   background-color: $right-background;
   position: relative;
+  display: flex;
+  justify-content: center;
 }
+

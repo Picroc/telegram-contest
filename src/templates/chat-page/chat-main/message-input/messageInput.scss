@@ -106,6 +106,10 @@ svg {
   width: 24px;
   height: 24px;
   opacity: .5;
+  &.active {
+    fill: #4ea4f6;
+    opacity: .7;
+  }
 }
 
 .attach-media {
