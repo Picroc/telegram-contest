@@ -10,10 +10,9 @@ const loadDialog = peer => {
     console.log(peer);
     const right = document.getElementById('right');
     startLoading(right);
-    ChatMain(peer).then(chatMain => {
-        stopLoading(right);
-        right.appendChild(chatMain)
-    });
+    ChatMain(right, peer).then(() =>
+        stopLoading(right)
+    );
 };
 
 const loadData = () => {
@@ -42,6 +41,6 @@ export default elem => {
 	loadData();
 	setTimeout(() => {
 		const dialog = document.getElementById('user-dialogs').childNodes[0];
-		// dialog.dispatchEvent(new Event('click'));
+		dialog.dispatchEvent(new Event('click'));
 	}, 500);
 };

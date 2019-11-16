@@ -1,6 +1,6 @@
 .message-input {
   width: 600px;
-  min-height: 40px;
+  min-height: 22px;
   align-items: center;
   display: flex;
   justify-content: space-between;
@@ -30,31 +30,85 @@
   }
 
   &__input {
-    overflow-wrap: break-word;
-    resize:none;
+    resize: none;
     flex: auto;
-    word-wrap: break-word;
-    word-break: break-all;
+    align-self: center;
     border: 0 solid transparent;
-    margin: 10px;
+    margin: 0 0 5px 10px;
     width: 470px;
-    min-height: 22px;
+    min-height: 15px;
     outline: none;
+    padding-top: 12px;
+    padding-right: 20px;
+    & textarea {
+      position: relative;
+      resize: none;
+    }
   }
 }
 
+textarea::-webkit-scrollbar-track {
+  border: none;
+  border-radius: .5em;
+  background-color: #F5F5F5;
+  position: absolute;
+  right: 25px;
+}
+
+textarea::-webkit-scrollbar {
+  width: 6px;
+  background-color: #F5F5F5;
+  position: absolute;
+  right: 25px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background-color: #e3e3e3;
+  position: absolute;
+  right: 25px;
+}
+
+
 .voice-message {
+  cursor: pointer;
   background-color: #4ea4f6;
-  padding: 5px;
-  border-radius: 1.5em;
+  padding: 16px !important;
+  border-radius: 2.5em;
   fill: #FFFFFF;
+
   & svg {
     opacity: 1 !important;
   }
 }
 
+$send-button-size: 26px;
+
+.microphone, .send-arrow {
+  width: $send-button-size;
+  height: $send-button-size;
+}
+
+.microphone {
+  background: url("./microphone.svg") no-repeat;
+}
+
+.send-arrow {
+  background: url("./sendArrow.svg") no-repeat;
+}
+
+.svg {
+  align-self: flex-end;
+  padding-bottom: 6px;
+}
+
 svg {
+  cursor: pointer;
   width: 24px;
   height: 24px;
   opacity: .5;
+}
+
+.attach-media {
+  position: absolute;
+  right: 15px;
 }
