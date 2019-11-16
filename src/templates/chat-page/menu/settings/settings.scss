@@ -68,6 +68,8 @@ $hover-color: #f1f3f4;
       width: 80px;
       height: 80px;
     }
+    overflow: hidden;
+    border-radius: 40px;
   }
 
   &__name {

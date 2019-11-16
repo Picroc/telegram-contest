@@ -22,9 +22,21 @@ export default (elem, info) => {
         const settings = htmlToElement(template(info));
         elem.prepend(settings);
         cashed = settings;
+        telegramApi.getUserInfo()
+            .then(res => {
+                document.querySelector('.settings__name').innerHTML = res.first_name + (res.last_name ? ' ' + res.last_name : '');
+                document.querySelector('.settings__phone').innerHTML = '+' + res.phone;
+            })
+        telegramApi.getUserPhoto('blob', 'small')
+            .then(res => {
+                console.log(res);
+                const urlCreator = window.URL || window.webkitURL;
+                const imageUrl = urlCreator.createObjectURL(res);
+                document.querySelector(".settings__avatar img").src = imageUrl;
+            })
         subscribe('.settings__back')('click', () => hide(settings));
         subscribe('.settings-list__logout')('click', () => logout());
-    } 
-    
+    }
+
     setTimeout(() => show(cashed), 0);
 };

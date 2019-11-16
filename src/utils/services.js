@@ -99,7 +99,7 @@ export class TelegramApiWrapper {
 
         const dialog_items = [];
 
-        await dialogs.forEach((dialog) => {
+        await dialogs.forEach(async (dialog) => {
             let peer = dialog.peer;
             let title, status;
             if (peer._ === 'peerChat') {
@@ -140,7 +140,7 @@ export class TelegramApiWrapper {
                 text: text,
                 time: this._convertDate(date),
                 unreadCount: unread_count,
-                dialog_peer: peer,
+                dialog_peer: peer
             });
         });
 
@@ -186,8 +186,8 @@ export class TelegramApiWrapper {
 
         const search_items = [];
 
-        results.forEach(result => {
-            let peer, title, text;
+        await results.forEach(async result => {
+            let peer, title, text, photo;
 
             if (result._ === 'peerChat') {
                 const chat = chats[chats.findIndex(el => el.id === result.chat_id)];
@@ -221,7 +221,8 @@ export class TelegramApiWrapper {
                 title,
                 peer,
                 text,
-                status
+                status,
+                photo
             });
         });
 
