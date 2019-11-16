@@ -49,6 +49,7 @@ const getContent = ({message, date}) => {
 };
 
 export default async (elem, peer) => {
+    console.log('PEER', peer);
     const chatMain = createDiv('chat-main');
     const statusInfo = createDiv('status-info');
     const chatMessage = createDiv('chat-messages');
