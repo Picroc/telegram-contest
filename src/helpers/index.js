@@ -1,6 +1,6 @@
 export const subscribe = element => {
 	const el = typeof element === 'string' ? document.querySelector(element) : element;
-	return function(...args) {
+	return function (...args) {
 		el.addEventListener(...args);
 	};
 };
@@ -15,7 +15,7 @@ export const htmlToElement = html => {
 export const startLoading = elem => {
 	const loader = document.createElement('div');
 	loader.className = 'spinner';
-	elem.innerHTML = loader;
+	elem.appendChild(loader);
 	elem.classList.add('loading');
 };
 

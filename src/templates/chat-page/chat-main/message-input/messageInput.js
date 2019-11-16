@@ -1,7 +1,7 @@
-import microphoneSvg from "./microphone";
-import attachSvg from './attach'
-import emojiSvg from "./emoji";
-import './messageInput.scss'
+import microphoneSvg from './microphone';
+import attachSvg from './attach';
+import emojiSvg from './emoji';
+import './messageInput.scss';
 
 export default () => `
 <div id="message-input">
