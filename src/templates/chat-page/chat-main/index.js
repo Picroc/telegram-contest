@@ -19,10 +19,11 @@ const getSentDate = time => {
     const currentDate = new Date();
     const date = new Date(time * 1000);
 
-    const [day, month, year] = [date.getDay(), date.getMonth(), date.getFullYear()];
-    const daysPast = currentDate.getDay() - day;
+    const [day, month, year] = [date.getDate(), date.getMonth(), date.getFullYear()];
+    const daysPast = currentDate.getDate() - day;
 
     if (daysPast < 2) {
+        console.log('check day', day, currentDate.getDate(), daysPast, daysPast === 0 ? 'Today' : 'Yesterday');
         return daysPast === 0 ? 'Today' : 'Yesterday';
     } else if (currentDate.getFullYear() - year === 0) {
         const sentMonth = months[month];
@@ -54,10 +55,11 @@ export default async (elem, peer) => {
     const statusInfo = createDiv('status-info');
     const chatMessage = createDiv('chat-messages');
     let messageInput = InputMessage();
+    const {id} = await telegramApi.getUserInfo();
     chatMain.append(...[statusInfo, chatMessage, messageInput]);
 
     await loadMessages(peer).then(messages => {
-        let previousSentDate = 'Today';
+        let previousSentDate;
         let previousId = 0;
         for (const mes of messages.messages) {
             console.log(mes);
@@ -67,20 +69,22 @@ export default async (elem, peer) => {
                 entities: mentionedUsers,
                 from_id: fromId,
                 to_id: {user_id: userId},
+                media,
                 message,
             } = mes;
             const sentDate = getSentDate(date);
 
-            if (sentDate !== previousSentDate) {
+            if (previousSentDate && sentDate !== previousSentDate) {
                 chatMessage.insertAdjacentHTML('beforeEnd', makeDateBubble(previousSentDate));
-                previousSentDate = sentDate;
             }
-            const content = getContent({message, mentionedUsers, pFlags, date});
-            const bubbleMessage = makeBubble({content, isIncoming: fromId !== userId, haveTail: previousId !== fromId});
+
+            previousSentDate = sentDate;
+
+            const content = getContent({message, mentionedUsers, pFlags, date, media});
+            const bubbleMessage = makeBubble({content, isIncoming: fromId !== id, haveTail: previousId !== fromId});
             previousId = fromId;
             chatMessage.insertAdjacentHTML('beforeEnd', bubbleMessage);
         }
-        chatMessage.insertAdjacentHTML('beforeEnd', makeDateBubble(previousSentDate));
         console.log(messages);
     });
 
