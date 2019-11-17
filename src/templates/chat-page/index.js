@@ -9,8 +9,10 @@ import { updateSearchResults } from './contacts-menu';
 import topBar from '../chat-page/chat-main/top-bar';
 
 
-export const loadDialog = (peer, dialog) => {
+export const loadDialog = (elem, peer, dialog) => {
 	const right = document.getElementById('right');
+	const avatar = elem.children[0].children[0].src;
+	dialog = { ...dialog, avatar };
 	startLoading(right);
 	ChatMain(right, peer).then(() => {
 		stopLoading(right);
@@ -66,7 +68,7 @@ const loadData = async () => {
 
 			const d = htmlToElement(dialog(user));
 			const { dialog_peer } = user;
-			subscribe(d)('click', () => loadDialog(dialog_peer, user));
+			subscribe(d)('click', () => loadDialog(d, dialog_peer, user));
 			userDialogs.appendChild(d);
 		});
 

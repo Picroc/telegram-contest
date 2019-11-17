@@ -79,18 +79,18 @@ $send-button-size: 26px;
 .svg {
   align-self: flex-end;
   padding-bottom: 6px;
-}
-
-svg {
-  cursor: pointer;
-  width: 24px;
-  height: 24px;
-  opacity: .5;
-  &.active {
-    fill: #4ea4f6;
-    opacity: .7;
+  svg {
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    opacity: .5;
+    &.active {
+      fill: #4ea4f6;
+      opacity: .7;
+    }
   }
 }
+
 
 .attach-media {
   position: absolute;
