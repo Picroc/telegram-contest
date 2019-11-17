@@ -37,13 +37,11 @@ const loadPhotos = async () => {
 				if (photo) {
 					try {
 						dialogs.data[ind].children[0].children[0].src = photo;
-					} catch {
-						loadPhotos().then()
-					}
+					} catch {}
 				}
 			});
 
-		})(i), 100 * i)
+		})(i), 0)
     })
 };
 
