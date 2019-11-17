@@ -3,7 +3,7 @@ import './register-page.scss';
 import profileImage from '../profile-image/index';
 
 const subscribe = element => {
-	return function(...args) {
+	return function (...args) {
 		document.querySelector(element).addEventListener(...args);
 	};
 };
@@ -34,8 +34,8 @@ const handleRegister = () => {
 export default (elem, rt, data) => {
 	elem.innerHTML = template;
 
-	phone = data.phone;
-	code = data.code;
+	// phone = data.phone;
+	// code = data.code;
 	router = rt;
 
 	subscribe('.register-page__icon')('click', () => {
