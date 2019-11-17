@@ -33,7 +33,7 @@ const loadMessages = async (elem, messageGenerator) => {
     let previousId = 0;
     for (const mes of messages) {
         const {
-            pFlags,
+            pFlags = {},
             date,
             entities: mentionedUsers,
             from_id: fromId,
