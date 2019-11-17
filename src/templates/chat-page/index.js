@@ -29,19 +29,21 @@ const ta = new TelegramApiWrapper();
 const loadPhotos = async () => {
 	const dialogs = document.getElementById('user-dialogs');
 	cached.forEach((cachedItem, i) => {
-		setTimeout((async ind => {
+		setTimeout((ind => {
 			if (!cachedItem.photo) {
 				return;
 			}
-			const photo = await ta.getPhotoFile(cachedItem.photo.photo_small);
-			if (photo) {
-				try {
-					dialogs.data[ind].children[0].children[0].src = photo;
-				} catch {
-					await loadPhotos()
+			ta.getPhotoFile(cachedItem.photo.photo_small).then(photo => {
+				if (photo) {
+					try {
+						dialogs.data[ind].children[0].children[0].src = photo;
+					} catch {
+						loadPhotos().then()
+					}
 				}
-			}
-		})(i), 0)
+			});
+
+		})(i), 100 * i)
 	})
 };
 

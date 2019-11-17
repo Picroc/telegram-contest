@@ -5,9 +5,53 @@ import { createDiv } from '../../../helpers';
 import './messages.scss';
 import './chatMain.scss'
 
-const loadMessages = peer => {
+async function* fetchMessages(peer, limit = 30) {
     const ta = new TelegramApiWrapper();
-    return ta.getMessagesFromPeer(peer, 35);
+    let offsetId = 0;
+    let loadAll = false;
+    while (!loadAll) {
+        const messages = await ta.getMessagesFromPeer(peer, limit, offsetId);
+        offsetId = messages.messages[messages.messages.length - 1].id;
+        loadAll = messages.messages.length === 0;
+
+        for(const message of messages.messages) {
+            yield message;
+        }
+    }
+}
+
+const loadMessages = async (elem, messageGenerator) => {
+    const { id } = await telegramApi.getUserInfo();
+    const limit = 30;
+    const messages = [];
+    for (let i = 0; i < limit; i++) {
+        messages.push((await messageGenerator.next()).value);
+    }
+
+    let previousSentDate;
+    let previousId = 0;
+    for (const mes of messages) {
+        const {
+            pFlags,
+            date,
+            entities: mentionedUsers,
+            from_id: fromId,
+            media,
+            message,
+        } = mes;
+        const sentDate = getSentDate(date);
+
+        if (previousSentDate && sentDate !== previousSentDate) {
+            elem.insertAdjacentHTML('beforeEnd', makeDateBubble(previousSentDate));
+        }
+
+        previousSentDate = sentDate;
+
+        const content = getContent({message, mentionedUsers, pFlags, date, media});
+        const bubbleMessage = makeBubble({content, isIncoming: fromId !== id, haveTail: previousId !== fromId});
+        previousId = fromId;
+        elem.insertAdjacentHTML('beforeEnd', bubbleMessage);
+    }
 };
 
 const makeDateBubble = date => `
@@ -23,7 +67,6 @@ const getSentDate = time => {
     const daysPast = currentDate.getDate() - day;
 
     if (daysPast < 2) {
-        console.log('check day', day, currentDate.getDate(), daysPast, daysPast === 0 ? 'Today' : 'Yesterday');
         return daysPast === 0 ? 'Today' : 'Yesterday';
     } else if (currentDate.getFullYear() - year === 0) {
         const sentMonth = months[month];
@@ -34,13 +77,23 @@ const getSentDate = time => {
     }
 };
 
-const getContent = ({ message, date }) => {
+const getContent = ({message, date, media}) => {
     const dateObj = new Date(date);
     const formatTime = t => t < 10 ? "0" + t : t;
     const [hours, minutes] = [dateObj.getHours(), dateObj.getMinutes()];
     const time = `${formatTime(hours)}:${formatTime(minutes)}`;
+    let imageUrl;
+    if (media && media.photo && media.photo.sizes && media.photo.sizes[0].bytes) {
+        const sizes = media.photo.sizes;
+        const STRING_CHAR = sizes[0].bytes.reduce((data, byte) => {
+            return data + String.fromCharCode(byte);
+        }, '');
+        const base64String = btoa(STRING_CHAR);
+        imageUrl = `data:image/jpg;base64, ` + base64String;
+    }
     return `
         <div class="message">
+            ${imageUrl ? "<img src=\"" + imageUrl + "\" width=\"200px\" alt=\"Blob image\">" : ""}
             <div class="message-content">${message}</div>      
             <div class="message-info">
                 <div class="message-time">${time}</div>
@@ -54,39 +107,16 @@ export default async (elem, peer) => {
     const statusInfo = createDiv('status-info');
     const chatMessage = createDiv('chat-messages');
     let messageInput = InputMessage();
-    const { id } = await telegramApi.getUserInfo();
     chatMain.append(...[statusInfo, chatMessage, messageInput]);
 
-    await loadMessages(peer).then(messages => {
-        let previousSentDate;
-        let previousId = 0;
-        for (const mes of messages.messages) {
-            console.log(mes);
-            const {
-                pFlags,
-                date,
-                entities: mentionedUsers,
-                from_id: fromId,
-                to_id: { user_id: userId },
-                media,
-                message,
-            } = mes;
-            const sentDate = getSentDate(date);
-
-            if (previousSentDate && sentDate !== previousSentDate) {
-                chatMessage.insertAdjacentHTML('beforeEnd', makeDateBubble(previousSentDate));
-            }
-
-            previousSentDate = sentDate;
-
-            const content = getContent({ message, mentionedUsers, pFlags, date, media });
-            const bubbleMessage = makeBubble({ content, isIncoming: fromId !== id, haveTail: previousId !== fromId });
-            previousId = fromId;
-            chatMessage.insertAdjacentHTML('beforeEnd', bubbleMessage);
+    const limit = 30;
+    const messageGenerator = fetchMessages(peer, limit);
+    await loadMessages(chatMessage, messageGenerator);
+    chatMessage.addEventListener('scroll', () => {
+        if (chatMessage.scrollTop <= 100) {
+            loadMessages(chatMessage, messageGenerator).then()
         }
-        console.log(messages);
     });
-
 
     elem.append(chatMain);
     const textarea = elem.querySelector('.text-input__input');
@@ -112,5 +142,25 @@ export default async (elem, peer) => {
                 .forEach(svg => svg.classList.remove('active'));
             svg.classList.toggle('active');
         })
-    })
+    });
+
+    // document.getElementById('send-button').addEventListener('click', () => {
+    //     let recipientId;
+    //     switch (peer._) {
+    //         case 'peerChat':
+    //             recipientId = +peer.chat_id;
+    //             break;
+    //         case 'peerUser':
+    //             recipientId = +peer.user_id;
+    //             break;
+    //         case 'peerChannel':
+    //             recipientId = +peer.channel_id;
+    //             break;
+    //         default:
+    //             recipientId = 0;
+    //     }
+    //     if (textarea.value.trim().length > 0) {
+    //         telegramApi.sendMessage(recipientId, textarea.value.trim())
+    //     }
+    // })
 };
