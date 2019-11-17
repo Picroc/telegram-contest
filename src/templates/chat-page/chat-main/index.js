@@ -15,7 +15,7 @@ async function* fetchMessages(peer, limit = 30) {
         offsetId = mes[mes.length - 1] && mes[mes.length - 1].id || 0;
         loadAll = messages.messages.length === 0;
 
-        for(const message of messages.messages) {
+        for (const message of messages.messages) {
             yield message;
         }
     }
@@ -26,7 +26,10 @@ const loadMessages = async (elem, messageGenerator) => {
     const limit = 30;
     const messages = [];
     for (let i = 0; i < limit; i++) {
-        messages.push((await messageGenerator.next()).value);
+        const resp = await messageGenerator.next();
+        if (resp.done)
+            break;
+        messages.push(resp.value);
     }
 
     let previousSentDate;
@@ -48,8 +51,8 @@ const loadMessages = async (elem, messageGenerator) => {
 
         previousSentDate = sentDate;
 
-        const content = getContent({message, mentionedUsers, pFlags, date, media});
-        const bubbleMessage = makeBubble({content, isIncoming: fromId !== id, haveTail: previousId !== fromId});
+        const content = getContent({ message, mentionedUsers, pFlags, date, media });
+        const bubbleMessage = makeBubble({ content, isIncoming: fromId !== id, haveTail: previousId !== fromId });
         previousId = fromId;
         elem.insertAdjacentHTML('beforeEnd', bubbleMessage);
     }
@@ -78,7 +81,7 @@ const getSentDate = time => {
     }
 };
 
-const getContent = ({message, date, media}) => {
+const getContent = ({ message, date, media }) => {
     const dateObj = new Date(date);
     const formatTime = t => t < 10 ? "0" + t : t;
     const [hours, minutes] = [dateObj.getHours(), dateObj.getMinutes()];
@@ -119,7 +122,7 @@ export default async (elem, peer) => {
         }
     });
 
-    elem.append(chatMain);
+    elem.innerHTML = chatMain.outerHTML;
     const textarea = elem.querySelector('.text-input__input');
     textarea.addEventListener('input', () => {
         const sendButton = document.getElementById('send-button');

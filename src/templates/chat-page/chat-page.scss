@@ -29,6 +29,10 @@ $hover-color: #f1f3f4;
     cursor: pointer;
   }
 
+  &_active {
+    background-color: $hover-color;
+  }
+
   &__saved {
     width: 40px;
     height: 40px;
@@ -40,7 +44,7 @@ $hover-color: #f1f3f4;
     svg {
       width: 24px;
       height: 24px;
-      opacity: 1
+      opacity: 1;
     }
   }
 
