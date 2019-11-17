@@ -118,6 +118,12 @@ export default (elem, rt) => {
 			state.closed = true;
 		}
 	});
+	subscribe('.login-password__password')('keyup', event => {
+		if (event.keyCode === 13) {
+			event.preventDefault();
+			document.querySelector('.submit').click();
+		}
+	});
 	// subscribe('.login-password__password')('focusout', () => { if (state.closed) { animFromCloseToIdle(false); state.closed = false; } });
 	subscribe('.login-password__submit')('click', () => {
 		handlePassword(document.querySelector('.login-password__password').value);

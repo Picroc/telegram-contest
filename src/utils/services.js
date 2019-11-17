@@ -119,12 +119,6 @@ export class TelegramApiWrapper {
                     ...peer,
                     access_hash: channel.access_hash
                 };
-                if (chats[idx + 1]._ === 'chatForbidden') {
-                    peer = {
-                        ...peer,
-                        chatForbidden: true
-                    }
-                }
             } else {
                 const user = users[users.findIndex(el => el.id === peer.user_id)];
                 const last_name = user.last_name ? ' ' + user.last_name : ''

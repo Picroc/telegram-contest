@@ -119,6 +119,8 @@ const routeToNewPage = () => {
 const showInvalid = () => {
 	document.querySelector('.login-form__phone').classList.add('input-field_invalid');
 	document.querySelector('.login-form__phone ~ label').innerHTML = 'Invalid phone';
+	document.querySelector('.submit').classList.remove('submit_loading');
+	document.querySelector('.submit span').innerHTML = 'NEXT';
 };
 
 const checkIsInvalid = () => {
@@ -129,12 +131,16 @@ const checkIsInvalid = () => {
 };
 
 const logIn = () => {
+	document.querySelector('.submit').classList.add('submit_loading');
+	document.querySelector('.submit span').innerHTML = 'PLEASE WAIT';
 	const phone = document.querySelector('.login-form__phone').value;
 
 	if (!phone || phone.length < 11) {
 		showInvalid();
 		return;
 	}
+
+	// setTimeout(() => { showInvalid(); }, 2000);
 
 	telegramApi.sendCode(phone).then(res => {
 		telegramApi.sendSms(phone, res.phone_code_hash, res.next_type).then(() => {
@@ -159,6 +165,12 @@ export default (elem, rt) => {
 	});
 	subCountry('input', onCountryChange);
 	subscribe('.login-form__phone')('input', handleMaskedInput);
+	subscribe('.login-form__phone')('keyup', event => {
+		if (event.keyCode === 13) {
+			event.preventDefault();
+			document.querySelector('.submit').click();
+		}
+	});
 	subscribe('.login-form__submit')('click', () => {
 		logIn();
 	});

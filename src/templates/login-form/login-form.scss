@@ -238,6 +238,9 @@
   width: 360px;
   height: 54px;
 
+  cursor: pointer;
+  position: relative;
+
   background: rgb(79, 164, 246);
 
   border: 0;
@@ -296,4 +299,24 @@
 
 .cd-tgsticker svg {
   opacity: 1;
+}
+
+.submit_loading span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &::after {
+    content: "";
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    position: absolute;
+    right: 16px;
+    border-bottom-color: white;
+    border-right-color: white;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+  }
 }
