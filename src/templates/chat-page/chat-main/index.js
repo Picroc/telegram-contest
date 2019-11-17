@@ -11,7 +11,8 @@ async function* fetchMessages(peer, limit = 30) {
     let loadAll = false;
     while (!loadAll) {
         const messages = await ta.getMessagesFromPeer(peer, limit, offsetId);
-        offsetId = messages.messages[messages.messages.length - 1].id;
+        const mes = messages.messages;
+        offsetId = mes[mes.length - 1] && mes[mes.length - 1].id || 0;
         loadAll = messages.messages.length === 0;
 
         for(const message of messages.messages) {
