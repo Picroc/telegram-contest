@@ -26,7 +26,10 @@ const loadMessages = async (elem, messageGenerator) => {
     const limit = 30;
     const messages = [];
     for (let i = 0; i < limit; i++) {
-        messages.push((await messageGenerator.next()).value);
+        const resp = await messageGenerator.next();
+        if (resp.done)
+            break;
+        messages.push(resp.value);
     }
 
     let previousSentDate;
@@ -119,7 +122,7 @@ export default async (elem, peer) => {
         }
     });
 
-    elem.append(chatMain);
+    elem.innerHTML = chatMain.outerHTML;
     const textarea = elem.querySelector('.text-input__input');
     textarea.addEventListener('input', () => {
         const sendButton = document.getElementById('send-button');

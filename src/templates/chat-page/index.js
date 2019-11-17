@@ -8,8 +8,22 @@ import ChatMain from './chat-main';
 import { updateSearchResults } from './contacts-menu';
 import topBar from '../chat-page/chat-main/top-bar';
 
+let prevId;
+let prevActive;
 
 export const loadDialog = (elem, peer, dialog) => {
+	const id = peer.channel_id || peer.chat_id || peer.user_id;
+	if (prevActive) {
+		if (prevId === id) {
+			return;
+		} else {
+			prevActive.classList.toggle('dialog_active');
+		}
+	}
+	prevActive = elem;
+	prevId = id;
+
+	elem.classList.toggle('dialog_active');
 	const right = document.getElementById('right');
 	const avatar = elem.children[0].children[0].src;
 	dialog = { ...dialog, avatar };
@@ -27,9 +41,9 @@ export const loadDialog = (elem, peer, dialog) => {
 const ta = new TelegramApiWrapper();
 
 const loadPhotos = async () => {
-    const dialogs = document.getElementById('user-dialogs');
-    cached.forEach((cachedItem, i) => {
-        setTimeout((ind => {
+	const dialogs = document.getElementById('user-dialogs');
+	cached.forEach((cachedItem, i) => {
+		setTimeout((ind => {
 			if (!cachedItem.photo) {
 				return;
 			}
@@ -37,12 +51,12 @@ const loadPhotos = async () => {
 				if (photo) {
 					try {
 						dialogs.data[ind].children[0].children[0].src = photo;
-					} catch {}
+					} catch { }
 				}
 			});
 
 		})(i), 0)
-    })
+	})
 };
 
 let cached = [];
