@@ -89,7 +89,6 @@ const loadData = async () => {
 
 	await ta.getDialogs(5).then(load);
 	await ta.getDialogs(100).then(load);
-	await ta.getDialogs(1000).then(load);
 	return left;
 };
 
