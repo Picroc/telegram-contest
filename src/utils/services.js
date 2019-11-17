@@ -98,7 +98,7 @@ export class TelegramApiWrapper {
 
         const { chats, dialogs, messages, users } = result;
         // console.log(users);
-
+        
         const dialog_items = [];
 
         await dialogs.forEach(async (dialog) => {

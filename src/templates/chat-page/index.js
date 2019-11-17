@@ -28,12 +28,18 @@ const loadData = async () => {
 	const ta = new TelegramApiWrapper();
 	const left = document.getElementById('left');
 	let cached = [];
-	
+	const { id } = await telegramApi.getUserInfo();
+
 	const load = data => {
 		data.forEach(user => {
 			if (cached.filter(({ title }) => user.title === title).length > 0) {
 				return;
 			}
+
+			if (user.dialog_peer.user_id === id) {
+				user = { ...user, savedMessages: true };
+			}
+
 			const d = htmlToElement(dialog(user));
 			const { dialog_peer } = user;
 			subscribe(d)('click', () => loadDialog(dialog_peer, user));
