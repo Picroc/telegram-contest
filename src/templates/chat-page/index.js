@@ -97,6 +97,6 @@ export default elem => {
 	elem.innerHTML = template;
 	loadData()
 		.then(() => {
-			loadPhotos();
+			loadPhotos().then();
 		});
 };
