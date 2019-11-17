@@ -5,7 +5,6 @@ import img from './search.js';
 import { TelegramApiWrapper } from '../../../utils/services';
 import settings from './settings/index';
 
-
 export default (elem, type, callback) => {
 	const nav = document.createElement('nav');
 	nav.className = 'menu';

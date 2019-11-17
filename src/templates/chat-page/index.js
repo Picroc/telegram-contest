@@ -23,18 +23,15 @@ export const loadDialog = (peer, dialog) => {
 };
 
 const ta = new TelegramApiWrapper();
-const users = [];
 
 const loadPhotos = async (from = 0) => {
-	const dialogItems = document.getElementsByClassName('dialog__avatar-wrapper');
 	const dialogs = document.getElementById('user-dialogs');
-	console.log(dialogs.data);
 	for (let i = from; i < 100; i++) {
-		if (users[i].photo) {
-			const photo = await ta.getPhotoFile(users[i].photo.photo_small);
+		if (cached[i].photo) {
+			const photo = await ta.getPhotoFile(cached[i].photo.photo_small);
 			if (photo) {
 				try {
-					dialogItems[i].children[0].src = photo;
+					dialogs.data[i].children[0].children[0].src = photo;
 				} catch {
 					setTimeout(() => { loadPhotos(i) }, 10000);
 					break;
@@ -44,11 +41,17 @@ const loadPhotos = async (from = 0) => {
 	}
 }
 
+let cached = [];
+
 const loadData = async () => {
-	const userDialogs = document.createElement('div');
-	userDialogs.id = 'user-dialogs';
+	let userDialogs = document.getElementById('div');
 	const left = document.getElementById('left');
-	let cached = [];
+
+	if (userDialogs === null) {
+		userDialogs = document.createElement('div');
+		userDialogs.id = 'user-dialogs';
+	}
+
 	const { id } = await telegramApi.getUserInfo();
 
 	const load = data => {
@@ -61,7 +64,6 @@ const loadData = async () => {
 				user = { ...user, savedMessages: true };
 			}
 
-			users.push(user);
 			const d = htmlToElement(dialog(user));
 			const { dialog_peer } = user;
 			subscribe(d)('click', () => loadDialog(dialog_peer, user));
@@ -73,10 +75,11 @@ const loadData = async () => {
 		if (cached.length === 0) {
 			stopLoading(left);
 			menu(left, 'contacts', updateSearchResults);
+			left.appendChild(userDialogs);
 		}
 
 		cached = data;
-		left.appendChild(userDialogs);
+		userDialogs.data = Array.from(userDialogs.children)
 		window.updateRipple();
 	}
 
