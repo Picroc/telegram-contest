@@ -27,9 +27,9 @@ export const loadDialog = (elem, peer, dialog) => {
 const ta = new TelegramApiWrapper();
 
 const loadPhotos = async () => {
-    const dialogs = document.getElementById('user-dialogs');
-    cached.forEach((cachedItem, i) => {
-        setTimeout((async ind => {
+	const dialogs = document.getElementById('user-dialogs');
+	cached.forEach((cachedItem, i) => {
+		setTimeout((async ind => {
 			if (!cachedItem.photo) {
 				return;
 			}
@@ -38,11 +38,11 @@ const loadPhotos = async () => {
 				try {
 					dialogs.data[ind].children[0].children[0].src = photo;
 				} catch {
-				    await loadPhotos()
+					await loadPhotos()
 				}
 			}
 		})(i), 0)
-    })
+	})
 };
 
 let cached = [];
@@ -89,7 +89,6 @@ const loadData = async () => {
 
 	await ta.getDialogs(5).then(load);
 	await ta.getDialogs(100).then(load);
-	await ta.getDialogs(1000).then(load);
 	return left;
 };
 
@@ -97,10 +96,6 @@ export default elem => {
 	elem.innerHTML = template;
 	loadData()
 		.then(() => {
-			loadPhotos().then();
+			// loadPhotos().then();
 		});
-	setTimeout(() => {
-		const dialog = document.getElementById('user-dialogs').childNodes[0];
-		dialog.dispatchEvent(new Event('click'));
-	}, 2000);
 };
