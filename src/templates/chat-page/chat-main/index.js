@@ -15,7 +15,7 @@ async function* fetchMessages(peer, limit = 30) {
         offsetId = mes[mes.length - 1] && mes[mes.length - 1].id || 0;
         loadAll = messages.messages.length === 0;
 
-        for(const message of messages.messages) {
+        for (const message of messages.messages) {
             yield message;
         }
     }
@@ -51,8 +51,8 @@ const loadMessages = async (elem, messageGenerator) => {
 
         previousSentDate = sentDate;
 
-        const content = getContent({message, mentionedUsers, pFlags, date, media});
-        const bubbleMessage = makeBubble({content, isIncoming: fromId !== id, haveTail: previousId !== fromId});
+        const content = getContent({ message, mentionedUsers, pFlags, date, media });
+        const bubbleMessage = makeBubble({ content, isIncoming: fromId !== id, haveTail: previousId !== fromId });
         previousId = fromId;
         elem.insertAdjacentHTML('beforeEnd', bubbleMessage);
     }
@@ -81,7 +81,7 @@ const getSentDate = time => {
     }
 };
 
-const getContent = ({message, date, media}) => {
+const getContent = ({ message, date, media }) => {
     const dateObj = new Date(date);
     const formatTime = t => t < 10 ? "0" + t : t;
     const [hours, minutes] = [dateObj.getHours(), dateObj.getMinutes()];
