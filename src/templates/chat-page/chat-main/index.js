@@ -1,13 +1,13 @@
 import makeBubble from './bubbles/bubbleMessage';
 import InputMessage from './message-input';
-import {TelegramApiWrapper} from '../../../utils/services';
-import {createDiv} from '../../../helpers';
+import { TelegramApiWrapper } from '../../../utils/services';
+import { createDiv } from '../../../helpers';
 import './messages.scss';
 import './chatMain.scss'
 
 const loadMessages = peer => {
     const ta = new TelegramApiWrapper();
-    return ta.getMessagesFromPeer(peer, 15);
+    return ta.getMessagesFromPeer(peer, 35);
 };
 
 const makeDateBubble = date => `
@@ -33,7 +33,7 @@ const getSentDate = time => {
     }
 };
 
-const getContent = ({message, date}) => {
+const getContent = ({ message, date }) => {
     const dateObj = new Date(date);
     const formatTime = t => t < 10 ? "0" + t : t;
     const [hours, minutes] = [dateObj.getHours(), dateObj.getMinutes()];
@@ -49,7 +49,6 @@ const getContent = ({message, date}) => {
 };
 
 export default async (elem, peer) => {
-    console.log('PEER', peer);
     const chatMain = createDiv('chat-main');
     const statusInfo = createDiv('status-info');
     const chatMessage = createDiv('chat-messages');
@@ -66,7 +65,7 @@ export default async (elem, peer) => {
                 date,
                 entities: mentionedUsers,
                 from_id: fromId,
-                to_id: {user_id: userId},
+                to_id: { user_id: userId },
                 message,
             } = mes;
             const sentDate = getSentDate(date);
@@ -75,8 +74,8 @@ export default async (elem, peer) => {
                 chatMessage.insertAdjacentHTML('beforeEnd', makeDateBubble(previousSentDate));
                 previousSentDate = sentDate;
             }
-            const content = getContent({message, mentionedUsers, pFlags, date});
-            const bubbleMessage = makeBubble({content, isIncoming: fromId !== userId, haveTail: previousId !== fromId});
+            const content = getContent({ message, mentionedUsers, pFlags, date });
+            const bubbleMessage = makeBubble({ content, isIncoming: fromId !== userId, haveTail: previousId !== fromId });
             previousId = fromId;
             chatMessage.insertAdjacentHTML('beforeEnd', bubbleMessage);
         }

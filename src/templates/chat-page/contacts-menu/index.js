@@ -2,19 +2,15 @@ import './contacts-menu.scss';
 import Contact from './contact';
 import { subscribe } from '../../../helpers';
 import { loadDialog } from '..';
+import { TelegramApiWrapper } from '../../../utils/services';
 
 export default async (elem) => {
     menu = document.createElement('div');
 
-    await telegramApi.invokeApi('contacts.getContacts', {
-        hash: 0
-    })
-        .then(res => {
-            console.log(res);
-        });
-
     return menu;
 }
+
+const tApi = new TelegramApiWrapper();
 
 export const updateSearchResults = async res => {
     const menu = document.createElement('div');
@@ -29,7 +25,7 @@ export const updateSearchResults = async res => {
         `;
         menu.appendChild(title);
 
-        res.forEach(el => {
+        res.forEach(async el => {
             const item = document.createElement('div');
 
             item.innerHTML = Contact({

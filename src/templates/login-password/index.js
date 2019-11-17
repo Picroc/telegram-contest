@@ -13,7 +13,7 @@ const state = {
 };
 
 const subscribe = element => {
-	return function(...args) {
+	return function (...args) {
 		document.querySelector(element).addEventListener(...args);
 	};
 };
@@ -94,11 +94,9 @@ const handlePassword = password => {
 	telegramApi
 		.signIn2FA(password)
 		.then(res => {
-			console.log(res);
 			router('chat_page');
 		})
 		.catch(err => {
-			console.log(err);
 			showInvalid();
 		});
 };

@@ -30,7 +30,7 @@ const handleMaskedInput = event => {
 };
 
 const subscribe = element => {
-	return function(...args) {
+	return function (...args) {
 		document.querySelector(element).addEventListener(...args);
 	};
 };
@@ -38,11 +38,10 @@ const subscribe = element => {
 const countriesPopup = coutries => {
 	return coutries
 		.map(country => {
-			// console.log(emojiFlags[country.alpha])
 			return `
             <li class='popup-item'>
                 <span class='popup-item__flag'>${
-					emojiFlags[country.alpha] ? emojiFlags[country.alpha].emoji : 'NONE'
+				emojiFlags[country.alpha] ? emojiFlags[country.alpha].emoji : 'NONE'
 				}</span>
                 <span class='popup-item__name'>${country.name}</span>
                 <span class='popup-item__code'>+ ${country.code}</span>

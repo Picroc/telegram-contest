@@ -4,7 +4,6 @@ export const clsx = (...clss) =>
 	clss
 		.map(item => {
 			if (typeof item == 'object') {
-				console.log(item);
 				return item.condition ? item.class : '';
 			}
 
@@ -14,7 +13,7 @@ export const clsx = (...clss) =>
 
 export const subscribe = element => {
 	const el = typeof element === 'string' ? document.querySelector(element) : element;
-	return function(...args) {
+	return function (...args) {
 		el.addEventListener(...args);
 	};
 };

@@ -69,7 +69,7 @@ export class TelegramApiWrapper {
         };
 
         const formatTime = t => t < 10 ? "0" + t : t;
-        
+
         if (time.getDay() - currentTime.getDay() === 0) {
             time = `${formatTime(time.getHours())}:${formatTime(time.getMinutes())}`;
         } else if (time.getDay() > startOfTheWeek(time)) {
@@ -94,27 +94,31 @@ export class TelegramApiWrapper {
 
     getDialogs = async limit => {
         const { result } = await telegramApi.getDialogs(0, 1000);
-        console.log('CHATS', result);
 
         const { chats, dialogs, messages, users } = result;
-        // console.log(users);
 
         const dialog_items = [];
 
         await dialogs.forEach(async (dialog) => {
             let peer = dialog.peer;
-            let title, status;
+            let title, status, photo;
             if (peer._ === 'peerChat') {
-                title = chats[chats.findIndex(el => el.id === peer.chat_id)].title;
+                const chat = chats[chats.findIndex(el => el.id === peer.chat_id)];
+                title = chat.title;
+                if (chat.photo._ !== 'chatPhotoEmpty') {
+                    photo = chat.photo;
+                }
             } else if (peer._ === 'peerChannel') {
                 const idx = chats.findIndex(el => el.id === peer.channel_id);
                 const channel = chats[idx];
                 title = channel.title;
+                if (channel.photo._ !== 'chatPhotoEmpty') {
+                    photo = channel.photo;
+                }
                 peer = {
                     ...peer,
                     access_hash: channel.access_hash
                 };
-                console.log(channel);
                 if (chats[idx + 1]._ === 'chatForbidden') {
                     peer = {
                         ...peer,
@@ -126,6 +130,9 @@ export class TelegramApiWrapper {
                 const last_name = user.last_name ? ' ' + user.last_name : ''
                 title = user.first_name + last_name;
                 status = user.status;
+                if (user.photo && user.first_name !== 'Telegram') {
+                    photo = user.photo;
+                }
                 peer = user.access_hash ? {
                     ...peer,
                     access_hash: user.access_hash
@@ -142,13 +149,12 @@ export class TelegramApiWrapper {
                 text: text,
                 time: this._convertDate(date),
                 unreadCount: unread_count,
-                dialog_peer: peer
+                dialog_peer: peer,
+                photo
             });
         });
 
         dialog_items.sort((a, b) => a.time - b.time);
-
-        // console.log(dialog_items);
 
         return dialog_items;
     };
@@ -183,7 +189,6 @@ export class TelegramApiWrapper {
             limit
         });
 
-        console.log(res);
         const { results, users, chats } = res;
 
         const search_items = [];
@@ -195,6 +200,7 @@ export class TelegramApiWrapper {
                 const chat = chats[chats.findIndex(el => el.id === result.chat_id)];
                 title = chat.title;
                 text = chat.participants_count > 1 ? chat.participants_count + ' members' : chat.participants_count + ' member';
+                photo = chat.photo;
                 peer = {
                     ...result,
                     access_hash: chat.access_hash
@@ -203,6 +209,7 @@ export class TelegramApiWrapper {
                 const channel = chats[chats.findIndex(el => el.id === result.channel_id)];
                 title = channel.title;
                 text = channel.participants_count > 1 ? channel.participants_count + ' members' : channel.participants_count + ' member';
+                photo = channel.photo;
                 peer = {
                     ...result,
                     access_hash: channel.access_hash
@@ -212,6 +219,7 @@ export class TelegramApiWrapper {
                 title = user.first_name + ' ' + user.last_name;
                 status = user.status;
                 text = '@' + user.username;
+                photo = user.photo;
                 peer = user.access_hash ? {
                     ...result,
                     access_hash: user.access_hash
@@ -232,12 +240,36 @@ export class TelegramApiWrapper {
     }
 
     getMessagesFromPeer = async (peer, limit = 200, offsetId = 0) => {
-        console.log('Got peer', peer);
-        console.log('Will try to send', this.mapPeerToTruePeer(peer));
         return await telegramApi.invokeApi('messages.getHistory', {
             peer: this.mapPeerToTruePeer(peer),
             limit,
             offset_id: offsetId
         });
     };
+
+    getPhotoFile = async (location) => {
+        return await telegramApi.invokeApi('upload.getFile', {
+            location: {
+                _: "inputFileLocation",
+                // dc_id: 2,
+                // local_id: 100767,
+                // secret: "6658604105320603709",
+                // volume_id: "257713757",
+                dc_id: location.dc_id,
+                local_id: location.local_id,
+                secret: location.secret,
+                volume_id: location.volume_id,
+            },
+            offset: 0,
+            limit: 1048576
+        }, { fileDownload: true })
+            .then(res => {
+                return "data:image/png;base64," + btoa(String.fromCharCode(...new Uint8Array(res.bytes)));
+            })
+            .catch(err => {
+                if (err.type === 'FILEREF_UPGRADE_NEEDED') {
+                    return null;
+                }
+            });
+    }
 }

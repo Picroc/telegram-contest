@@ -59,7 +59,6 @@ export const routePage = (page, ...args) => {
 
 window.updateRipple = () => {
     [].map.call(document.querySelectorAll('[anim="ripple"]'), el => {
-        console.log(el);
         el.addEventListener('click', e => {
             e = e.touches ? e.touches[0] : e;
             const r = el.getBoundingClientRect(),

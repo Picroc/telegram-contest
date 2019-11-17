@@ -5,7 +5,7 @@ import { idle, track as peek } from '../../utils/anim-monkey';
 import lottie from 'lottie-web';
 
 const subscribe = element => {
-	return function(...args) {
+	return function (...args) {
 		document.querySelector(element).addEventListener(...args);
 	};
 };
@@ -31,8 +31,6 @@ const validateCode = event => {
 
 	const newText = code.replace(/\D/g, '').slice(0, 5);
 
-	console.log(code, newText);
-
 	if (newText.length === 5) {
 		telegramApi
 			.signIn(phone, window.phone_code_hash, newText)
@@ -49,7 +47,6 @@ const validateCode = event => {
 					router('login_password');
 				} else {
 					showInvalid();
-					console.log(err);
 				}
 			});
 	}

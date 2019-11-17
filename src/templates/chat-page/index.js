@@ -22,13 +22,33 @@ export const loadDialog = (peer, dialog) => {
 	});
 };
 
-const loadData = () => {
+const ta = new TelegramApiWrapper();
+const users = [];
+
+const loadPhotos = async (from = 0) => {
+	const dialogItems = document.getElementsByClassName('dialog__avatar-wrapper');
+	for (let i = from; i < 100; i++) {
+		if (users[i].photo) {
+			const photo = await ta.getPhotoFile(users[i].photo.photo_small);
+			if (photo) {
+				try {
+					dialogItems[i].children[0].src = photo;
+				} catch {
+					setTimeout(() => { loadPhotos(i) }, 10000);
+					break;
+				}
+			}
+		}
+	}
+}
+
+const loadData = async () => {
 	const userDialogs = document.createElement('div');
 	userDialogs.id = 'user-dialogs';
-	const ta = new TelegramApiWrapper();
 	const left = document.getElementById('left');
-	ta.getDialogs(2).then(data => {
+	await ta.getDialogs(2).then(data => {
 		data.map(user => {
+			users.push(user);
 			const d = htmlToElement(dialog(user));
 			const { dialog_peer } = user;
 			subscribe(d)('click', () => loadDialog(dialog_peer, user));
@@ -48,7 +68,10 @@ const loadData = () => {
 
 export default elem => {
 	elem.innerHTML = template;
-	loadData();
+	loadData()
+		.then(() => {
+			loadPhotos();
+		});
 	setTimeout(() => {
 		const dialog = document.getElementById('user-dialogs').childNodes[0];
 		dialog.dispatchEvent(new Event('click'));
