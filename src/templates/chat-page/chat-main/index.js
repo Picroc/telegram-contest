@@ -122,7 +122,8 @@ export default async (elem, peer) => {
         }
     });
 
-    elem.innerHTML = chatMain.outerHTML;
+    elem.innerHTML = '';
+    elem.append(chatMain);
     const textarea = elem.querySelector('.text-input__input');
     textarea.addEventListener('input', () => {
         const sendButton = document.getElementById('send-button');

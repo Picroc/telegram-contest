@@ -71,7 +71,7 @@ window.updateRipple = () => {
 };
 
 function render() {
-    RegisterPage(App, routePage);
+    Login(App, routePage);
 }
 
 function onDocumentReady(callback) {

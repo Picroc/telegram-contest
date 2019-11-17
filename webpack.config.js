@@ -10,7 +10,6 @@ const common = {
         index: path.join(__dirname, 'src') + '/App.js',
         anim: path.join(__dirname, 'src') + '/utils/anim-monkey.js'
     },
-    devtool: 'source-map',
     output: {
         filename: '[name].bundle.js',
         path: path.join(__dirname, 'build')
