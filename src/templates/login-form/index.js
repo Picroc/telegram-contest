@@ -70,8 +70,6 @@ const onCodeChoice = event => {
 const subscribePopupItems = () => {
 	const items = document.getElementsByClassName('popup-item');
 
-	// console.log(items);
-
 	Array.from(items, item =>
 		item.addEventListener('click', event => {
 			event.stopPropagation();

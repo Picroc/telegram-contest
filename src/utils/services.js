@@ -93,7 +93,7 @@ export class TelegramApiWrapper {
     };
 
     getDialogs = async limit => {
-        const { result } = await telegramApi.getDialogs(0, 1000);
+        const { result } = await telegramApi.getDialogs(0, limit);
 
         const { chats, dialogs, messages, users } = result;
 
@@ -101,7 +101,7 @@ export class TelegramApiWrapper {
 
         await dialogs.forEach(async (dialog) => {
             let peer = dialog.peer;
-            let title, status, photo;
+            let title, status, photo, onlineInfo;
             if (peer._ === 'peerChat') {
                 const chat = chats[chats.findIndex(el => el.id === peer.chat_id)];
                 title = chat.title;
@@ -216,7 +216,8 @@ export class TelegramApiWrapper {
                 };
             } else {
                 const user = users[users.findIndex(el => el.id === result.user_id)];
-                title = user.first_name + ' ' + user.last_name;
+                const last_name = user.last_name ? ' ' + user.last_name : ''
+                title = user.first_name + last_name;
                 status = user.status;
                 text = '@' + user.username;
                 photo = user.photo;

@@ -1,6 +1,6 @@
 import search from './svg/search.svg';
-import more from './svg/more_svg.svg';
-import mute from './svg/mute_svg.svg';
+import more from './svg/more.svg';
+import mute from './svg/mute.svg';
 import { clsx, cc } from '../../../../helpers/index';
 
 export default ({

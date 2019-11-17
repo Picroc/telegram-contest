@@ -28,6 +28,21 @@ $hover-color: #f1f3f4;
     cursor: pointer;
   }
 
+  &__saved {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #4ea4f6;
+    svg {
+      width: 24px;
+      height: 24px;
+      opacity: 1
+    }
+  }
+
   &__avatar-wrapper {
     justify-self: center;
     grid-column: 1;

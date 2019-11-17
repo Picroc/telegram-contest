@@ -27,6 +27,8 @@ const users = [];
 
 const loadPhotos = async (from = 0) => {
 	const dialogItems = document.getElementsByClassName('dialog__avatar-wrapper');
+	const dialogs = document.getElementById('user-dialogs');
+	console.log(dialogs.data);
 	for (let i = from; i < 100; i++) {
 		if (users[i].photo) {
 			const photo = await ta.getPhotoFile(users[i].photo.photo_small);
@@ -46,23 +48,40 @@ const loadData = async () => {
 	const userDialogs = document.createElement('div');
 	userDialogs.id = 'user-dialogs';
 	const left = document.getElementById('left');
-	await ta.getDialogs(2).then(data => {
-		data.map(user => {
+	let cached = [];
+	const { id } = await telegramApi.getUserInfo();
+
+	const load = data => {
+		data.forEach(user => {
+			if (cached.filter(({ title }) => user.title === title).length > 0) {
+				return;
+			}
+
+			if (user.dialog_peer.user_id === id) {
+				user = { ...user, savedMessages: true };
+			}
+
 			users.push(user);
 			const d = htmlToElement(dialog(user));
 			const { dialog_peer } = user;
 			subscribe(d)('click', () => loadDialog(dialog_peer, user));
 			userDialogs.appendChild(d);
 		});
+
 		const left = document.getElementById('left');
-		stopLoading(left);
-		menu(left, 'contacts', updateSearchResults);
 
-		// subscribe(document.querySelector('.menu-list__contacts'))('click', () => { loadContacts() });
+		if (cached.length === 0) {
+			stopLoading(left);
+			menu(left, 'contacts', updateSearchResults);
+		}
 
+		cached = data;
 		left.appendChild(userDialogs);
 		window.updateRipple();
-	});
+	}
+
+	await ta.getDialogs(5).then(load)
+	await ta.getDialogs(100).then(load);
 	return left;
 };
 
