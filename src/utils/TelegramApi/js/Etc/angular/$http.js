@@ -1,17 +1,17 @@
-export default class $httpModule {
-    post(url, data) {
-        return new Promise(function (resolve, reject) {
-            var xhr = new XMLHttpRequest();
+export default class $http {
+    static post = (url, data) => {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
 
             xhr.open('POST', url, true);
             xhr.responseType = 'arraybuffer';
-            xhr.onload = function () {
-                var result = { data: xhr.response };
+            xhr.onload = () => {
+                const result = { data: xhr.response };
                 xhr.status == 200
                     ? resolve(result)
                     : reject(result);
             };
-            xhr.onerror = xhr.onabort = function () {
+            xhr.onerror = xhr.onabort = () => {
                 reject({ status: xhr.status });
             };
             xhr.send(data);

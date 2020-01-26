@@ -1,4 +1,4 @@
-export default function $timeoutModule() {
+export default function $timeout() {
     timeout = (cb, t) => new Promise((resolve, reject) => {
         this.__timeoutID = setTimeout(() => {
             resolve(cb());

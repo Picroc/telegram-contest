@@ -1,3 +1,3 @@
-export default function $intervalModule() {
+export default function $interval() {
     return setInterval;
 }
