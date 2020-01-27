@@ -5,6 +5,9 @@
  * https://github.com/zhukov/webogram/blob/master/LICENSE
  */
 
+import { SecureRandom, BigInteger } from 'jsbn';
+import CryptoJS from 'crypto-js';
+
 export function bigint(num) {
   return new BigInteger(num.toString(16), 16);
 }

@@ -275,4 +275,9 @@ export default class MtpApiManagerModule {
         return baseDcID || false;
     }
 
+    //legacy
+
+    invokeApi = this.mtpInvokeApi;
+    getUserID = this.mtpGetUserID;
+
 }
