@@ -52,6 +52,7 @@ export default class MtpRsaKeysManagerModule {
         return false;
     }
 
+    //legacy
     prepare = this.prepareRsaKeys;
     select = this.selectRsaKeyByFingerPrint;
 }

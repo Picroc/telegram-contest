@@ -45,4 +45,8 @@ export default class MtpTimeManagerModule {
 
         return changed;
     }
+
+    //legacy
+    generateID = this.generateMessageID;
+
 }

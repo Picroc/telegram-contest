@@ -279,5 +279,8 @@ export default class MtpApiManagerModule {
 
     invokeApi = this.mtpInvokeApi;
     getUserID = this.mtpGetUserID;
+    getNetworker = this.mtpGetNetworker;
+    setUserAuth = this.mtpSetUserAuth;
+    logOut = this.mtpLogOut;
 
 }

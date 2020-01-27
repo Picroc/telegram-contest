@@ -397,4 +397,7 @@ export default class MtpAuthorizerModule {
                 });
         });
     }
+
+    //legacy
+    auth = this.mtpAuth;
 }
