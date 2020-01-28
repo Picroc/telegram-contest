@@ -17,5 +17,9 @@ export default class StorageModule {
                 });
             };
         });
+        this.get = this.methods.get;
+        this.set = this.methods.set;
+        this.remove = this.methods.remove;
     }
+
 }

@@ -2,23 +2,21 @@ import StorageModule from "../Etc/Storage";
 import { nextRandomInt, longFromInts } from "../lib/bin_utils";
 import { tsNow, dT } from "../lib/utils";
 
-export default class MtpTimeManagerModule {
-    lastMessageID = [0, 0];
-    timeOffset = 0;
+export default function MtpTimeManagerModule() {
+    window.lastMessageID = [0, 0];
+    window.timeOffset = 0;
 
-    Storage = new StorageModule();
+    const Storage = new StorageModule();
 
-    constructor() {
-        this.Storage.get('server_time_offset').then((to) => {
-            if (to) {
-                this.timeOffset = to;
-            }
-        });
-    }
+    Storage.methods.get('server_time_offset').then((to) => {
+        if (to) {
+            timeOffset = to;
+        }
+    });
 
-    generateMessageID = () => {
+    const generateMessageID = () => {
         const timeTicks = tsNow(),
-            timeSec = Math.floor(timeTicks / 1000) + this.timeOffset,
+            timeSec = Math.floor(timeTicks / 1000) + timeOffset,
             timeMSec = timeTicks % 1000,
             random = nextRandomInt(0xFFFF);
 
@@ -29,24 +27,26 @@ export default class MtpTimeManagerModule {
             messageID = [lastMessageID[0], lastMessageID[1] + 4];
         }
 
-        this.lastMessageID = messageID;
+        lastMessageID = messageID;
 
         return longFromInts(messageID[0], messageID[1]);
     }
 
-    applyServerTime = (serverTime, localTime) => {
+    const applyServerTime = (serverTime, localTime) => {
         const newTimeOffset = serverTime - Math.floor((localTime || tsNow()) / 1000),
-            changed = Math.abs(this.timeOffset - newTimeOffset) > 10;
-        this.Storage.set({ server_time_offset: newTimeOffset });
+            changed = Math.abs(timeOffset - newTimeOffset) > 10;
+        Storage.set({ server_time_offset: newTimeOffset });
 
-        this.lastMessageID = [0, 0];
-        this.timeOffset = newTimeOffset;
+        lastMessageID = [0, 0];
+        timeOffset = newTimeOffset;
         console.log(dT(), 'Apply server time', serverTime, localTime, newTimeOffset, changed);
 
         return changed;
     }
 
-    //legacy
-    generateID = this.generateMessageID;
+    return {
+        generateID: generateMessageID,
+        applyServerTime
+    }
 
 }

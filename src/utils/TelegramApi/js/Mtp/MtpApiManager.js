@@ -8,77 +8,75 @@ import MtpNetworkerFactoryModule from "./MtpNetworkerFactory";
 import MtpAuthorizerModule from "./MtpAuthorizer";
 import { dT, tsNow } from "../lib/utils";
 
-export default class MtpApiManagerModule {
-    cachedNetworkers = {};
-    cachedUploadNetworkers = {};
-    cachedExportPromise = {};
-    baseDcID = false;
+export default function MtpApiManagerModule() {
+    let cachedNetworkers = {};
+    let cachedUploadNetworkers = {};
+    let cachedExportPromise = {};
+    let baseDcID = false;
 
-    telegramMeNotified;
+    let telegramMeNotified;
 
-    MtpSingleInstanceService = new MtpSingleInstanceServiceModule();
-    MtpNetworkerFactory = new MtpNetworkerFactoryModule();
-    MtpAuthorizer = new MtpAuthorizerModule();
-    Storage = new StorageModule();
-    TelegramMeWebService = new TelegramMeWebServiceModule();
-    qSync = new qSyncModule();
+    let MtpSingleInstanceService = MtpSingleInstanceServiceModule();
+    let MtpNetworkerFactory = MtpNetworkerFactoryModule();
+    let MtpAuthorizer = new MtpAuthorizerModule();
+    let Storage = new StorageModule();
+    let TelegramMeWebService = new TelegramMeWebServiceModule();
+    let qSync = new qSyncModule();
 
-    constructor() {
-        this.MtpSingleInstanceService.start();
+    MtpSingleInstanceService.start();
 
-        this.Storage.get('dc').then((dcID) => {
-            if (dcID) {
-                this.baseDcID = dcID;
-            }
-        });
-    }
+    Storage.get('dc').then((dcID) => {
+        if (dcID) {
+            baseDcID = dcID;
+        }
+    });
 
-    telegramMeNotify = (newValue) => {
-        if (this.telegramMeNotified !== newValue) {
-            this.telegramMeNotified = newValue;
-            this.TelegramMeWebService.setAuthorized(this.telegramMeNotified);
+    const telegramMeNotify = (newValue) => {
+        if (telegramMeNotified !== newValue) {
+            telegramMeNotified = newValue;
+            TelegramMeWebService.setAuthorized(telegramMeNotified);
         }
     }
 
-    mtpSetUserAuth = (dcID, userAuth) => {
+    const mtpSetUserAuth = (dcID, userAuth) => {
         const fullUserAuth = extend({ dcID: dcID }, userAuth);
-        this.Storage.set({
+        Storage.set({
             dc: dcID,
             user_auth: fullUserAuth
         });
-        this.telegramMeNotify(true);
+        telegramMeNotify(true);
 
-        this.baseDcID = dcID;
+        baseDcID = dcID;
     }
 
-    mtpLogOut = () => {
+    const mtpLogOut = () => {
         const storageKeys = [];
         for (let dcID = 1; dcID <= 5; dcID++) {
             storageKeys.push('dc' + dcID + '_auth_key');
         }
 
-        return this.Storage.get.apply(Storage, storageKeys).then((storageResult) => {
+        return Storage.get.apply(Storage, storageKeys).then((storageResult) => {
             const logoutPromises = [];
             for (let i = 0; i < storageResult.length; i++) {
                 if (storageResult[i]) {
-                    logoutPromises.push(this.mtpInvokeApi('auth.logOut', {}, { dcID: i + 1 }));
+                    logoutPromises.push(mtpInvokeApi('auth.logOut', {}, { dcID: i + 1 }));
                 }
             }
             return Promise.all(logoutPromises).then(() => {
-                this.Storage.remove('dc', 'user_auth');
-                this.baseDcID = false;
-                this.telegramMeNotify(false);
+                Storage.remove('dc', 'user_auth');
+                baseDcID = false;
+                telegramMeNotify(false);
             }, (error) => {
-                this.Storage.remove.apply(storageKeys);
-                this.Storage.remove('dc', 'user_auth');
-                this.baseDcID = false;
+                Storage.remove.apply(storageKeys);
+                Storage.remove('dc', 'user_auth');
+                baseDcID = false;
                 error.handled = true;
-                this.telegramMeNotify(false);
+                telegramMeNotify(false);
             });
         });
     }
 
-    mtpGetNetworker = (dcID, options) => {
+    const mtpGetNetworker = (dcID, options) => {
         options = options || {};
 
         const cache = (options.fileUpload || options.fileDownload)
@@ -89,13 +87,13 @@ export default class MtpApiManagerModule {
         }
 
         if (cache[dcID] !== undefined) {
-            return this.qSync.when(cache[dcID]);
+            return qSync.when(cache[dcID]);
         }
 
         const akk = 'dc' + dcID + '_auth_key',
             ssk = 'dc' + dcID + '_server_salt';
 
-        return this.Storage.get(akk, ssk).then((result) => {
+        return Storage.get(akk, ssk).then((result) => {
 
             if (cache[dcID] !== undefined) {
                 return cache[dcID];
@@ -108,22 +106,22 @@ export default class MtpApiManagerModule {
                 const authKey = bytesFromHex(authKeyHex);
                 const serverSalt = bytesFromHex(serverSaltHex);
 
-                return cache[dcID] = this.MtpNetworkerFactory.getNetworker(dcID, authKey, serverSalt, options);
+                return cache[dcID] = MtpNetworkerFactory.getNetworker(dcID, authKey, serverSalt, options);
             }
 
             if (!options.createNetworker) {
                 return Promise.reject({ type: 'AUTH_KEY_EMPTY', code: 401 });
             }
 
-            return this.MtpAuthorizer.auth(dcID).then((auth) => {
+            return MtpAuthorizer.auth(dcID).then((auth) => {
                 const storeObj = {};
                 storeObj[akk] = bytesToHex(auth.authKey);
                 storeObj[ssk] = bytesToHex(auth.serverSalt);
-                this.Storage.set(storeObj);
+                Storage.set(storeObj);
 
                 console.log("AUTH", auth);
 
-                return cache[dcID] = this.MtpNetworkerFactory.getNetworker(dcID, auth.authKey, auth.serverSalt, options);
+                return cache[dcID] = MtpNetworkerFactory.getNetworker(dcID, auth.authKey, auth.serverSalt, options);
             }, (error) => {
                 console.log('Get networker error', error, error.stack);
                 return Promise.reject(error);
@@ -131,7 +129,7 @@ export default class MtpApiManagerModule {
         });
     }
 
-    mtpInvokeApi = (method, params, options) => {
+    const mtpInvokeApi = (method, params, options) => {
         options = options || {};
 
         return new Promise((resolve, reject) => {
@@ -176,17 +174,17 @@ export default class MtpApiManagerModule {
                         resolve(result);
                     },
                     (error) => {
-                        console.error(dT(), 'Error', error.code, error.type, this.baseDcID, dcID);
-                        if (error.code == 401 && this.baseDcID == dcID) {
-                            this.Storage.remove('dc', 'user_auth');
-                            this.telegramMeNotify(false);
+                        console.error(dT(), 'Error', error.code, error.type, baseDcID, dcID);
+                        if (error.code == 401 && baseDcID == dcID) {
+                            Storage.remove('dc', 'user_auth');
+                            telegramMeNotify(false);
                             rejectPromise(error);
                         }
-                        else if (error.code == 401 && this.baseDcID && dcID != this.baseDcID) {
-                            if (this.cachedExportPromise[dcID] === undefined) {
+                        else if (error.code == 401 && baseDcID && dcID != baseDcID) {
+                            if (cachedExportPromise[dcID] === undefined) {
                                 const exportPromise = new Promise((exportResolve, exportReject) => {
-                                    this.mtpInvokeApi('auth.exportAuthorization', { dc_id: dcID }, { noErrorBox: true }).then((exportedAuth) => {
-                                        this.mtpInvokeApi('auth.importAuthorization', {
+                                    mtpInvokeApi('auth.exportAuthorization', { dc_id: dcID }, { noErrorBox: true }).then((exportedAuth) => {
+                                        mtpInvokeApi('auth.importAuthorization', {
                                             id: exportedAuth.id,
                                             bytes: exportedAuth.bytes
                                         }, { dcID: dcID, noErrorBox: true }).then(() => {
@@ -199,10 +197,10 @@ export default class MtpApiManagerModule {
                                     });
                                 });
 
-                                this.cachedExportPromise[dcID] = exportPromise;
+                                cachedExportPromise[dcID] = exportPromise;
                             }
 
-                            this.cachedExportPromise[dcID].then(() => {
+                            cachedExportPromise[dcID].then(() => {
                                 (cachedNetworker = networker).wrapApiCall(method, params, options).then((result) => {
                                     resolve(result);
                                 }, rejectPromise);
@@ -214,10 +212,10 @@ export default class MtpApiManagerModule {
                                 if (options.dcID) {
                                     options.dcID = newDcID;
                                 } else {
-                                    this.Storage.set({ dc: this.baseDcID = newDcID });
+                                    Storage.set({ dc: baseDcID = newDcID });
                                 }
 
-                                this.mtpGetNetworker(newDcID, options).then((networker) => {
+                                mtpGetNetworker(newDcID, options).then((networker) => {
                                     networker.wrapApiCall(method, params, options).then((result) => {
                                         resolve(result);
                                     }, rejectPromise);
@@ -253,34 +251,36 @@ export default class MtpApiManagerModule {
                     });
             };
 
-            dcID = options.dcID || this.baseDcID;
+            dcID = options.dcID || baseDcID;
             if (dcID) {
                 mtpGetNetworker(dcID, options).then(performRequest, rejectPromise);
             } else {
-                this.Storage.get('dc').then((baseDcID) => {
+                Storage.get('dc').then((baseDcID) => {
                     mtpGetNetworker(dcID = baseDcID || 2, options).then(performRequest, rejectPromise);
                 });
             }
         });
     }
 
-    mtpGetUserID = () => {
-        return this.Storage.get('user_auth').then((auth) => {
-            this.telegramMeNotify(auth && auth.id > 0 || false);
+    const mtpGetUserID = () => {
+        return Storage.get('user_auth').then((auth) => {
+            telegramMeNotify(auth && auth.id > 0 || false);
             return auth.id || 0;
         });
     }
 
-    getBaseDcID = () => {
+    const getBaseDcID = () => {
         return baseDcID || false;
     }
 
-    //legacy
-
-    invokeApi = this.mtpInvokeApi;
-    getUserID = this.mtpGetUserID;
-    getNetworker = this.mtpGetNetworker;
-    setUserAuth = this.mtpSetUserAuth;
-    logOut = this.mtpLogOut;
+    return {
+        telegramMeNotify,
+        invokeApi: mtpInvokeApi,
+        getUserID: mtpGetUserID,
+        getNetworker: mtpGetNetworker,
+        setUserAuth: mtpSetUserAuth,
+        logOut: mtpLogOut,
+        getBaseDcID
+    }
 
 }

@@ -3,100 +3,108 @@ import IdleManagerModule from "../Etc/IdleManager";
 import StorageModule from "../Etc/Storage";
 import { dT, tsNow } from "../lib/utils";
 import $rootScope from '../Etc/angular/$rootScope';
-import { MtpNetworkerFactoryModule } from "./MtpNetworkerFactory";
+import MtpNetworkerFactoryModule from "./MtpNetworkerFactory";
 import $timeout from "../Etc/angular/$timeout";
+import { Config } from "../lib/config";
 
-export default class MtpSingleInstanceServiceModule {
+export default function MtpSingleInstanceServiceModule() {
 
-    instanceID = nextRandomInt(0xFFFFFFFF);
-    started = false;
-    masterInstance = false;
-    deactivatePromise = false;
-    deactivated = false;
+    window.instanceID = nextRandomInt(0xFFFFFFFF);
+    window.started = false;
+    window.masterInstance = false;
+    window.deactivatePromise = false;
+    window.deactivated = false;
 
-    IdleManager = new IdleManagerModule();
-    Storage = new StorageModule();
-    MtpNetworkerFactory = new MtpNetworkerFactoryModule();
+    let IdleManager = new IdleManagerModule();
+    let Storage = new StorageModule();
+    let MtpNetworkerFactory = MtpNetworkerFactoryModule();
 
-    start = () => {
-        if (!this.started && !Config.Navigator.mobile) {
-            this.started = true;
+    const start = () => {
+        if (!started && !Config.Navigator.mobile) {
+            started = true;
 
-            this.IdleManager.start();
+            IdleManager.start();
 
             // $interval(checkInstance, 5000);
-            setInterval(this.checkInstance, 5000);
-            this.checkInstance();
+            setInterval(checkInstance, 5000);
+            checkInstance();
 
             try {
                 // $(window).on('beforeunload', clearInstance);
-                window.addEventListener('beforeunload', this.clearInstance);
+                window.addEventListener('beforeunload', clearInstance);
             } catch (e) {
                 console.log("Error starting instance: ", e);
             }
         }
     }
 
-    clearInstance = () => {
-        this.Storage.remove(this.masterInstance ? 'xt_instance' : 'xt_idle_instance');
+    const clearInstance = () => {
+        Storage.methods.remove(masterInstance ? 'xt_instance' : 'xt_idle_instance');
     }
 
-    deactivateInstance = () => {
-        if (this.masterInstance || this.deactivated) {
+    const deactivateInstance = () => {
+        if (masterInstance || deactivated) {
             return false;
         }
         console.log(dT(), 'deactivate');
-        this.deactivatePromise = false;
-        this.deactivated = true;
-        this.clearInstance();
+        deactivatePromise = false;
+        deactivated = true;
+        clearInstance();
 
         $rootScope.idle.deactivated = true;
     }
 
-    checkInstance = () => {
-        if (this.deactivated) {
+    const checkInstance = () => {
+        if (deactivated) {
             return false;
         }
 
         const time = tsNow();
         const idle = $rootScope.idle && $rootScope.idle.isIDLE;
-        const newInstance = { id: this.instanceID, idle: idle, time: time };
+        const newInstance = { id: instanceID, idle: idle, time: time };
 
-        this.Storage.get('xt_instance', 'xt_idle_instance').then((result) => {
+        Storage.methods.get('xt_instance', 'xt_idle_instance').then((result) => {
             const curInstance = result[0],
                 idleInstance = result[1];
 
             // console.log(dT(), 'check instance', newInstance, curInstance, idleInstance);
             if (!idle || !curInstance ||
-                curInstance.id == this.instanceID ||
+                curInstance.id == instanceID ||
                 curInstance.time < time - 60000) {
 
                 if (idleInstance &&
-                    idleInstance.id == this.instanceID) {
-                    this.Storage.remove('xt_idle_instance');
+                    idleInstance.id == instanceID) {
+                    Storage.methods.remove('xt_idle_instance');
                 }
-                this.Storage.set({ xt_instance: newInstance });
-                if (!this.masterInstance) {
-                    this.MtpNetworkerFactory.startAll();
+                Storage.methods.set({ xt_instance: newInstance });
+                if (!masterInstance) {
+                    MtpNetworkerFactory.startAll();
                     console.warn(dT(), 'now master instance', newInstance);
                 }
-                this.masterInstance = true;
-                if (this.deactivatePromise) {
-                    $timeout.cancel(this.deactivatePromise);
-                    this.deactivatePromise = false;
+                masterInstance = true;
+                if (deactivatePromise) {
+                    $timeout.cancel(deactivatePromise);
+                    deactivatePromise = false;
                 }
             } else {
-                this.Storage.set({ xt_idle_instance: newInstance });
-                if (this.masterInstance) {
-                    this.MtpNetworkerFactory.stopAll();
+                Storage.methods.set({ xt_idle_instance: newInstance });
+                if (masterInstance) {
+                    MtpNetworkerFactory.stopAll();
                     console.warn(dT(), 'now idle instance', newInstance);
-                    if (!this.deactivatePromise) {
-                        this.deactivatePromise = $timeout(this.deactivateInstance, 30000);
+                    if (!deactivatePromise) {
+                        deactivatePromise = $timeout(deactivateInstance, 30000);
                     }
                 }
-                this.masterInstance = false;
+                masterInstance = false;
             }
         });
+    }
+
+    return {
+        start,
+        clearInstance,
+        deactivateInstance,
+        checkInstance
     }
 
 }

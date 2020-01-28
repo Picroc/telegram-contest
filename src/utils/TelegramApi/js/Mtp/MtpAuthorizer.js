@@ -1,10 +1,10 @@
-import { TLSerialization } from "../lib/tl_utils";
+import TLDeserialization, { TLSerialization } from "../lib/tl_utils";
 import MtpTimeManagerModule from "./MtpTimeManager";
 import $http from '../Etc/angular/$http';
 import $timeout from '../Etc/angular/$timeout';
 import { extend } from "../Etc/Helper";
-import { dT } from "../lib/utils";
-import { bytesToHex, bytesCmp, sha1BytesSync, aesDecryptSync, bytesToArrayBuffer, bytesFromHex, aesEncryptSync, bytesXor, nextRandomInt } from "../lib/bin_utils";
+import { dT, tsNow } from "../lib/utils";
+import { bytesToHex, bytesCmp, sha1BytesSync, aesDecryptSync, bytesToArrayBuffer, bytesFromHex, aesEncryptSync, bytesXor, nextRandomInt, rsaEncrypt } from "../lib/bin_utils";
 import MtpRsaKeysManagerModule from "./MtpRsaKeysManager";
 import CryptoWorkerModule from "../Etc/CryptoWorker";
 import { MtpSecureRandomModule } from "./MtpSecureRandom";
@@ -42,7 +42,7 @@ export default class MtpAuthorizerModule {
 
         const requestData = this.xhrSendBuffer ? resultBuffer : resultArray;
         let requestPromise;
-        const url = MtpDcConfigurator.chooseServer(dcID);
+        const url = this.MtpDcConfigurator.chooseServer(dcID);
         const baseError = { code: 406, type: 'NETWORK_BAD_RESPONSE', url: url };
         try {
             requestPromise = $http.post(url, requestData, {
@@ -50,12 +50,14 @@ export default class MtpAuthorizerModule {
                 transformRequest: null
             });
         } catch (e) {
+            console.log('SMTH wrong with http');
             requestPromise = Promise.reject(extend(baseError, { originalError: e }));
         }
 
         return requestPromise.then(
             (result) => {
                 if (!result.data || !result.data.byteLength) {
+                    console.log('SMTH wrong with byteLen');
                     return Promise.reject(baseError);
                 }
 
@@ -68,6 +70,7 @@ export default class MtpAuthorizerModule {
                     msg_len = deserializer.fetchInt('msg_len');
 
                 } catch (e) {
+                    console.log('SMTH wrong with deser');
                     return Promise.reject(extend(baseError, { originalError: e }));
                 }
 
@@ -75,8 +78,10 @@ export default class MtpAuthorizerModule {
             },
             (error) => {
                 if (!error.message && !error.type) {
+                    console.log('SMTH wrong with shit');
                     error = extend(baseError, { originalError: error });
                 }
+                console.log('SMTH wrong with errrrror');
                 return Promise.reject(error);
             }
         );
@@ -92,10 +97,12 @@ export default class MtpAuthorizerModule {
             const response = deserializer.fetchObject('ResPQ');
 
             if (response._ != 'resPQ') {
+                console.log('resPQ response invalid: ' + response._);
                 throw new Error('resPQ response invalid: ' + response._);
             }
 
             if (!bytesCmp(auth.nonce, response.nonce)) {
+                console.log('resPQ nonce mismatch');
                 throw new Error('resPQ nonce mismatch');
             }
 
@@ -108,8 +115,11 @@ export default class MtpAuthorizerModule {
             auth.publicKey = this.MtpRsaKeysManager.select(auth.fingerprints);
 
             if (!auth.publicKey) {
+                console.log('No public key found');
                 throw new Error('No public key found');
             }
+
+            console.log('Got to FACTORIZE');
 
             console.log(dT(), 'PQ factorization start', auth.pq);
             this.CryptoWorker.factorize(auth.pq).then((pAndQ) => {
@@ -125,7 +135,7 @@ export default class MtpAuthorizerModule {
                 reject(error);
             });
         }, (error) => {
-            console.error(dT(), 'req_pq error', error.message);
+            console.error(dT(), 'req_pq error', error);
             reject(error);
         });
 
@@ -382,7 +392,7 @@ export default class MtpAuthorizerModule {
 
         return new Promise((resolve, reject) => {
             $timeout(() => {
-                return mtpSendReqPQ(auth);
+                return this.mtpSendReqPQ(auth);
             })
                 .then((result) => {
                     this.cached[dcID] = result;

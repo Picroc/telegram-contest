@@ -1,17 +1,17 @@
 // Console-polyfill. MIT license.
 // https://github.com/paulmillr/console-polyfill
 // Make it safe to do console.log() always.
-;(function(global) {
+; (function (global) {
   'use strict';
   global.console = global.console || {};
   var con = global.console;
   var prop, method;
   var empty = {};
-  var dummy = function() {};
+  var dummy = function () { };
   var properties = 'memory'.split(',');
   var methods = ('assert,clear,count,debug,dir,dirxml,error,exception,group,' +
-     'groupCollapsed,groupEnd,info,log,markTimeline,profile,profiles,profileEnd,' +
-     'show,table,time,timeEnd,timeline,timelineEnd,timeStamp,trace,warn').split(',');
+    'groupCollapsed,groupEnd,info,log,markTimeline,profile,profiles,profileEnd,' +
+    'show,table,time,timeEnd,timeline,timelineEnd,timeStamp,trace,warn').split(',');
   while (prop = properties.pop()) if (!con[prop]) con[prop] = empty;
   while (method = methods.pop()) if (!con[method]) con[method] = dummy;
 })(typeof window === 'undefined' ? this : window);
@@ -21,7 +21,7 @@
 
 /* Array.indexOf polyfill */
 if (!Array.prototype.indexOf) {
-  Array.prototype.indexOf = function(searchElement, fromIndex) {
+  Array.prototype.indexOf = function (searchElement, fromIndex) {
     var k;
     if (this == null) {
       throw new TypeError('"this" is null or not defined');
@@ -53,15 +53,15 @@ if (!Array.prototype.indexOf) {
 
 /* Array.isArray polyfill */
 if (!Array.isArray) {
-  Array.isArray = function(arg) {
+  Array.isArray = function (arg) {
     return Object.prototype.toString.call(arg) === '[object Array]';
   };
 }
 
 /* Object.create polyfill */
 if (typeof Object.create != 'function') {
-  Object.create = (function() {
-    var Object = function() {};
+  Object.create = (function () {
+    var Object = function () { };
     return function (prototype) {
       if (arguments.length > 1) {
         throw Error('Second argument not supported');
@@ -85,14 +85,14 @@ if (!Function.prototype.bind) {
     }
 
     var aArgs = Array.prototype.slice.call(arguments, 1),
-        fToBind = this,
-        fNOP = function () {},
-        fBound = function () {
-          return fToBind.apply(this instanceof fNOP && oThis
-                 ? this
-                 : oThis,
-                 aArgs.concat(Array.prototype.slice.call(arguments)));
-        };
+      fToBind = this,
+      fNOP = function () { },
+      fBound = function () {
+        return fToBind.apply(this instanceof fNOP && oThis
+          ? this
+          : oThis,
+          aArgs.concat(Array.prototype.slice.call(arguments)));
+      };
 
     fNOP.prototype = this.prototype;
     fBound.prototype = new fNOP();
@@ -102,7 +102,7 @@ if (!Function.prototype.bind) {
 }
 
 /* setZeroTimeout polyfill, from http://dbaron.org/log/20100309-faster-timeouts */
-(function(global) {
+(function (global) {
   var timeouts = [];
   var messageName = 'zero-timeout-message';
 
@@ -132,4 +132,4 @@ if (!Function.prototype.bind) {
   };
 
   global.setZeroTimeout = setZeroTimeout;
-})(this);
+})(window);

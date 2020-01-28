@@ -1,62 +1,62 @@
 import MtpApiManagerModule from "./MtpApiManager";
 
-export default class MtpApiFileManagerModule {
-    cachedFs = false;
-    cachedFsPromise = false;
-    cachedSavePromises = {};
-    cachedDownloadPromises = {};
-    cachedDownloads = {};
+export default function MtpApiFileManagerModule() {
+    let cachedFs = false;
+    let cachedFsPromise = false;
+    let cachedSavePromises = {};
+    let cachedDownloadPromises = {};
+    let cachedDownloads = {};
 
-    downloadPulls = {};
-    downloadActives = {};
+    let downloadPulls = {};
+    let downloadActives = {};
 
-    MtpApiManager = new MtpApiManagerModule();
+    let MtpApiManager = new MtpApiManagerModule();
 
-    downloadRequest(dcID, cb, activeDelta) {
-        if (this.downloadPulls[dcID] === undefined) {
-            this.downloadPulls[dcID] = [];
-            this.downloadActives[dcID] = 0;
+    const downloadRequest = (dcID, cb, activeDelta) => {
+        if (downloadPulls[dcID] === undefined) {
+            downloadPulls[dcID] = [];
+            downloadActives[dcID] = 0;
         }
 
-        const downloadPull = this.downloadPulls[dcID];
+        const downloadPull = downloadPulls[dcID];
         return new Promise((resolve, reject) => {
             downloadPull.push({ cb: cb, resolve: resolve, reject: reject, activeDelta: activeDelta });
             setZeroTimeout(() => {
-                this.downloadCheck(dcID);
+                downloadCheck(dcID);
             });
         });
     }
 
-    downloadCheck(dcID) {
-        const downloadPull = this.downloadPulls[dcID];
+    const downloadCheck = (dcID) => {
+        const downloadPull = downloadPulls[dcID];
         const downloadLimit = dcID == 'upload' ? 11 : 5;
 
-        if (this.downloadActives[dcID] >= downloadLimit || !downloadPull || !downloadPull.length) {
+        if (downloadActives[dcID] >= downloadLimit || !downloadPull || !downloadPull.length) {
             return false;
         }
 
         const data = downloadPull.shift(),
             activeDelta = data.activeDelta || 1;
 
-        this.downloadActives[dcID] += activeDelta;
+        downloadActives[dcID] += activeDelta;
 
         const a = index++;
         data.cb()
             .then((result) => {
-                this.downloadActives[dcID] -= activeDelta;
-                this.downloadCheck(dcID);
+                downloadActives[dcID] -= activeDelta;
+                downloadCheck(dcID);
 
                 data.resolve(result);
 
             }, (error) => {
-                this.downloadActives[dcID] -= activeDelta;
-                this.downloadCheck(dcID);
+                downloadActives[dcID] -= activeDelta;
+                downloadCheck(dcID);
 
                 data.reject(error);
             });
     }
 
-    uploadFile(file) {
+    const uploadFile = (file) => {
         let fileSize = file.size,
             isBigFile = fileSize >= 10485760,
             canceled = false,
@@ -103,7 +103,7 @@ export default class MtpApiFileManagerModule {
 
             for (offset = 0; offset < fileSize; offset += partSize) {
                 ((offset, part) => {
-                    this.downloadRequest('upload', () => {
+                    downloadRequest('upload', () => {
                         return new Promise((uploadResolve, uploadReject) => {
                             // var uploadDeferred = new Promise();
 
@@ -118,7 +118,7 @@ export default class MtpApiFileManagerModule {
                                 if (e.target.readyState != FileReader.DONE) {
                                     return;
                                 }
-                                this.MtpApiManager.invokeApi(isBigFile ? 'upload.saveBigFilePart' : 'upload.saveFilePart', {
+                                MtpApiManager.invokeApi(isBigFile ? 'upload.saveBigFilePart' : 'upload.saveFilePart', {
                                     file_id: fileID,
                                     file_part: part,
                                     file_total_parts: totalParts,
@@ -146,7 +146,7 @@ export default class MtpApiFileManagerModule {
                 })(offset, part++);
             }
 
-            this.cancel = () => {
+            cancel = () => {
                 console.log('cancel upload', canceled, resolved);
                 if (!canceled && !resolved) {
                     canceled = true;
@@ -155,4 +155,10 @@ export default class MtpApiFileManagerModule {
             };
         });
     }
+
+    return {
+        downloadRequest,
+        downloadCheck,
+        uploadFile
+    };
 }

@@ -1,4 +1,5 @@
 import $timeout from './angular/$timeout';
+import { sha1HashSync, sha256HashSync, convertToArrayBuffer, aesEncryptSync, aesDecryptSync, convertToByteArray, pqPrimeFactorization, bytesModPow } from '../lib/bin_utils';
 
 export default class CryptoWorkerModule {
     sha1Hash(bytes) {

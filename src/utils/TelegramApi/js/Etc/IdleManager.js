@@ -1,4 +1,5 @@
 import $rootScope from "./angular/$rootScope";
+import $timeout from "./angular/$timeout";
 
 export default class IdleManagerModule {
 
@@ -45,7 +46,7 @@ export default class IdleManagerModule {
         }
 
         let isIDLE = e.type == 'blur' || e.type == 'timeout' ? true : false;
-        if (this.hidden && document[hidden]) {
+        if (this.hidden && document[this.hidden]) {
             isIDLE = true;
         }
 

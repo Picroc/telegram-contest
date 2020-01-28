@@ -1,4 +1,4 @@
-import { convertToUint8Array, sha1BytesSync, nextRandomInt, bytesToHex, bytesFromArrayBuffer, bytesToArrayBuffer, longToBytes, uintToInt, bigStringInt } from "../lib/bin_utils";
+import { convertToUint8Array, sha1BytesSync, nextRandomInt, bytesToHex, bytesFromArrayBuffer, bytesToArrayBuffer, longToBytes, uintToInt, bigStringInt, bytesCmp } from "../lib/bin_utils";
 import $interval from '../Etc/angular/$interval';
 import $timeout from '../Etc/angular/$timeout';
 import { MtpSecureRandomModule } from "./MtpSecureRandom";
@@ -11,29 +11,31 @@ import StorageModule from "../Etc/Storage";
 import '../lib/polyfill';
 import CryptoWorkerModule from "../Etc/CryptoWorker";
 import $http from "../Etc/angular/$http";
+import MtpDcConfiguratorModule from "./MtpDcConfigurator";
 
-export function MtpNetworkerFactoryModule() {
+export default function MtpNetworkerFactoryModule() {
     let updatesProcessor;
     let akStopped = false;
     const chromeMatches = navigator.userAgent.match(/Chrome\/(\d+(\.\d+)?)/);
-    const chromeVersion = this.chromeMatches && parseFloat(this.chromeMatches[1]) || false;
-    const xhrSendBuffer = !('ArrayBufferView' in window) && (!this.chromeVersion || this.chromeVersion < 30);
+    const chromeVersion = chromeMatches && parseFloat(chromeMatches[1]) || false;
+    const xhrSendBuffer = !('ArrayBufferView' in window) && (!chromeVersion || chromeVersion < 30);
 
     const subscriptions = {};
 
     const subscribe = (id, handler) => {
         if (typeof handler == 'function') {
-            this.subscriptions[id] = handler;
+            subscriptions[id] = handler;
         }
     }
 
     const unSubscribe = (id) => {
-        delete this.subscriptions[id];
+        delete subscriptions[id];
     }
 
     class MtpNetworker {
         MtpSecureRandom = new MtpSecureRandomModule();
         MtpTimeManager = new MtpTimeManagerModule();
+        MtpDcConfigurator = new MtpDcConfiguratorModule();
         Storage = new StorageModule();
         CryptoWorker = new CryptoWorkerModule();
 
@@ -363,7 +365,7 @@ export function MtpNetworkerFactoryModule() {
             });
 
             const pingMessage = {
-                msg_id: MtpTimeManager.generateID(),
+                msg_id: this.MtpTimeManager.generateID(),
                 seq_no: this.generateSeqNo(true),
                 body: serializer.getBytes()
             };
@@ -401,14 +403,14 @@ export function MtpNetworkerFactoryModule() {
 
                 this.onOnlineCb = this.checkConnection.bind(this);
 
-                $(document.body).on('online focus', this.onOnlineCb);
+                document.body.addEventListener('online focus', this.onOnlineCb);
             } else {
                 delete this.longPollPending;
                 this.checkLongPoll();
                 this.sheduleRequest();
 
                 if (this.onOnlineCb) {
-                    $(document.body).off('online focus', this.onOnlineCb);
+                    document.body.removeEventListener('online focus', this.onOnlineCb);
                 }
                 $timeout.cancel(this.checkConnectionPromise);
             }
@@ -645,7 +647,7 @@ export function MtpNetworkerFactoryModule() {
             // console.log(dT(), 'get decrypted start');
             return this.getMsgKeyIv(msgKey, false).then((keyIv) => {
                 // console.log(dT(), 'after msg key iv');
-                return CryptoWorker.aesDecrypt(encryptedData, keyIv[0], keyIv[1]);
+                return this.CryptoWorker.aesDecrypt(encryptedData, keyIv[0], keyIv[1]);
             });
         };
 
@@ -680,7 +682,7 @@ export function MtpNetworkerFactoryModule() {
                 const requestData = xhrSendBuffer ? request.getBuffer() : request.getArray();
 
                 let requestPromise;
-                const url = MtpDcConfigurator.chooseServer(self.dcID, self.upload);
+                const url = this.MtpDcConfigurator.chooseServer(self.dcID, self.upload);
                 const baseError = {
                     code: 406, type: 'NETWORK_BAD_RESPONSE', url: url
                 };

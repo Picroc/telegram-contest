@@ -19,7 +19,7 @@ export const Config = window.Config || {};
 */
 
 Config.App = {
-  version: '0.0.0'
+  version: '0.0.1'
 };
 
 Config.Server = {};

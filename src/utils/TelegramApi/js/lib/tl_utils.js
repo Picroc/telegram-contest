@@ -6,19 +6,21 @@
  */
 
 import { isArray, isObject } from "../Etc/Helper";
-import { intToUint, bytesToHex, uintToInt, bytesToArrayBuffer, gzipUncompress } from "./bin_utils";
+import { intToUint, bytesToHex, uintToInt, bytesToArrayBuffer, gzipUncompress, bigStringInt, bigint } from "./bin_utils";
+import { Config } from "./config";
 
 export class TLSerialization {
   offset = 0; // in bytes
+  // debug = true;
 
   // this.debug = options.debug !== undefined ? options.debug : Config.Modes.debug;
 
   constructor(options) {
-    this.createBuffer();
-
     this.options = options || {};
-    this.maxLength = options.startMaxLength || 2048; // 2Kb
-    this.mtproto = options.mtproto || false;
+    this.maxLength = this.options.startMaxLength || 2048; // 2Kb
+    this.mtproto = this.options.mtproto || false;
+
+    this.createBuffer();
   }
 
   createBuffer = () => {
@@ -188,7 +190,7 @@ export class TLSerialization {
 
   storeIntBytes = (bytes, bits, field) => {
     if (bytes instanceof ArrayBuffer) {
-      bytes = new Uint8Array(bytes);
+      bytes = new Uint16Array(bytes);
     }
     const len = bytes.length;
     if ((bits % 32) || (len * 8) != bits) {
@@ -220,6 +222,7 @@ export class TLSerialization {
     let methodData = false;
     let i;
 
+
     for (i = 0; i < schema.methods.length; i++) {
       if (schema.methods[i].method == methodName) {
         methodData = schema.methods[i];
@@ -246,6 +249,7 @@ export class TLSerialization {
         type = condType[1];
       }
 
+      console.log('DEBUG Going to store ', params[param.name], ' with type ', type);
       this.storeObject(params[param.name], type, methodName + '[' + param.name + ']');
     }
 
@@ -612,7 +616,7 @@ export default class TLDeserialization {
             constructorData = schemaFallback.constructors[i];
 
             delete this.mtproto;
-            fallback = true;
+            this.fallback = true;
             break;
           }
         }
@@ -660,7 +664,7 @@ export default class TLDeserialization {
       }
     }
 
-    if (fallback) {
+    if (this.fallback) {
       this.mtproto = true;
     }
 

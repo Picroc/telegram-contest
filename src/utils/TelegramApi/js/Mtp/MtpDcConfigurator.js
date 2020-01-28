@@ -1,10 +1,12 @@
-export default class MtpDcConfiguratorModule {
-    chosenServers = {};
+import { Config } from "../lib/config";
 
-    chooseServer = (dcID, upload) => {
+export default function MtpDcConfiguratorModule() {
+    window.chosenServers = {};
+
+    const chooseServer = (dcID, upload) => {
         const dcOptions = Config.Modes.test ? Config.Server.Test : Config.Server.Production;
 
-        if (this.chosenServers[dcID] === undefined) {
+        if (chosenServers[dcID] === undefined) {
             let chosenServer = false,
                 i, dcOption;
 
@@ -15,17 +17,22 @@ export default class MtpDcConfiguratorModule {
                     break;
                 }
             }
-            this.chosenServers[dcID] = chosenServer;
+            chosenServers[dcID] = chosenServer;
         }
 
-        return this.chosenServers[dcID];
+        return chosenServers[dcID];
     }
 
-    chooseProtocol = () => {
+    const chooseProtocol = () => {
         if (location.protocol.indexOf('http') != -1) {
             return location.protocol;
         }
 
         return 'http:';
+    }
+
+    return {
+        chooseServer,
+        chooseProtocol
     }
 }

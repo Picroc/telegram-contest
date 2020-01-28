@@ -1,5 +1,5 @@
 import { TLSerialization } from "../lib/tl_utils";
-import { sha1BytesSync, bytesToHex } from "../lib/bin_utils";
+import { sha1BytesSync, bytesToHex, bytesFromHex, bigStringInt } from "../lib/bin_utils";
 import { extend } from "../Etc/Helper";
 
 export default class MtpRsaKeysManagerModule {
@@ -16,8 +16,8 @@ export default class MtpRsaKeysManagerModule {
             return;
         }
 
-        for (let i = 0; i < publisKeysHex.length; i++) {
-            const keyParsed = publisKeysHex[i];
+        for (let i = 0; i < this.publisKeysHex.length; i++) {
+            const keyParsed = this.publisKeysHex[i];
 
             const RSAPublicKey = new TLSerialization();
             RSAPublicKey.storeBytes(bytesFromHex(keyParsed.modulus), 'n');
@@ -28,7 +28,7 @@ export default class MtpRsaKeysManagerModule {
             const fingerprintBytes = sha1BytesSync(buffer).slice(-8);
             fingerprintBytes.reverse();
 
-            publicKeysParsed[bytesToHex(fingerprintBytes)] = {
+            this.publicKeysParsed[bytesToHex(fingerprintBytes)] = {
                 modulus: keyParsed.modulus,
                 exponent: keyParsed.exponent
             };
@@ -43,7 +43,7 @@ export default class MtpRsaKeysManagerModule {
         let fingerprintHex, foundKey, i;
         for (i = 0; i < fingerprints.length; i++) {
             fingerprintHex = bigStringInt(fingerprints[i]).toString(16);
-            foundKey = publicKeysParsed[fingerprintHex];
+            foundKey = this.publicKeysParsed[fingerprintHex];
             if (foundKey) {
                 return extend({ fingerprint: fingerprints[i] }, foundKey);
             }
