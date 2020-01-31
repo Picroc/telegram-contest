@@ -73,14 +73,7 @@ const common = {
             filename: 'index.html',
             template: path.join(__dirname, '/public/index.html'),
             inject: true
-        }),
-        new AddAssetHtmlPlugin(
-            [
-                {
-                    filepath: require.resolve("./src/utils/telegramApi.min.js"),
-                }
-            ]
-        )
+        })
     ]
 }
 

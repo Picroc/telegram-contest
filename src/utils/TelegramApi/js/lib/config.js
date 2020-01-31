@@ -25,7 +25,7 @@ Config.App = {
 Config.Server = {};
 
 Config.Modes = {
-  debug: true,//location.search.indexOf('debug=1') > 0,
+  debug: location.search.indexOf('debug=1') > 0,
   test: location.search.indexOf('test=1') > 0
 };
 

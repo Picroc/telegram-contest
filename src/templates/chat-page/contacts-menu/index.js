@@ -2,42 +2,43 @@ import './contacts-menu.scss';
 import Contact from './contact';
 import { subscribe } from '../../../helpers';
 import { loadDialog } from '..';
-import { TelegramApiWrapper } from '../../../utils/services';
 
-export default async (elem) => {
-    menu = document.createElement('div');
+export default async elem => {
+	menu = document.createElement('div');
 
-    return menu;
-}
+	return menu;
+};
 
-const tApi = new TelegramApiWrapper();
+const tApi = window.telegramApi;
 
 export const updateSearchResults = async res => {
-    const menu = document.createElement('div');
-    document.querySelector('#user-dialogs').appendChild(menu);
+	const menu = document.createElement('div');
+	document.querySelector('#user-dialogs').appendChild(menu);
 
-    menu.innerHTML = '';
-    if (res.length > 0) {
-        const title = document.createElement('div');
-        title.classList.add('contacts-title');
-        title.innerHTML = `
+	menu.innerHTML = '';
+	if (res.length > 0) {
+		const title = document.createElement('div');
+		title.classList.add('contacts-title');
+		title.innerHTML = `
             <h3>Contacts and Chats</h3>
         `;
-        menu.appendChild(title);
+		menu.appendChild(title);
 
-        res.forEach(async el => {
-            const item = document.createElement('div');
+		res.forEach(async el => {
+			const item = document.createElement('div');
 
-            item.innerHTML = Contact({
-                title: el.title,
-                text: el.text,
-                isOnline: el.status ? (el.status._ === 'userStatusOnline' ? true : false) : false
-            });
+			item.innerHTML = Contact({
+				title: el.title,
+				text: el.text,
+				isOnline: el.status ? (el.status._ === 'userStatusOnline' ? true : false) : false,
+			});
 
-            menu.appendChild(item);
-            subscribe(item)('click', () => { loadDialog(el.peer) });
-        });
+			menu.appendChild(item);
+			subscribe(item)('click', () => {
+				loadDialog(el.peer);
+			});
+		});
 
-        window.updateRipple();
-    }
-}
+		window.updateRipple();
+	}
+};
