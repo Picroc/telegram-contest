@@ -7,7 +7,6 @@ import './assets/globals.scss';
 import './assets/popup.scss';
 import chatPage from './templates/chat-page';
 import RegisterPage from './templates/register-page/index';
-import { TelegramApiWrapper } from './utils/services';
 import LoginForm from './pages/login-form/login-form';
 import Router from './components/router';
 import CountriesPopupItem from './components/countries-popup-item/countries-popup-item';
@@ -18,6 +17,13 @@ customElements.define('countries-popup-item', CountriesPopupItem);
 
 const q = elem => document.querySelector(elem);
 const App = q('.root');
+const rt = document.getElementById('router');
+export const router = (route, attrs) => {
+	rt.setAttribute('route', route);
+	Object.keys(attrs).map(attr => {
+		rt.setAttribute(attr, JSON.stringify(attrs[attr]));
+	});
+};
 
 let state = {
 	history: ['register_page'],

@@ -2,6 +2,7 @@ import './login-form.scss';
 import template from './login-form.html';
 import { setInnerHTML, hide, htmlToElement, show } from '../../helpers/index';
 import countries from './countries.json';
+import { router } from '../../App';
 
 export default class LoginForm extends HTMLElement {
 	constructor() {
@@ -12,18 +13,28 @@ export default class LoginForm extends HTMLElement {
 	render() {
 		this.innerHTML = template;
 		this.set = setInnerHTML.bind(this);
+
 		this.phone = this.querySelector('.login-form__phone');
-		this.setLabel = this.set('.login-form__phone ~ label');
 		this.submit = this.querySelector('.submit');
-		this.setSubmitLabel = this.set('.submit span');
 		this.popup = this.querySelector('.login-form__popup');
-		this.countries.forEach(this.renderCountry);
-		hide(this.popup);
 		this.country = this.querySelector('.login-form__country');
+
+		this.setLabel = this.set('.login-form__phone ~ label');
+		this.setSubmitLabel = this.set('.submit span');
+		this.countries.forEach(this.renderCountry);
+
 		this.country.addEventListener('focus', this.onCountryClick);
 		this.addEventListener('click', this.onCountryOut);
 		this.country.addEventListener('click', event => event.stopPropagation());
 		this.country.addEventListener('input', this.filterCountries);
+		this.phone.addEventListener('keyup', event => {
+			if (event.keyCode === 13) {
+				event.preventDefault();
+				this.submit.click();
+			}
+		});
+
+		this.submit.addEventListener('click', this.logIn);
 	}
 
 	renderCountry = country => {
@@ -77,10 +88,10 @@ export default class LoginForm extends HTMLElement {
 		}
 	}
 
-	logIn() {
-		this.querySelector('.submit').classList.add('submit_loading');
+	logIn = () => {
+		this.submit.classList.add('submit_loading');
 		this.set('.submit span')('PLEASE WAIT');
-		const phone = document.querySelector('.login-form__phone').value;
+		const phone = this.phone.value;
 
 		if (!phone || phone.length < 11) {
 			showInvalid();
@@ -93,7 +104,7 @@ export default class LoginForm extends HTMLElement {
 				router('login_code', { phone: phone });
 			});
 		});
-	}
+	};
 
 	connectedCallback() {
 		if (!this.rendered) {
