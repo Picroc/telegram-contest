@@ -29,7 +29,7 @@ const handleMaskedInput = event => {
 	event.target.value = getMaskedValue(value);
 };
 
-const subscribe = element => {
+const subscribe = (element) => {
 	return function (...args) {
 		document.querySelector(element).addEventListener(...args);
 	};

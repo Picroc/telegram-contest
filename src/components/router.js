@@ -2,7 +2,9 @@ class Router extends HTMLElement {
 
     render() {
         const route = this.getAttribute('route');
-
+        const page = document.createElement(route);
+        this.innerHTML = '';
+        this.appendChild(page);
     }
 
     connectedCallback() { // (2)

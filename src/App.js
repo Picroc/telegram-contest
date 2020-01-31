@@ -13,7 +13,7 @@ const q = elem => document.querySelector(elem);
 const App = q('.root');
 
 let state = {
-    history: ['login'],
+    history: ['register_page'],
 };
 
 const changeState = transform => {
@@ -71,7 +71,7 @@ window.updateRipple = () => {
 };
 
 function render() {
-    Login(App, routePage);
+    RegisterPage(App, routePage);
 }
 
 function onDocumentReady(callback) {
