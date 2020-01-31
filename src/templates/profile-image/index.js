@@ -1,15 +1,16 @@
 import template from './profile-image.html';
 import './profile-image.scss';
 
-export default callback => {
-	const element = document.createElement('div');
-	element.innerHTML = template;
+class ProfileImage extends HTMLElement {
+	render() {
+		this.innerHTML = template;
+		this.onclick = event => event.target.remove();
+	}
 
-	document.body.append(element);
-	document.querySelector('.profile-image__paranja').addEventListener('click', event => {
-		event.target.remove();
-		if (callback) {
-			callback();
-		}
-	});
-};
+	connectedCallback() {
+		this.render()
+	}
+
+}
+
+customElements.define('profile-image',ProfileImage);
