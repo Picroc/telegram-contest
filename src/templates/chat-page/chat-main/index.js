@@ -13,9 +13,9 @@ async function* fetchMessages(peer, limit = 30) {
         const messages = await ta.getMessagesFromPeer(peer, limit, offsetId);
         const mes = messages.messages;
         offsetId = mes[mes.length - 1] && mes[mes.length - 1].id || 0;
-        loadAll = messages.messages.length === 0;
+        loadAll = mes.length === 0;
 
-        for (const message of messages.messages) {
+        for (const message of mes) {
             yield message;
         }
     }
@@ -98,7 +98,7 @@ const getContent = ({ message, date, media }) => {
     return `
         <div class="message">
             ${imageUrl ? "<img src=\"" + imageUrl + "\" width=\"200px\" alt=\"Blob image\">" : ""}
-            <div class="message-content">${message}</div>      
+            <div class="message-content">${message}</div>
             <div class="message-info">
                 <div class="message-time">${time}</div>
                 <div class="status sending"></div>

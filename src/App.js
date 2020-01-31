@@ -10,10 +10,16 @@ import RegisterPage from './templates/register-page/index';
 import LoginForm from './pages/login-form/login-form';
 import Router from './components/router';
 import CountriesPopupItem from './components/countries-popup-item/countries-popup-item';
+import BubbleMessage from './pages/chat-page/chat-main/bubbles/bubbleMessage';
+import MessageInput from './pages/chat-page/chat-main/message-input/messageInput';
+import ProfileImage from './pages/chat-page/profile-image/profileImage';
 
 customElements.define('my-router', Router);
 customElements.define('login-form', LoginForm);
 customElements.define('countries-popup-item', CountriesPopupItem);
+customElements.define('bubble-message', BubbleMessage);
+customElements.define('message-input', MessageInput);
+customElements.define('profile-image', ProfileImage);
 
 const q = elem => document.querySelector(elem);
 const App = q('.root');
@@ -84,7 +90,7 @@ window.updateRipple = () => {
 };
 
 function render() {
-	// document.getElementById('router');
+	RegisterPage(App, routePage);
 }
 
 function onDocumentReady(callback) {

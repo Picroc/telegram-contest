@@ -9,23 +9,24 @@ export const clsx = (...clss) =>
 
 			return item;
 		})
+		.filter(Boolean)
 		.join(' ');
 
 export const subscribe = element => {
 	const el = typeof element === 'string' ? document.querySelector(element) : element;
-	return function (...args) {
+	return function(...args) {
 		el.addEventListener(...args);
 	};
 };
 
 export const htmlToElement = html => {
-	var template = document.createElement('template');
+	const template = document.createElement('template');
 	html = html.trim(); // Never return a text node of whitespace as the result
 	template.innerHTML = html;
 	return template.content.firstChild;
 };
 
-export const setInnerHTML = function (selector) {
+export const setInnerHTML = function(selector) {
 	return value => {
 		this.querySelector(selector).innerHTML = value;
 	};
@@ -38,6 +39,10 @@ const toggle = force => elem => {
 export const hide = toggle(true);
 
 export const show = toggle(false);
+
+export const setAttribute = selector => attribute => value => {
+	this.querySelector(selector).setAttribute(attribute, value);
+};
 
 export const startLoading = elem => {
 	elem.innerHTML = '';
