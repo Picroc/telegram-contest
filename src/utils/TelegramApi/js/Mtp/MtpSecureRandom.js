@@ -1,7 +1,11 @@
-import { SecureRandom, rng_seed_time } from 'jsbn';
+import RandomBytes from 'randombytes'
 
-export function MtpSecureRandomModule() {
-    // $(window).on('click keydown', rng_seed_time);
-    window.addEventListener('mousedown', rng_seed_time);
-    return new SecureRandom();
+const getRandom = (arr) => {
+  const ln = arr.length
+  const buf = RandomBytes(ln)
+  for (let i = 0; i < ln; i++)
+    arr[i] = buf[i]
+  return arr
 }
+
+export default getRandom

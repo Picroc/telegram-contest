@@ -1,6 +1,7 @@
 import MtpApiManagerModule from "./MtpApiManager";
 import { bufferConcat } from "../lib/bin_utils";
 import CryptoWorkerModule from "../Etc/CryptoWorker";
+import MtpSecureRandom from './MtpSecureRandom';
 
 export default class MtpPasswordManagerModule {
     MtpApiManager = new MtpApiManagerModule();
@@ -37,7 +38,7 @@ export default class MtpPasswordManagerModule {
             settings.new_password.length > 0) {
             const saltRandom = new Array(8);
             const newSalt = bufferConcat(state.new_salt, saltRandom);
-            MtpSecureRandom.nextBytes(saltRandom);
+            MtpSecureRandom(saltRandom);
             newHashPromise = this.makePasswordHash(newSalt, settings.new_password);
             params.new_settings.new_salt = newSalt;
             params.new_settings.flags |= 1;

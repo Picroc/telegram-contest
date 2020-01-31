@@ -7,7 +7,7 @@ import { dT, tsNow } from "../lib/utils";
 import { bytesToHex, bytesCmp, sha1BytesSync, aesDecryptSync, bytesToArrayBuffer, bytesFromHex, aesEncryptSync, bytesXor, nextRandomInt, rsaEncrypt } from "../lib/bin_utils";
 import MtpRsaKeysManagerModule from "./MtpRsaKeysManager";
 import CryptoWorkerModule from "../Etc/CryptoWorker";
-import { MtpSecureRandomModule } from "./MtpSecureRandom";
+import MtpSecureRandom from "./MtpSecureRandom";
 import MtpDcConfiguratorModule from "./MtpDcConfigurator";
 
 export default class MtpAuthorizerModule {
@@ -18,7 +18,6 @@ export default class MtpAuthorizerModule {
     MtpTimeManager = new MtpTimeManagerModule();
     MtpRsaKeysManager = new MtpRsaKeysManagerModule();
     CryptoWorker = new CryptoWorkerModule();
-    MtpSecureRandom = new MtpSecureRandomModule();
     MtpDcConfigurator = new MtpDcConfiguratorModule();
 
     mtpSendPlainRequest = (dcID, requestBuffer) => {
@@ -119,8 +118,6 @@ export default class MtpAuthorizerModule {
                 throw new Error('No public key found');
             }
 
-            console.log('Got to FACTORIZE');
-
             console.log(dT(), 'PQ factorization start', auth.pq);
             this.CryptoWorker.factorize(auth.pq).then((pAndQ) => {
                 auth.p = pAndQ[0];
@@ -146,7 +143,7 @@ export default class MtpAuthorizerModule {
 
     mtpSendReqDhParams = (auth) => new Promise((resolve, reject) => {
         auth.newNonce = new Array(32);
-        this.MtpSecureRandom.nextBytes(auth.newNonce);
+        MtpSecureRandom(auth.newNonce);
 
         const data = new TLSerialization({ mtproto: true });
         data.storeObject({
@@ -264,7 +261,7 @@ export default class MtpAuthorizerModule {
         const gBytes = bytesFromHex(auth.g.toString(16));
 
         auth.b = new Array(256);
-        this.MtpSecureRandom.nextBytes(auth.b);
+        MtpSecureRandom(auth.b);
 
         this.CryptoWorker.modPow(gBytes, auth.b, auth.dhPrime).then((gB) => {
             const data = new TLSerialization({ mtproto: true });

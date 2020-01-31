@@ -11,7 +11,7 @@ import { Config } from "./config";
 
 export class TLSerialization {
   offset = 0; // in bytes
-  // debug = true;
+  debug = true;
 
   // this.debug = options.debug !== undefined ? options.debug : Config.Modes.debug;
 
@@ -248,8 +248,7 @@ export class TLSerialization {
         }
         type = condType[1];
       }
-
-      console.log('DEBUG Going to store ', params[param.name], ' with type ', type);
+      
       this.storeObject(params[param.name], type, methodName + '[' + param.name + ']');
     }
 
@@ -347,6 +346,7 @@ export class TLSerialization {
 
 
 export default class TLDeserialization {
+  debug = true;
 
   constructor(buffer, options) {
     options = options || {};

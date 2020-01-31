@@ -1,3 +1,3 @@
 export default function $rootScopeModule() {
-    return {};
+    return window;
 }

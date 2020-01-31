@@ -10,13 +10,13 @@ export default function MtpTimeManagerModule() {
 
     Storage.methods.get('server_time_offset').then((to) => {
         if (to) {
-            timeOffset = to;
+            window.timeOffset = to;
         }
     });
 
     const generateMessageID = () => {
         const timeTicks = tsNow(),
-            timeSec = Math.floor(timeTicks / 1000) + timeOffset,
+            timeSec = Math.floor(timeTicks / 1000) + Number(timeOffset),
             timeMSec = timeTicks % 1000,
             random = nextRandomInt(0xFFFF);
 
@@ -27,7 +27,7 @@ export default function MtpTimeManagerModule() {
             messageID = [lastMessageID[0], lastMessageID[1] + 4];
         }
 
-        lastMessageID = messageID;
+        window.lastMessageID = messageID;
 
         return longFromInts(messageID[0], messageID[1]);
     }
@@ -37,8 +37,8 @@ export default function MtpTimeManagerModule() {
             changed = Math.abs(timeOffset - newTimeOffset) > 10;
         Storage.set({ server_time_offset: newTimeOffset });
 
-        lastMessageID = [0, 0];
-        timeOffset = newTimeOffset;
+        window.lastMessageID = [0, 0];
+        window.timeOffset = newTimeOffset;
         console.log(dT(), 'Apply server time', serverTime, localTime, newTimeOffset, changed);
 
         return changed;

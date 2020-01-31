@@ -1,7 +1,7 @@
 import { convertToUint8Array, sha1BytesSync, nextRandomInt, bytesToHex, bytesFromArrayBuffer, bytesToArrayBuffer, longToBytes, uintToInt, bigStringInt, bytesCmp } from "../lib/bin_utils";
 import $interval from '../Etc/angular/$interval';
 import $timeout from '../Etc/angular/$timeout';
-import { MtpSecureRandomModule } from "./MtpSecureRandom";
+import MtpSecureRandom from "./MtpSecureRandom";
 import MtpTimeManagerModule from "./MtpTimeManager";
 import { forEach, extend, isObject, toArray } from "../Etc/Helper";
 import TLDeserialization, { TLSerialization } from "../lib/tl_utils";
@@ -20,7 +20,8 @@ export default function MtpNetworkerFactoryModule() {
     const chromeVersion = chromeMatches && parseFloat(chromeMatches[1]) || false;
     const xhrSendBuffer = !('ArrayBufferView' in window) && (!chromeVersion || chromeVersion < 30);
 
-    const subscriptions = {};
+    
+    window.subscriptions = {};
 
     const subscribe = (id, handler) => {
         if (typeof handler == 'function') {
@@ -33,7 +34,6 @@ export default function MtpNetworkerFactoryModule() {
     }
 
     class MtpNetworker {
-        MtpSecureRandom = new MtpSecureRandomModule();
         MtpTimeManager = new MtpTimeManagerModule();
         MtpDcConfigurator = new MtpDcConfiguratorModule();
         Storage = new StorageModule();
@@ -72,7 +72,7 @@ export default function MtpNetworkerFactoryModule() {
         updateSession = () => {
             this.seqNo = 0;
             this.sessionID = new Array(8);
-            this.MtpSecureRandom.nextBytes(this.sessionID);
+            MtpSecureRandom(this.sessionID);
         };
 
         updateSentMessage = (sentMessageID) => {
@@ -246,6 +246,8 @@ export default function MtpNetworkerFactoryModule() {
 
         pushMessage = (message, options) => {
             const self = this;
+
+            console.log(dT(), 'Push message ', message, options);
 
             return new Promise((resolve, reject) => {
                 self.sentMessages[message.msg_id] = extend(message, options || {
@@ -765,7 +767,7 @@ export default function MtpNetworkerFactoryModule() {
                     const deserializerOptions = {
                         mtproto: true,
                         override: {
-                            mt_message: (result, field) => {
+                            mt_message: function (result, field) {
                                 result.msg_id = this.fetchLong(field + '[msg_id]');
                                 result.seqno = this.fetchInt(field + '[seqno]');
                                 result.bytes = this.fetchInt(field + '[bytes]');
@@ -787,7 +789,7 @@ export default function MtpNetworkerFactoryModule() {
                                 }
                                 // console.log(dT(), 'override message', result);
                             },
-                            mt_rpc_result: (result, field) => {
+                            mt_rpc_result: function (result, field) {
                                 result.req_msg_id = this.fetchLong(field + '[req_msg_id]');
 
                                 const sentMessage = self.sentMessages[result.req_msg_id],
