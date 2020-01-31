@@ -25,9 +25,19 @@ export const htmlToElement = html => {
 	return template.content.firstChild;
 };
 
-export const setInnerHTML = selector => value => {
-	this.querySelector(selector).innerHTML = value;
-}
+export const setInnerHTML = function (selector) {
+	return value => {
+		this.querySelector(selector).innerHTML = value;
+	};
+};
+
+const toggle = force => elem => {
+	elem.classList.toggle('hide', force);
+};
+
+export const hide = toggle(true);
+
+export const show = toggle(false);
 
 export const startLoading = elem => {
 	elem.innerHTML = '';

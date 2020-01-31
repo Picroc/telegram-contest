@@ -14,22 +14,31 @@ const getMaskedValue = text => {
 	const idx = Math.max(newText.length - 10, 1);
 	const code = newText.slice(0, idx);
 	const number = newText.slice(idx);
-	if (number.length >= 9)
+	if (number.length >= 9) {
 		return `+${code} ${number.slice(0, 3)} ${number.slice(3, 6)} ${number.slice(6, 8)} ${number.slice(8)}`;
-	if (number.length >= 7) return `+${code} ${number.slice(0, 3)} ${number.slice(3, 6)} ${number.slice(6)}`;
-	if (number.length >= 5) return `+${code} ${number.slice(0, 3)} ${number.slice(3)}`;
-	if (number.length >= 1) return `+${code} ${number.slice(0)}`;
+	}
+	if (number.length >= 7) {
+		return `+${code} ${number.slice(0, 3)} ${number.slice(3, 6)} ${number.slice(6)}`;
+	}
+	if (number.length >= 5) {
+		return `+${code} ${number.slice(0, 3)} ${number.slice(3)}`;
+	}
+	if (number.length >= 1) {
+		return `+${code} ${number.slice(0)}`;
+	}
 	return `+${code}`;
 };
 
 const handleMaskedInput = event => {
 	const value = event.target.value;
-	if (!value) return;
+	if (!value) {
+		return;
+	}
 
 	event.target.value = getMaskedValue(value);
 };
 
-const subscribe = (element) => {
+const subscribe = element => {
 	return function (...args) {
 		document.querySelector(element).addEventListener(...args);
 	};
@@ -42,11 +51,11 @@ const countriesPopup = coutries => {
             <li class='popup-item'>
                 <span class='popup-item__flag'>${
 				emojiFlags[country.alpha] ? emojiFlags[country.alpha].emoji : 'NONE'
-				}</span>
-                <span class='popup-item__name'>${country.name}</span>
-                <span class='popup-item__code'>+ ${country.code}</span>
-            </li>
-        `;
+				}</span >
+		<span class='popup-item__name'>${country.name}</span>
+		<span class='popup-item__code'>+ ${country.code}</span>
+            </li >
+	`;
 		})
 		.join('');
 };
@@ -84,7 +93,9 @@ const filterCountries = value => {
 };
 
 const onCountyClick = event => {
-	if (document.querySelector('.login-form__popup')) return;
+	if (document.querySelector('.login-form__popup')) {
+		return;
+	}
 
 	const elem = document.createElement('ul');
 	elem.classList.add('login-form__popup');
@@ -105,7 +116,9 @@ const onCountryChange = event => {
 
 const onCountryOut = () => {
 	const elem = document.querySelector('.login-form__popup');
-	if (!elem) return;
+	if (!elem) {
+		return;
+	}
 	elem.remove();
 };
 
