@@ -8,9 +8,8 @@ class ProfileImage extends HTMLElement {
 	}
 
 	connectedCallback() {
-		this.render()
+		this.render();
 	}
-
 }
 
-customElements.define('profile-image',ProfileImage);
+customElements.define('profile-image', ProfileImage);
