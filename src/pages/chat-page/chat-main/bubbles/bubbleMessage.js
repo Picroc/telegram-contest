@@ -1,10 +1,5 @@
 import './bubbleMessage.scss';
 
-export default ({ content, isIncoming, haveTail }) =>
-	`<div class="bubble ${isIncoming ? 'incoming' : 'outgoing'} ${
-		haveTail ? 'have-tail' : 'tailless'
-	}">${content}</div>`;
-
 class BubbleMessage extends HTMLElement {
 	render() {
 		this.innerHTML = `<div class="bubble"></div>`;
