@@ -25,6 +25,10 @@ export const htmlToElement = html => {
 	return template.content.firstChild;
 };
 
+export const setInnerHTML = selector => value => {
+	this.querySelector(selector).innerHTML = value;
+}
+
 export const startLoading = elem => {
 	elem.innerHTML = '';
 	elem.classList.add('loading');

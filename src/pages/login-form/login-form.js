@@ -2,7 +2,6 @@ import './login-form.scss';
 import template from './login-form.html';
 
 class LoginForm extends HTMLElement {
-
     render() {
         this.innerHTML = template;
     }
