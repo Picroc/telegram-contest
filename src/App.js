@@ -8,74 +8,81 @@ import './assets/popup.scss';
 import chatPage from './templates/chat-page';
 import RegisterPage from './templates/register-page/index';
 import { TelegramApiWrapper } from './utils/services';
+import BubbleMessage from './pages/chat-page/chat-main/bubbles/bubbleMessage';
+import MessageInput from './pages/chat-page/chat-main/message-input/messageInput';
+import ProfileImage from './pages/chat-page/profile-image/profileImage';
+
+customElements.define('bubble-message', BubbleMessage);
+customElements.define('message-input', MessageInput);
+customElements.define('profile-image', ProfileImage);
 
 const q = elem => document.querySelector(elem);
 const App = q('.root');
 
 let state = {
-    history: ['register_page'],
+	history: ['register_page'],
 };
 
 const changeState = transform => {
-    return function (...args) {
-        const [oldState, newState] = [state, transform(...args)];
+	return function(...args) {
+		const [oldState, newState] = [state, transform(...args)];
 
-        state = {
-            ...oldState,
-            ...newState,
-        };
-    };
+		state = {
+			...oldState,
+			...newState,
+		};
+	};
 };
 
 const subscribe = element => {
-    return function (...args) {
-        document.querySelector(element).addEventListener(...args);
-    };
+	return function(...args) {
+		document.querySelector(element).addEventListener(...args);
+	};
 };
 
 const switchPage = page => {
-    switch (page) {
-        case 'login':
-            return Login;
-        case 'login_code':
-            return LoginCode;
-        case 'login_password':
-            return LoginPassword;
-        case 'register_page':
-            return RegisterPage;
-        case 'chat_page':
-            return chatPage;
-        default:
-            return () => {
-                throw new ReferenceError('No such page');
-            };
-    }
+	switch (page) {
+		case 'login':
+			return Login;
+		case 'login_code':
+			return LoginCode;
+		case 'login_password':
+			return LoginPassword;
+		case 'register_page':
+			return RegisterPage;
+		case 'chat_page':
+			return chatPage;
+		default:
+			return () => {
+				throw new ReferenceError('No such page');
+			};
+	}
 };
 
 export const routePage = (page, ...args) => {
-    changeState(() => ({ history: [...state.history, page] }))();
-    switchPage(page)(App, routePage, ...args);
+	changeState(() => ({ history: [...state.history, page] }))();
+	switchPage(page)(App, routePage, ...args);
 };
 
 window.updateRipple = () => {
-    [].map.call(document.querySelectorAll('[anim="ripple"]'), el => {
-        el.addEventListener('click', e => {
-            e = e.touches ? e.touches[0] : e;
-            const r = el.getBoundingClientRect(),
-                d = Math.sqrt(Math.pow(r.width, 2) + Math.pow(r.height, 2)) * 2;
-            el.style.cssText = `--s: 0; --o: 1;`;
-            el.offsetTop;
-            el.style.cssText = `--t: 1; --o: 0; --d: ${d}; --x:${e.clientX - r.left}; --y:${e.clientY - r.top};`;
-        });
-    });
+	[].map.call(document.querySelectorAll('[anim="ripple"]'), el => {
+		el.addEventListener('click', e => {
+			e = e.touches ? e.touches[0] : e;
+			const r = el.getBoundingClientRect(),
+				d = Math.sqrt(Math.pow(r.width, 2) + Math.pow(r.height, 2)) * 2;
+			el.style.cssText = `--s: 0; --o: 1;`;
+			el.offsetTop;
+			el.style.cssText = `--t: 1; --o: 0; --d: ${d}; --x:${e.clientX - r.left}; --y:${e.clientY - r.top};`;
+		});
+	});
 };
 
 function render() {
-    RegisterPage(App, routePage);
+	RegisterPage(App, routePage);
 }
 
 function onDocumentReady(callback) {
-    document.addEventListener('DOMContentLoaded', callback);
+	document.addEventListener('DOMContentLoaded', callback);
 }
 
 onDocumentReady(render);

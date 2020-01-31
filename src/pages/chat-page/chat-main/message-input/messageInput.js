@@ -14,7 +14,7 @@ import './messageInput.scss';
 import './bubbleMessage.scss';
 import { setInnerHTML, setAttribute } from '../../../../helpers/index';
 
-class MessageInput extends HTMLElement {
+export default class MessageInput extends HTMLElement {
 	render() {
 		this.innerHTML = template;
 		const setHTML = setInnerHTML.bind(this);
@@ -43,5 +43,3 @@ class MessageInput extends HTMLElement {
 		this.render();
 	}
 }
-
-customElements.define('message-input', MessageInput);

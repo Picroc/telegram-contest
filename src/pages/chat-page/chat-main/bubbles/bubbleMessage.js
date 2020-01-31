@@ -1,6 +1,6 @@
 import './bubbleMessage.scss';
 
-class BubbleMessage extends HTMLElement {
+export default class BubbleMessage extends HTMLElement {
 	render() {
 		this.innerHTML = `<div class="bubble"></div>`;
 		const isIncoming = this.getAttribute('isIncoming'); //'incoming' || 'outgoing'
@@ -28,5 +28,3 @@ class BubbleMessage extends HTMLElement {
 		this.render();
 	}
 }
-
-customElements.define('bubble-message', BubbleMessage);
