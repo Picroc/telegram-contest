@@ -1,0 +1,17 @@
+<!-- import microphoneSvg from './microphone.svg';
+import attachSvg from './attach';
+import emojiSvg from './emoji';
+import './messageInput.scss';
+import sendArrow from './sendArrow.svg';
+
+export default (message = '') => `
+
+`; -->
+<div class="message-input">
+        <div class="text-input">
+            <div class="svg emoji-set"></div>
+            <textarea name="text" class="text-input__input" placeholder="Message" cols="10" wrap="hard" autofocus></textarea>
+            <div class="svg attach-media"></div>
+         </div>
+        <div class="svg voice-message"><div id="send-button" class="microphone"></div></div>
+    </div>

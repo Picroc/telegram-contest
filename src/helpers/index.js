@@ -8,12 +8,13 @@ export const clsx = (...clss) =>
 			}
 
 			return item;
-		}).filter(Boolean)
+		})
+		.filter(Boolean)
 		.join(' ');
 
 export const subscribe = element => {
 	const el = typeof element === 'string' ? document.querySelector(element) : element;
-	return function (...args) {
+	return function(...args) {
 		el.addEventListener(...args);
 	};
 };
@@ -27,7 +28,11 @@ export const htmlToElement = html => {
 
 export const setInnerHTML = selector => value => {
 	this.querySelector(selector).innerHTML = value;
-}
+};
+
+export const setAttribute = selector => attribute => value => {
+	this.querySelector(selector).setAttribute(attribute, value);
+};
 
 export const startLoading = elem => {
 	elem.innerHTML = '';
