@@ -8,7 +8,7 @@ export const clsx = (...clss) =>
 			}
 
 			return item;
-		})
+		}).filter(Boolean)
 		.join(' ');
 
 export const subscribe = element => {
@@ -19,7 +19,7 @@ export const subscribe = element => {
 };
 
 export const htmlToElement = html => {
-	var template = document.createElement('template');
+	const template = document.createElement('template');
 	html = html.trim(); // Never return a text node of whitespace as the result
 	template.innerHTML = html;
 	return template.content.firstChild;
