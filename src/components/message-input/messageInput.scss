@@ -15,16 +15,16 @@
   flex-direction: row;
   justify-content: space-between;
   padding: 5px 10px 5px 10px;
-  background-color: #FFFFFF;
+  background-color: var(--white);
   margin-right: 20px;
-  border-radius: .5em .5em 0 .5em;
+  border-radius: 0.5em 0.5em 0 0.5em;
 
   &:after {
     content: " ";
     position: absolute;
     right: -15px;
     border: 20px solid transparent;
-    border-left-color: #FFFFFF;
+    border-left-color: var(--white);
     border-right: 0;
     border-bottom: 0;
     bottom: 0;
@@ -48,13 +48,12 @@
   }
 }
 
-
 .voice-message {
   cursor: pointer;
-  background-color: #4ea4f6;
+  background-color: var(--primary);
   padding: 16px !important;
   border-radius: 2.5em;
-  fill: #FFFFFF;
+  fill: var(--white);
 
   & svg {
     opacity: 1 !important;
@@ -63,7 +62,8 @@
 
 $send-button-size: 26px;
 
-.microphone, .send-arrow {
+.microphone,
+.send-arrow {
   width: $send-button-size;
   height: $send-button-size;
 }
@@ -83,14 +83,13 @@ $send-button-size: 26px;
     cursor: pointer;
     width: 24px;
     height: 24px;
-    opacity: .5;
+    opacity: 0.5;
     &.active {
-      fill: #4ea4f6;
-      opacity: .7;
+      fill: var(--primary);
+      opacity: 0.7;
     }
   }
 }
-
 
 .attach-media {
   position: absolute;

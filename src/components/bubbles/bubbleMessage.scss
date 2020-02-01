@@ -6,11 +6,11 @@
 
 .incoming {
   margin-left: 20px;
-  border-radius: .5em .5em .5em 0;
+  border-radius: 0.5em 0.5em 0.5em 0;
   align-self: flex-start;
   float: left;
-  background-color: #FFFFFF;
-  border: 0 solid #FFFFFF;
+  background-color: var(--white);
+  border: 0 solid var(--white);
 
   &.have-tail:after {
     content: " ";
@@ -23,18 +23,18 @@
     bottom: 0;
   }
   &.tailless {
-    border-radius: .5em .5em .5em .2em !important;
+    border-radius: 0.5em 0.5em 0.5em 0.2em !important;
   }
 }
 
 .outgoing {
   margin: 5px 20px 5px 5px;
   padding: 5px;
-  border-radius: .5em .5em 0 .5em;
+  border-radius: 0.5em 0.5em 0 0.5em;
   align-self: flex-end;
   float: right;
-  background-color: #EEFFDF;
-  border: 0 solid #EEFFDF;
+  background-color: var(--light-green);
+  border: 0 solid var(--light-green);
 
   &.have-tail:after {
     content: " ";
@@ -47,6 +47,6 @@
     bottom: 0;
   }
   &.tailless {
-    border-radius: .5em .5em .2em .5em !important;
+    border-radius: 0.5em 0.5em 0.2em 0.5em !important;
   }
 }
