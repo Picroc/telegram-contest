@@ -39,10 +39,11 @@ export default class LoginForm extends HTMLElement {
 
 		this.submit.addEventListener('click', this.logIn);
 
+		this.phone.addEventListener('input', this.handleMaskedInput);
+
 		fetch('http://ip-api.com/json')
 			.then(response => response.json())
 			.then(data => {
-				console.log('data', data);
 				Array.from(this.popup.children, elem => {
 					if (elem.getAttribute('alpha') === data.countryCode) {
 						this.country.value = elem.getAttribute('name');
@@ -87,14 +88,14 @@ export default class LoginForm extends HTMLElement {
 		return `+${code}`;
 	};
 
-	handleMaskedInput() {
+	handleMaskedInput = () => {
 		const { value } = this.phone;
 		if (!value) {
 			return;
 		}
 
 		this.phone.value = this.getMaskedValue(value);
-	}
+	};
 
 	checkIsInvalid() {
 		if (this.phone.classList.contains('input-field_invalid')) {
