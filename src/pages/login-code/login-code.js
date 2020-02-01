@@ -13,7 +13,6 @@ export default class LoginCode extends HTMLElement {
 			auto: true,
 			loop: true,
 		});
-
 		this.monkey_peek = this.getAnimationItem('.cd-tgsticker', peek, {
 			auto: false,
 		});
@@ -21,6 +20,7 @@ export default class LoginCode extends HTMLElement {
 	render() {
 		this.innerHTML = template;
 		this.code = this.querySelector('.login-code__code');
+		this.prevInputLength = this.code.value.length;
 		this.setLabel = setInnerHTML('.login-code__code ~ label');
 		this.phone = this.getAttribute('phone');
 		this.current_animation = this.monkey_idle;
@@ -32,13 +32,14 @@ export default class LoginCode extends HTMLElement {
 		c('focusout', () => {
 			this.translateAnimation(this.monkey_idle);
 		});
-		c('input', () => {
+		c('change', event => {
 			const { length } = this.code.value;
-			const segments = length > prev_input ? this.getSegments(length) : this.getSegments(length).reverse();
+			const segments =
+				length > this.prevInputLength ? this.getSegments(length) : this.getSegments(length).reverse();
 			this.current_animation.playSegments(segments, true);
-			prev_input = length;
+			this.prev_input = length;
 		});
-		c('input', this.validateCode);
+		c('change', this.validateCode);
 	}
 
 	validateCode = () => {

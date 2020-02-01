@@ -4,9 +4,8 @@ export default class Router extends HTMLElement {
 	render() {
 		const route = this.getAttribute('route');
 		this.id = 'router';
-		Array.from(this.children, elem => {
-			elem.tagName.toLocaleLowerCase() === route ? show(elem) : hide(elem);
-		});
+		this.innerHTML = '';
+		this.appendChild(document.createElement(route));
 	}
 
 	connectedCallback() {

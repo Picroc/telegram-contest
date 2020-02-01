@@ -14,7 +14,6 @@
   flex-direction: column;
   align-items: center;
 
-
   &__submit {
     margin-top: 24px;
   }
@@ -110,13 +109,14 @@
     overflow: hidden;
 
     & input {
+      width: 24px;
+      height: 24px;
       -webkit-appearance: none;
       background-color: white;
-      border: 1px solid rgba(218, 220, 224, 0.75);
-      padding: 8px;
-      border-radius: 3px;
       display: inline-flex;
-      position: relative;
+      align-items: flex-start;
+      margin-top: -2px;
+      background: url("./empty.svg");
 
       &:active,
       &:checked:active,
@@ -125,27 +125,14 @@
       }
 
       &:checked {
-        background: rgba(79, 164, 246, 1);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      &:checked:before {
-        content: "";
-        width: 14px;
-        height: 14px;
-        position: absolute;
-        z-index: 1;
-        top: -2px;
-        left: 0;
-        background-image: url("./check.svg");
+        background: url("./filled.svg");
       }
     }
 
     & label {
       display: inline-block;
       margin-left: 32px;
+      user-select: none;
     }
   }
 }

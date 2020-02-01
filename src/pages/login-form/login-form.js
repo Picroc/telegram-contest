@@ -13,11 +13,12 @@ export default class LoginForm extends HTMLElement {
 	render() {
 		this.innerHTML = template;
 		this.set = setInnerHTML.bind(this);
-
 		this.phone = this.querySelector('.login-form__phone');
 		this.submit = this.querySelector('.submit');
 		this.popup = this.querySelector('.login-form__popup');
 		this.country = this.querySelector('.login-form__country');
+		this.checkbox = this.querySelector('#keep');
+		this.label = this.querySelector('.login-form__phone ~ label');
 
 		this.setLabel = this.set('.login-form__phone ~ label');
 		this.setSubmitLabel = this.set('.submit span');
@@ -34,7 +35,21 @@ export default class LoginForm extends HTMLElement {
 			}
 		});
 
+		this.checkbox.addEventListener('change', event => event.stopPropagation());
+
 		this.submit.addEventListener('click', this.logIn);
+
+		fetch('http://ip-api.com/json')
+			.then(response => response.json())
+			.then(data => {
+				console.log('data', data);
+				Array.from(this.popup.children, elem => {
+					if (elem.getAttribute('alpha') === data.countryCode) {
+						this.country.value = elem.getAttribute('name');
+						this.phone.value = this.getMaskedValue(elem.getAttribute('code'));
+					}
+				});
+			});
 	}
 
 	renderCountry = country => {
