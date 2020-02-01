@@ -1,10 +1,12 @@
+import { show, hide } from '../helpers/index';
+
 export default class Router extends HTMLElement {
 	render() {
 		const route = this.getAttribute('route');
-		const page = document.createElement(route);
 		this.id = 'router';
-		this.innerHTML = '';
-		this.appendChild(page);
+		Array.from(this.children, elem => {
+			elem.tagName.toLocaleLowerCase() === route ? show(elem) : hide(elem);
+		});
 	}
 
 	connectedCallback() {

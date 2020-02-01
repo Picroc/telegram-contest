@@ -1,18 +1,13 @@
-import Login from './templates/login-form';
-import LoginCode from './templates/login-code';
-import LoginPassword from './templates/login-password';
-
 import './assets/fonts.css';
 import './assets/globals.scss';
 import './assets/popup.scss';
-import chatPage from './templates/chat-page';
-import RegisterPage from './templates/register-page/index';
 import LoginForm from './pages/login-form/login-form';
 import Router from './components/router';
 import CountriesPopupItem from './components/countries-popup-item/countries-popup-item';
-import BubbleMessage from './pages/chat-page/chat-main/bubbles/bubbleMessage';
-import MessageInput from './pages/chat-page/chat-main/message-input/messageInput';
-import ProfileImage from './pages/chat-page/profile-image/profileImage';
+import BubbleMessage from './components/bubbles/bubbleMessage';
+import MessageInput from './components/message-input/messageInput';
+import ProfileImage from './components/profile-image/profile-image';
+import LoginCode from './pages/login-code/login-code';
 
 customElements.define('my-router', Router);
 customElements.define('login-form', LoginForm);
@@ -20,6 +15,7 @@ customElements.define('countries-popup-item', CountriesPopupItem);
 customElements.define('bubble-message', BubbleMessage);
 customElements.define('message-input', MessageInput);
 customElements.define('profile-image', ProfileImage);
+customElements.define('login-code', LoginCode);
 
 const q = elem => document.querySelector(elem);
 const App = q('.root');
@@ -31,10 +27,6 @@ export const router = (route, attrs) => {
 	});
 };
 
-let state = {
-	history: ['register_page'],
-};
-
 const changeState = transform => {
 	return function (...args) {
 		const [oldState, newState] = [state, transform(...args)];
@@ -44,36 +36,6 @@ const changeState = transform => {
 			...newState,
 		};
 	};
-};
-
-const subscribe = element => {
-	return function (...args) {
-		document.querySelector(element).addEventListener(...args);
-	};
-};
-
-const switchPage = page => {
-	switch (page) {
-		case 'login':
-			return Login;
-		case 'login_code':
-			return LoginCode;
-		case 'login_password':
-			return LoginPassword;
-		case 'register_page':
-			return RegisterPage;
-		case 'chat_page':
-			return chatPage;
-		default:
-			return () => {
-				throw new ReferenceError('No such page');
-			};
-	}
-};
-
-export const routePage = (page, ...args) => {
-	changeState(() => ({ history: [...state.history, page] }))();
-	switchPage(page)(App, routePage, ...args);
 };
 
 window.updateRipple = () => {
@@ -88,13 +50,3 @@ window.updateRipple = () => {
 		});
 	});
 };
-
-function render() {
-	RegisterPage(App, routePage);
-}
-
-function onDocumentReady(callback) {
-	document.addEventListener('DOMContentLoaded', callback);
-}
-
-onDocumentReady(render);
