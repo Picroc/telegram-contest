@@ -58,7 +58,7 @@ export default class TelegramApi {
 				],
 			},
 			mode: {
-				test: false,
+				test: true,
 				debug: true,
 			},
 		});
@@ -71,10 +71,13 @@ export default class TelegramApi {
 			'auth.sendCode',
 			{
 				phone_number: phone_number,
-				sms_type: 5,
+				// sms_type: 5,
 				api_id: Config.App.id,
 				api_hash: Config.App.hash,
 				lang_code: navigator.language || 'en',
+				settings: {
+					_: 'codeSettings',
+				},
 			},
 			this.options
 		);
@@ -764,6 +767,10 @@ export default class TelegramApi {
 			const { message: text, date } = message;
 			const unread_count = dialog.unread_count;
 
+			if (photo) {
+				photo = await this.getChatPhoto(peer, photo);
+			}
+
 			dialog_items.push({
 				title: title,
 				isOnline: status && status._ === 'userStatusOnline',
@@ -824,7 +831,7 @@ export default class TelegramApi {
 					chat.participants_count > 1
 						? chat.participants_count + ' members'
 						: chat.participants_count + ' member';
-				photo = chat.photo;
+				photo = chat.photo && chat.photo._ !== 'chatPhotoEmpty' && chat.photo;
 				peer = {
 					...result,
 					access_hash: chat.access_hash,
@@ -836,7 +843,7 @@ export default class TelegramApi {
 					channel.participants_count > 1
 						? channel.participants_count + ' members'
 						: channel.participants_count + ' member';
-				photo = channel.photo;
+				photo = channel.photo && channel.photo._ !== 'chatPhotoEmpty' && channel.photo;
 				peer = {
 					...result,
 					access_hash: channel.access_hash,
@@ -847,13 +854,17 @@ export default class TelegramApi {
 				title = user.first_name + last_name;
 				status = user.status;
 				text = '@' + user.username;
-				photo = user.photo;
+				photo = user.photo && user.photo._ !== 'userPhotoEmpty' && user.photo;
 				peer = user.access_hash
 					? {
 							...result,
 							access_hash: user.access_hash,
 					  }
 					: result;
+			}
+
+			if (photo) {
+				photo = this.getChatPhoto(peer, photo);
 			}
 
 			search_items.push({
@@ -890,6 +901,7 @@ export default class TelegramApi {
 					local_id: location.local_id,
 					secret: location.secret,
 					volume_id: location.volume_id,
+					file_reference: location.file_reference,
 				},
 				offset: 0,
 				limit: 1048576,
@@ -897,6 +909,7 @@ export default class TelegramApi {
 			{ fileDownload: true }
 		)
 			.then(res => {
+				console.log('Got file!');
 				return 'data:image/png;base64,' + btoa(String.fromCharCode(...new Uint8Array(res.bytes)));
 			})
 			.catch(err => {
@@ -904,5 +917,24 @@ export default class TelegramApi {
 					return null;
 				}
 			});
+	};
+
+	getChatPhoto = async (peer, photo) => {
+		photo = photo.photo_small;
+		console.log('PEER', peer);
+		console.log('PHOTO', photo);
+		return this.invokeApi('upload.getFile', {
+			location: {
+				_: 'inputPeerPhotoFileLocation',
+				peer: this.mapPeerToTruePeer(peer),
+				volume_id: photo.volume_id,
+				local_id: photo.local_id,
+			},
+			offset: 0,
+			limit: 1048576,
+		}).then(photo_file => {
+			console.log('Got file!');
+			return 'data:image/png;base64,' + btoa(String.fromCharCode(...new Uint8Array(photo_file.bytes)));
+		});
 	};
 }

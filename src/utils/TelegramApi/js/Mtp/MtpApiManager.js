@@ -9,9 +9,9 @@ import MtpAuthorizerModule from './MtpAuthorizer';
 import { dT, tsNow } from '../lib/utils';
 
 export default function MtpApiManagerModule() {
-	let cachedNetworkers = {};
-	let cachedUploadNetworkers = {};
-	let cachedExportPromise = {};
+	const cachedNetworkers = {};
+	const cachedUploadNetworkers = {};
+	const cachedExportPromise = {};
 	let baseDcID = false;
 
 	let telegramMeNotified;
@@ -156,7 +156,8 @@ export default function MtpApiManagerModule() {
 					setTimeout(function() {
 						if (!error.handled) {
 							if (error.code == 401 && error.type !== 'SESSION_PASSWORD_NEEDED') {
-								mtpLogOut();
+								// mtpLogOut();
+								console.error('THERE SHOULD BE LOG OUT!!!!!!!!!');
 							}
 							error.handled = true;
 						}
@@ -188,6 +189,7 @@ export default function MtpApiManagerModule() {
 							telegramMeNotify(false);
 							rejectPromise(error);
 						} else if (error.code == 401 && baseDcID && dcID != baseDcID) {
+							console.log('Exporting auth...');
 							if (cachedExportPromise[dcID] === undefined) {
 								const exportPromise = new Promise((exportResolve, exportReject) => {
 									mtpInvokeApi(
@@ -227,21 +229,81 @@ export default function MtpApiManagerModule() {
 								}, rejectPromise);
 							}, rejectPromise);
 						} else if (error.code == 303) {
-							const newDcID = error.type.match(
-								/^(PHONE_MIGRATE_|NETWORK_MIGRATE_|USER_MIGRATE_)(\d+)/
-							)[2];
-							if (newDcID != dcID) {
-								if (options.dcID) {
-									options.dcID = newDcID;
-								} else {
-									Storage.set({ dc: (baseDcID = newDcID) });
-								}
+							const fileMigrateDC = Number(error.type.match(/^(|FILE_MIGRATE_)(\d+)/)[2]);
+							if (fileMigrateDC) {
+								if (fileMigrateDC !== dcID) {
+									// const newOptions = {
+									// 	dcID: fileMigrateDC,
+									// 	fileDownload: true,
+									// 	createNetworker: true,
+									// 	...options,
+									// };
+									// baseDcID = fileMigrateDC;
+									if (cachedExportPromise[fileMigrateDC] === undefined) {
+										const exportPromise = new Promise((exportResolve, exportReject) => {
+											mtpInvokeApi(
+												'auth.exportAuthorization',
+												{ dc_id: fileMigrateDC },
+												{ noErrorBox: true }
+											).then(
+												exportedAuth => {
+													console.log(exportedAuth);
+													mtpInvokeApi(
+														'auth.importAuthorization',
+														{
+															id: exportedAuth.id,
+															bytes: new Uint8Array(exportedAuth.bytes),
+														},
+														{ dcID: fileMigrateDC, noErrorBox: true }
+													).then(
+														() => {
+															exportResolve();
+														},
+														e => {
+															console.error('INport rejected', e);
+															exportReject(e);
+														}
+													);
+												},
+												e => {
+													exportReject(e);
+												}
+											);
+										});
+										cachedExportPromise[fileMigrateDC] = exportPromise;
+									}
 
-								mtpGetNetworker(newDcID, options).then(networker => {
-									networker.wrapApiCall(method, params, options).then(result => {
-										resolve(result);
+									cachedExportPromise[fileMigrateDC].then(() => {
+										mtpGetNetworker(fileMigrateDC, options).then(networker => {
+											networker.wrapApiCall(method, params, options).then(
+												result => {
+													resolve(result);
+												},
+												e => {
+													console.log('WRAP FAILED', e);
+													return rejectPromise;
+												}
+											);
+										});
 									}, rejectPromise);
-								}, rejectPromise);
+								}
+							} else {
+								const newDcID = error.type.match(
+									/^(PHONE_MIGRATE_|NETWORK_MIGRATE_|USER_MIGRATE_)(\d+)/
+								)[2];
+								if (newDcID != dcID) {
+									if (options.dcID) {
+										options.dcID = newDcID;
+									} else {
+										Storage.set({ dc: (baseDcID = newDcID) });
+									}
+
+									mtpGetNetworker(newDcID, options).then(networker => {
+										networker.wrapApiCall(method, params, options).then(result => {
+											resolve(result);
+										}, rejectPromise);
+									}, rejectPromise);
+								}
 							}
 						} else if (!options.rawError && error.code == 420) {
 							const waitTime = error.type.match(/^FLOOD_WAIT_(\d+)/)[1] || 10;

@@ -2,6 +2,7 @@ import MtpApiManagerModule from './MtpApiManager';
 import { bufferConcat } from '../lib/bin_utils';
 import CryptoWorkerModule from '../Etc/CryptoWorker';
 import MtpSecureRandom from './MtpSecureRandom';
+import srp from 'srp-js';
 
 export default class MtpPasswordManagerModule {
 	MtpApiManager = MtpApiManagerModule();
@@ -62,11 +63,14 @@ export default class MtpPasswordManagerModule {
 	};
 
 	check = (state, password, options) =>
-		this.makePasswordHash(state.current_salt, password).then(passwordHash => {
+		this.makePasswordHash(password, state).then(passwordHash => {
 			return this.MtpApiManager.invokeApi(
 				'auth.checkPassword',
 				{
-					password_hash: passwordHash,
+					password: {
+						_: 'inputCheckPasswordSRP',
+						...passwordHash,
+					},
 				},
 				options
 			);
@@ -83,17 +87,48 @@ export default class MtpPasswordManagerModule {
 			options
 		);
 
-	makePasswordHash = (salt, password) => {
-		const passwordUTF8 = unescape(encodeURIComponent(password));
+	makePasswordHash = (password, state) => {
+		// const passwordUTF8 = unescape(encodeURIComponent(password));
 
-		let buffer = new ArrayBuffer(passwordUTF8.length);
-		const byteView = new Uint8Array(buffer);
-		for (let i = 0, len = passwordUTF8.length; i < len; i++) {
-			byteView[i] = passwordUTF8.charCodeAt(i);
-		}
+		// let buffer = new ArrayBuffer(passwordUTF8.length);
+		// const byteView = new Uint8Array(buffer);
+		// for (let i = 0, len = passwordUTF8.length; i < len; i++) {
+		// 	byteView[i] = passwordUTF8.charCodeAt(i);
+		// }
 
-		buffer = bufferConcat(bufferConcat(salt, byteView), salt);
+		// buffer = bufferConcat(bufferConcat(salt, byteView), salt);
 
-		return this.CryptoWorker.sha256Hash(buffer);
+		// return this.CryptoWorker.sha256Hash(buffer);
+		console.log('creating srp session');
+		return new Promise(resolve => {
+			const params = srp.params['2048'];
+
+			console.log('Here we go...');
+			console.log('SRP', srp);
+
+			const client = new srp.Client(
+				params,
+				new ArrayBuffer(state.new_algo.salt2),
+				new ArrayBuffer(state.new_algo.salt1),
+				new ArrayBuffer(password),
+				srp.genKey()
+			);
+			console.log('Still going...');
+			const srpA = client.computeA();
+			console.log('Almost ready...');
+
+			client.setB(state.srp_B);
+			console.log('Last step...');
+			const M1 = client.computeM1();
+			// const K = client.computeK();
+
+			console.log('Done with srp');
+
+			resolve({
+				srp_id: state.srp_id,
+				A: srpA,
+				M1: M1,
+			});
+		});
 	};
 }
