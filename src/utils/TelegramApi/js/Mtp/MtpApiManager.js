@@ -254,7 +254,7 @@ export default function MtpApiManagerModule() {
 															id: exportedAuth.id,
 															bytes: new Uint8Array(exportedAuth.bytes),
 														},
-														{ dcID: fileMigrateDC, noErrorBox: true }
+														{ dcID: fileMigrateDC, noErrorBox: true, createNetworker: true }
 													).then(
 														() => {
 															exportResolve();

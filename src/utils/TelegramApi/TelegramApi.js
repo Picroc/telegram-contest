@@ -58,7 +58,7 @@ export default class TelegramApi {
 				],
 			},
 			mode: {
-				test: true,
+				test: false,
 				debug: true,
 			},
 		});
@@ -768,7 +768,7 @@ export default class TelegramApi {
 			const unread_count = dialog.unread_count;
 
 			if (photo) {
-				photo = await this.getChatPhoto(peer, photo);
+				photo = this.getChatPhoto(peer, photo);
 			}
 
 			dialog_items.push({

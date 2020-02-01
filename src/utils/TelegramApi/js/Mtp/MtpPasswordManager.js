@@ -103,31 +103,38 @@ export default class MtpPasswordManagerModule {
 		return new Promise(resolve => {
 			const params = srp.params['2048'];
 
-			console.log('Here we go...');
-			console.log('SRP', srp);
+			let a;
 
-			const client = new srp.Client(
-				params,
-				new ArrayBuffer(state.new_algo.salt2),
-				new ArrayBuffer(state.new_algo.salt1),
-				new ArrayBuffer(password),
-				srp.genKey()
-			);
-			console.log('Still going...');
-			const srpA = client.computeA();
-			console.log('Almost ready...');
+			srp.genKey(32, (err, key) => {
+				a = key;
+				console.log('Here we go...');
+				console.log('SRP', srp);
 
-			client.setB(state.srp_B);
-			console.log('Last step...');
-			const M1 = client.computeM1();
-			// const K = client.computeK();
+				console.log(a);
 
-			console.log('Done with srp');
+				const client = new srp.Client(
+					params,
+					new Buffer(state.new_algo.salt2),
+					new Buffer(state.new_algo.salt1),
+					new Buffer(password),
+					a
+				);
+				console.log('Still going...');
+				const srpA = client.computeA();
+				console.log('Almost ready...');
 
-			resolve({
-				srp_id: state.srp_id,
-				A: srpA,
-				M1: M1,
+				client.setB(new Buffer(state.srp_B));
+				console.log('Last step...');
+				const M1 = client.computeM1();
+				// const K = client.computeK();
+
+				console.log('Done with srp');
+
+				resolve({
+					srp_id: state.srp_id,
+					A: srpA,
+					M1: M1,
+				});
 			});
 		});
 	};
