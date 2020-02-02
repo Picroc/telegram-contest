@@ -1,21 +1,20 @@
 import makeBubble from './bubbles/bubbleMessage';
 import InputMessage from './message-input';
-import { TelegramApiWrapper } from '../../../utils/services';
 import { createDiv } from '../../../helpers';
 import './messages.scss';
 import './chatMain.scss';
 
 async function* fetchMessages(peer, limit = 30) {
-	const ta = new TelegramApiWrapper();
+	const ta = window.telegramApi;
 	let offsetId = 0;
 	let loadAll = false;
 	while (!loadAll) {
 		const messages = await ta.getMessagesFromPeer(peer, limit, offsetId);
 		const mes = messages.messages;
 		offsetId = (mes[mes.length - 1] && mes[mes.length - 1].id) || 0;
-		loadAll = mes.length === 0;
+		loadAll = messages.messages.length === 0;
 
-		for (const message of mes) {
+		for (const message of messages.messages) {
 			yield message;
 		}
 	}
@@ -27,7 +26,9 @@ const loadMessages = async (elem, messageGenerator) => {
 	const messages = [];
 	for (let i = 0; i < limit; i++) {
 		const resp = await messageGenerator.next();
-		if (resp.done) break;
+		if (resp.done) {
+			break;
+		}
 		messages.push(resp.value);
 	}
 
@@ -90,7 +91,7 @@ const getContent = ({ message, date, media }) => {
 	return `
         <div class="message">
             ${imageUrl ? '<img src="' + imageUrl + '" width="200px" alt="Blob image">' : ''}
-            <div class="message-content">${message}</div>
+            <div class="message-content">${message}</div>      
             <div class="message-info">
                 <div class="message-time">${time}</div>
                 <div class="status sending"></div>
@@ -114,7 +115,8 @@ export default async (elem, peer) => {
 		}
 	});
 
-	elem.innerHTML = chatMain.outerHTML;
+	elem.innerHTML = '';
+	elem.append(chatMain);
 	const textarea = elem.querySelector('.text-input__input');
 	textarea.addEventListener('input', () => {
 		const sendButton = document.getElementById('send-button');

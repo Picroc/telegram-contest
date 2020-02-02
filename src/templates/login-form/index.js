@@ -39,7 +39,7 @@ const handleMaskedInput = event => {
 };
 
 const subscribe = element => {
-	return function(...args) {
+	return function (...args) {
 		document.querySelector(element).addEventListener(...args);
 	};
 };
@@ -50,12 +50,12 @@ const countriesPopup = coutries => {
 			return `
             <li class='popup-item'>
                 <span class='popup-item__flag'>${
-					emojiFlags[country.alpha] ? emojiFlags[country.alpha].emoji : 'NONE'
-				}</span >
-		<span class='popup-item__name'>${country.name}</span>
-		<span class='popup-item__code'>+ ${country.code}</span>
-            </li >
-	`;
+				emojiFlags[country.alpha] ? emojiFlags[country.alpha].emoji : 'NONE'
+				}</span>
+                <span class='popup-item__name'>${country.name}</span>
+                <span class='popup-item__code'>+ ${country.code}</span>
+            </li>
+        `;
 		})
 		.join('');
 };
@@ -197,11 +197,12 @@ export default (elem, rt) => {
 	telegramApi
 		.getUserInfo()
 		.then(user => {
+			console.log('HERE WE GO', user);
 			if (user.id) {
 				router('chat_page');
 			}
 		})
 		.catch(err => {
-			console.log(err);
+			console.log('LOGIN ERR', err);
 		});
 };

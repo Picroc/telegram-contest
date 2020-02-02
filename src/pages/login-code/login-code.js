@@ -97,22 +97,9 @@ export default class LoginCode extends HTMLElement {
 	}
 
 	getSegments = value => {
-		switch (value) {
-			case 0:
-				return [0, 15];
-			case 1:
-				return [15, 30];
-			case 2:
-				return [30, 45];
-			case 3:
-				return [45, 60];
-			case 4:
-				return [60, 75];
-			case 5:
-				return [75, 90];
-			case 6:
-				return [90, 100];
-		}
+		const result = value * 15;
+
+		return result > 100 ? 100 : result;
 	};
 
 	translateAnimation = (to, time) => {

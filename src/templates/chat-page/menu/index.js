@@ -2,7 +2,6 @@ import './menu.scss';
 import template from './menu.html';
 import { subscribe, createInput, createDiv } from '../../../helpers';
 import img from './search.js';
-import { TelegramApiWrapper } from '../../../utils/services';
 import settings from './settings/index';
 
 export default (elem, type, callback) => {
@@ -35,7 +34,7 @@ export const onType = event => {
 };
 
 let currentSeacrhTimeout;
-const tApi = new TelegramApiWrapper();
+const tApi = window.telegramApi;
 
 const onTypeContacts = (value, searchCallback = () => {}) => {
 	if (value.length == 0) {
@@ -43,7 +42,9 @@ const onTypeContacts = (value, searchCallback = () => {}) => {
 		return;
 	}
 
-	if (currentSeacrhTimeout) clearTimeout(currentSeacrhTimeout);
+	if (currentSeacrhTimeout) {
+		clearTimeout(currentSeacrhTimeout);
+	}
 
 	currentSeacrhTimeout = setTimeout(() => {
 		tApi.searchPeers(value, 20).then(res => {

@@ -14,7 +14,7 @@ export const clsx = (...clss) =>
 
 export const subscribe = element => {
 	const el = typeof element === 'string' ? document.querySelector(element) : element;
-	return function(...args) {
+	return function (...args) {
 		el.addEventListener(...args);
 	};
 };
@@ -26,25 +26,35 @@ export const htmlToElement = html => {
 	return template.content.firstChild;
 };
 
-export const setInnerHTML = function(selector) {
+export const setInnerHTML = function (selector) {
 	return value => {
 		this.querySelector(selector).innerHTML = value;
 	};
 };
 
-const toggle = force => elem => {
-	elem.classList.toggle('hide', force);
+const toggle = cls => force => elem => {
+	elem.classList.toggle(cls, force);
 };
 
-export const setAttribute = function(selector) {
+const toggleHide = toggle('hide');
+const toggleActive = force => elem => {
+	if (force) {
+		elem.setAttribute('active', 'true');
+	} else {
+		elem.removeAttribute('active');
+	}
+};
+
+export const hide = toggleHide(true);
+export const show = toggleHide(false);
+export const setAttribute = function (selector) {
 	return attribute => value => {
 		this.querySelector(selector).setAttribute(attribute, value);
 	};
 };
 
-export const hide = toggle(true);
-
-export const show = toggle(false);
+export const setActive = toggleActive(true);
+export const setNotActive = toggleActive(false);
 
 export const startLoading = elem => {
 	elem.innerHTML = '';

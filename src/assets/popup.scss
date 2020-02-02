@@ -35,6 +35,10 @@
       background: var(--light-gray);
     }
 
+    &_active {
+      background-color: var(--light-gray);
+    }
+
     & span {
       display: inline-block;
       max-width: 200px;

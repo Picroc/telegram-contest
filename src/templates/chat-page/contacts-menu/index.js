@@ -2,7 +2,6 @@ import './contacts-menu.scss';
 import Contact from './contact';
 import { subscribe } from '../../../helpers';
 import { loadDialog } from '..';
-import { TelegramApiWrapper } from '../../../utils/services';
 
 export default async elem => {
 	menu = document.createElement('div');
@@ -10,7 +9,7 @@ export default async elem => {
 	return menu;
 };
 
-const tApi = new TelegramApiWrapper();
+const tApi = window.telegramApi;
 
 export const updateSearchResults = async res => {
 	const menu = document.createElement('div');

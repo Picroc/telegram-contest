@@ -5,7 +5,11 @@
   justify-content: center;
   vertical-align: middle;
   align-items: center;
+  * {
+    user-select: none;
+  }
 }
+
 .login-form {
   display: flex;
 

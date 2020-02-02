@@ -19,7 +19,6 @@ export default class CountriesPopupItem extends HTMLElement {
 	}
 
 	connectedCallback() {
-		// (2)
 		if (!this.rendered) {
 			this.render();
 			this.rendered = true;
@@ -27,7 +26,6 @@ export default class CountriesPopupItem extends HTMLElement {
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		// (4)
 		this.render();
 	}
 }
