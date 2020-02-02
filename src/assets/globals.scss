@@ -6,7 +6,6 @@
   --right-gray: #eee;
   --dark-gray: rgb(106, 108, 111);
 
-  --hover-color: #f1f3f4;
   --green: #4dcd5e;
   --shadow: rgba(0, 0, 0, 0.75);
   --white: #fff;
@@ -65,6 +64,9 @@
 
 ul {
   list-style: none;
+  .active {
+    background-color: var(--light-gray);
+  }
 }
 
 .icon {
@@ -72,7 +74,7 @@ ul {
   justify-content: center;
   align-items: center;
   &:hover {
-    background: var(--hover-color);
+    background: var(--light-gray);
     border-radius: 50%;
     cursor: pointer;
   }

@@ -1,6 +1,6 @@
 import './login-form.scss';
 import template from './login-form.html';
-import { setInnerHTML, hide, htmlToElement, show } from '../../helpers/index';
+import { setInnerHTML, hide, htmlToElement, show, setNotActive, setActive } from '../../helpers/index';
 import countries from './countries.json';
 import { router } from '../../App';
 
@@ -13,6 +13,7 @@ export default class LoginForm extends HTMLElement {
 	render() {
 		this.innerHTML = template;
 		this.set = setInnerHTML.bind(this);
+
 		this.phone = this.querySelector('.login-form__phone');
 		this.submit = this.querySelector('.submit');
 		this.popup = this.querySelector('.login-form__popup');
@@ -24,13 +25,18 @@ export default class LoginForm extends HTMLElement {
 		this.setSubmitLabel = this.set('.submit span');
 		this.countries.forEach(this.renderCountry);
 
-		this.country.addEventListener('focus', this.onCountryClick);
 		this.addEventListener('click', this.onCountryOut);
+
+		this.country.addEventListener('focus', this.onCountryClick);
 		this.country.addEventListener('click', event => event.stopPropagation());
 		this.country.addEventListener('input', this.filterCountries);
+
+		this.popup.active = -1;
+
+		this.country.addEventListener('keyup', this.countryKeyListener);
+
 		this.phone.addEventListener('keyup', event => {
-			if (event.keyCode === 13) {
-				event.preventDefault();
+			if (event.keyCode === enter) {
 				this.submit.click();
 			}
 		});
@@ -88,6 +94,52 @@ export default class LoginForm extends HTMLElement {
 		return `+${code}`;
 	};
 
+	countryKeyListener = event => {
+		const up = 38;
+		const down = 40;
+		const enter = 13;
+
+		event.stopPropagation();
+
+		const { active } = this.popup;
+		const { length } = this.popup.children;
+		let next;
+		const update = this.updatePopup(active);
+
+		switch (event.keyCode) {
+			case down:
+				next = (active + 1) % length;
+				break;
+
+			case up: {
+				if (active === -1) {
+					return;
+				}
+				next = active - 1 >= 0 ? active - 1 : length - 1;
+				break;
+			}
+
+			case enter: {
+				this.popup.children[this.popup.active].children[0].click();
+				return;
+			}
+		}
+
+		update(next);
+	};
+
+	updatePopup = active => next => {
+		if (active !== -1) {
+			setNotActive(this.popup.children[active]);
+		}
+
+		setActive(this.popup.children[next]);
+		this.popup.active = next;
+		this.popup.children[next].scrollIntoView({
+			block: 'nearest',
+		});
+	};
+
 	handleMaskedInput = () => {
 		const { value } = this.phone;
 		if (!value) {
@@ -130,7 +182,6 @@ export default class LoginForm extends HTMLElement {
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		// (4)
 		this.render();
 	}
 
@@ -148,7 +199,12 @@ export default class LoginForm extends HTMLElement {
 	}
 
 	onCountryOut = event => {
+		if (this.popup.classList.contains('hide')) {
+			return;
+		}
 		hide(this.popup);
+		~this.popup.active && setNotActive(this.popup.children[this.popup.active]);
+		this.popup.active = -1;
 		return false;
 	};
 

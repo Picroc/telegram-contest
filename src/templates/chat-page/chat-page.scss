@@ -21,12 +21,12 @@
   --ripple-duration: 600ms;
 
   &:hover {
-    background-color: var(--hover-color);
+    background-color: var(--light-gray);
     cursor: pointer;
   }
 
   &_active {
-    background-color: var(--hover-color);
+    background-color: var(--light-gray);
   }
 
   &__saved {
