@@ -2,7 +2,6 @@ import MtpApiManagerModule from './MtpApiManager';
 import { bufferConcat } from '../lib/bin_utils';
 import CryptoWorkerModule from '../Etc/CryptoWorker';
 import MtpSecureRandom from './MtpSecureRandom';
-import srp from 'srp-js';
 
 export default class MtpPasswordManagerModule {
 	MtpApiManager = MtpApiManagerModule();
@@ -99,43 +98,9 @@ export default class MtpPasswordManagerModule {
 		// buffer = bufferConcat(bufferConcat(salt, byteView), salt);
 
 		// return this.CryptoWorker.sha256Hash(buffer);
-		console.log('creating srp session');
+
 		return new Promise(resolve => {
-			const params = srp.params['2048'];
-
-			let a;
-
-			srp.genKey(32, (err, key) => {
-				a = key;
-				console.log('Here we go...');
-				console.log('SRP', srp);
-
-				console.log(a);
-
-				const client = new srp.Client(
-					params,
-					new Buffer(state.new_algo.salt2),
-					new Buffer(state.new_algo.salt1),
-					new Buffer(password),
-					a
-				);
-				console.log('Still going...');
-				const srpA = client.computeA();
-				console.log('Almost ready...');
-
-				client.setB(new Buffer(state.srp_B));
-				console.log('Last step...');
-				const M1 = client.computeM1();
-				// const K = client.computeK();
-
-				console.log('Done with srp');
-
-				resolve({
-					srp_id: state.srp_id,
-					A: srpA,
-					M1: M1,
-				});
-			});
+			resolve();
 		});
 	};
 }
