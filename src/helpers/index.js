@@ -47,13 +47,14 @@ const toggleActive = force => elem => {
 
 export const hide = toggleHide(true);
 export const show = toggleHide(false);
+export const setAttribute = function (selector) {
+	return attribute => value => {
+		this.querySelector(selector).setAttribute(attribute, value);
+	};
+};
 
 export const setActive = toggleActive(true);
 export const setNotActive = toggleActive(false);
-
-export const setAttribute = selector => attribute => value => {
-	this.querySelector(selector).setAttribute(attribute, value);
-};
 
 export const startLoading = elem => {
 	elem.innerHTML = '';

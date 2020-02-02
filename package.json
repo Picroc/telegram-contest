@@ -18,7 +18,7 @@
     "lottie-web": "^5.5.9",
     "surge": "^0.21.3",
     "telegram-api-js": "^1.2.9",
-    "yarn": "^1.19.1"
+    "yarn": "^1.21.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.4",

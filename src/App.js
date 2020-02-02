@@ -15,6 +15,7 @@ customElements.define('countries-popup-item', CountriesPopupItem);
 customElements.define('bubble-message', BubbleMessage);
 customElements.define('message-input', MessageInput);
 customElements.define('profile-image', ProfileImage);
+customElements.define('top-bar', TopBar);
 customElements.define('login-code', LoginCode);
 
 const q = elem => document.querySelector(elem);
@@ -28,7 +29,7 @@ export const router = (route, attrs) => {
 };
 
 const changeState = transform => {
-	return function (...args) {
+	return function(...args) {
 		const [oldState, newState] = [state, transform(...args)];
 
 		state = {

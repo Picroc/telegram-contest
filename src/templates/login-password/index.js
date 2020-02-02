@@ -13,7 +13,7 @@ const state = {
 };
 
 const subscribe = element => {
-	return function (...args) {
+	return function(...args) {
 		document.querySelector(element).addEventListener(...args);
 	};
 };

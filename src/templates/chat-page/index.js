@@ -43,20 +43,22 @@ const ta = new TelegramApiWrapper();
 const loadPhotos = async () => {
 	const dialogs = document.getElementById('user-dialogs');
 	cached.forEach((cachedItem, i) => {
-		setTimeout((ind => {
-			if (!cachedItem.photo) {
-				return;
-			}
-			ta.getPhotoFile(cachedItem.photo.photo_small).then(photo => {
-				if (photo) {
-					try {
-						dialogs.data[ind].children[0].children[0].src = photo;
-					} catch { }
+		setTimeout(
+			(ind => {
+				if (!cachedItem.photo) {
+					return;
 				}
-			});
-
-		})(i), 0)
-	})
+				ta.getPhotoFile(cachedItem.photo.photo_small).then(photo => {
+					if (photo) {
+						try {
+							dialogs.data[ind].children[0].children[0].src = photo;
+						} catch {}
+					}
+				});
+			})(i),
+			0
+		);
+	});
 };
 
 let cached = [];
@@ -108,8 +110,7 @@ const loadData = async () => {
 
 export default elem => {
 	elem.innerHTML = template;
-	loadData()
-		.then(() => {
-			loadPhotos().then();
-		});
+	loadData().then(() => {
+		loadPhotos().then();
+	});
 };
