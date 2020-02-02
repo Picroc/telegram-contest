@@ -74,19 +74,18 @@ const loadData = async () => {
 
 	const load = data => {
 		console.log('data', data);
-		const { dialogs, messages } = data.result;
-		dialogs.forEach((user, i) => {
+		data.forEach((user, i) => {
 			if (cached.filter(({ title }) => user.title === title).length > 0) {
 				return;
 			}
 
-			if (user.peer.user_id === id) {
+			if (user.dialog_peer.user_id === id) {
 				user = { ...user, savedMessages: true };
 			}
 
 			const d = htmlToElement(dialog(user));
-			const { peer } = user;
-			subscribe(d)('click', () => loadDialog(d, peer, user));
+			const { dialog_peer } = user;
+			subscribe(d)('click', () => loadDialog(d, dialog_peer, user));
 			userDialogs.appendChild(d);
 		});
 
@@ -103,8 +102,8 @@ const loadData = async () => {
 		window.updateRipple();
 	};
 
-	await telegramApi.getDialogs(0, 5).then(load);
-	await telegramApi.getDialogs(5, 30).then(load);
+	await telegramApi.getDialogsParsed(0, 5).then(load);
+	await telegramApi.getDialogsParsed(5, 30).then(load);
 	return left;
 };
 

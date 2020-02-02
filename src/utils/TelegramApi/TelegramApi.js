@@ -721,8 +721,8 @@ export default class TelegramApi {
 		});
 	};
 
-	getDialogsParsed = async limit => {
-		const { result } = await this.getDialogs(0, limit);
+	getDialogsParsed = async (offset, limit) => {
+		const { result } = await this.getDialogs(offset, limit);
 
 		const { chats, dialogs, messages, users } = result;
 
@@ -758,9 +758,9 @@ export default class TelegramApi {
 				}
 				peer = user.access_hash
 					? {
-							...peer,
-							access_hash: user.access_hash,
-					  }
+						...peer,
+						access_hash: user.access_hash,
+					}
 					: peer;
 			}
 			const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
@@ -789,26 +789,32 @@ export default class TelegramApi {
 
 	mapPeerToTruePeer = peer => {
 		const type = peer._;
-		if (type === 'peerUser') {
-			return {
-				...peer,
-				_: 'inputPeerUser',
-				user_id: peer.user_id.toString(),
-			};
-		} else if (type === 'peerChat') {
-			return {
-				...peer,
-				_: 'inputPeerChat',
-				chat_id: peer.chat_id.toString(),
-			};
-		} else if (type === 'peerChannel') {
-			return {
-				...peer,
-				_: 'inputPeerChannel',
-				channel_id: peer.channel_id.toString(),
-			};
+
+		switch (type) {
+			case 'peerUser':
+				return {
+					...peer,
+					_: 'inputPeerUser',
+					user_id: peer.user_id.toString(),
+				};
+
+			case 'peerChat':
+				return {
+					...peer,
+					_: 'inputPeerChat',
+					chat_id: peer.chat_id.toString(),
+				};
+
+			case 'peerChannel':
+				return {
+					...peer,
+					_: 'inputPeerChannel',
+					channel_id: peer.channel_id.toString(),
+				};
+
+			default:
+				return peer;
 		}
-		return peer;
 	};
 
 	searchPeers = async (subsrt, limit) => {
@@ -857,9 +863,9 @@ export default class TelegramApi {
 				photo = user.photo && user.photo._ !== 'userPhotoEmpty' && user.photo;
 				peer = user.access_hash
 					? {
-							...result,
-							access_hash: user.access_hash,
-					  }
+						...result,
+						access_hash: user.access_hash,
+					}
 					: result;
 			}
 
