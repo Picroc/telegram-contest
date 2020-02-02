@@ -11,6 +11,8 @@ import LoginCode from './pages/login-code/login-code';
 import TopBar from './components/top-bar/top-bar';
 import TelegramApi from './utils/TelegramApi/index';
 import LoginPassword from './pages/login-password/login-password';
+import Menu from './components/menu/menu';
+import Settings from './components/menu/settings/settings';
 import ChatPage from './pages/chat-page/chat-page';
 
 customElements.define('my-router', Router);
@@ -19,6 +21,8 @@ customElements.define('bubble-message', BubbleMessage);
 customElements.define('message-input', MessageInput);
 customElements.define('profile-image', ProfileImage);
 customElements.define('top-bar', TopBar);
+customElements.define('my-menu', Menu);
+customElements.define('my-settings', Settings);
 
 customElements.define('login-form', LoginForm);
 customElements.define('login-code', LoginCode);
@@ -42,13 +46,19 @@ telegramApi
 		if (user.id) {
 			router('chat-page');
 		}
+		return true;
+	})
+	.then(res => {
+		if (res) {
+			router('login-form');
+		}
 	})
 	.catch(err => {
 		console.log('LOGIN ERR', err);
 	});
 
 const changeState = transform => {
-	return function (...args) {
+	return function(...args) {
 		const [oldState, newState] = [state, transform(...args)];
 
 		state = {

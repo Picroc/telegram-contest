@@ -2,7 +2,7 @@
 
 import template from './settings.html';
 import './settings.scss';
-import { setInnerHTML, setAttribute } from '../../../../helpers/index';
+import { setInnerHTML, setAttribute } from '../../../helpers/index';
 // import { htmlToElement, subscribe } from '../../../../helpers/index';
 // import { routePage } from '../../../../App';
 // info - { avatar, phone, name }

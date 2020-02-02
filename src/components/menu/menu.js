@@ -1,6 +1,6 @@
 import './menu.scss';
 import template from './menu.html';
-import { subscribe, createInput, createDiv } from '../../../helpers';
+import { subscribe, createInput, createDiv } from '../../helpers';
 // import img from './search.js';
 // import settings from './settings/index';
 
