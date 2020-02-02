@@ -30,8 +30,10 @@ export const setInnerHTML = selector => value => {
 	this.querySelector(selector).innerHTML = value;
 };
 
-export const setAttribute = selector => attribute => value => {
-	this.querySelector(selector).setAttribute(attribute, value);
+export const setAttribute = function(selector) {
+	return attribute => value => {
+		this.querySelector(selector).setAttribute(attribute, value);
+	};
 };
 
 export const startLoading = elem => {
