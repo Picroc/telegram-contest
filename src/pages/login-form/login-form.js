@@ -188,7 +188,7 @@ export default class LoginForm extends HTMLElement {
 	}
 
 	routeToNewPage() {
-		router('login_code', {
+		router('login-code', {
 			phone: this.phone.value,
 		});
 	}
