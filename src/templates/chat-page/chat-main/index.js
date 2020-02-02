@@ -32,6 +32,8 @@ const loadMessages = async (elem, messageGenerator) => {
 		messages.push(resp.value);
 	}
 
+	console.log('messages', messages);
+
 	let previousSentDate;
 	let previousId = 0;
 	for (const mes of messages) {
@@ -105,7 +107,6 @@ export default async (elem, peer) => {
 	const chatMessage = createDiv('chat-messages');
 	let messageInput = InputMessage();
 	chatMain.append(...[statusInfo, chatMessage, messageInput]);
-
 	const limit = 30;
 	const messageGenerator = fetchMessages(peer, limit);
 	await loadMessages(chatMessage, messageGenerator);

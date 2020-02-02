@@ -35,6 +35,18 @@ export const router = (route, attrs = {}) => {
 
 export const telegramApi = new TelegramApi();
 
+telegramApi
+	.getUserInfo()
+	.then(user => {
+		console.log('HERE WE GO', user);
+		if (user.id) {
+			router('chat-page');
+		}
+	})
+	.catch(err => {
+		console.log('LOGIN ERR', err);
+	});
+
 const changeState = transform => {
 	return function (...args) {
 		const [oldState, newState] = [state, transform(...args)];
