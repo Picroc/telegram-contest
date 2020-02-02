@@ -45,8 +45,9 @@ telegramApi
 		console.log('HERE WE GO', user);
 		if (user.id) {
 			router('chat-page');
+		} else {
+			return true;
 		}
-		return true;
 	})
 	.then(res => {
 		if (res) {
