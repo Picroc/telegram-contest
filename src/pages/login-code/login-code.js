@@ -96,24 +96,8 @@ export default class LoginCode extends HTMLElement {
 		this.render();
 	}
 
-	getSegments = value => {
-		switch (value) {
-			case 0:
-				return [0, 15];
-			case 1:
-				return [15, 30];
-			case 2:
-				return [30, 45];
-			case 3:
-				return [45, 60];
-			case 4:
-				return [60, 75];
-			case 5:
-				return [75, 90];
-			case 6:
-				return [90, 100];
-		}
-	};
+	// mapper animation from 0..6 to 0..100
+	getSegments = value => [value * 15, Math.max((value + 1) * 15, 100)];
 
 	translateAnimation = (to, time) => {
 		this.current_animation.play();

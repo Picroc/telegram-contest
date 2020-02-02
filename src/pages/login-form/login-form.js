@@ -97,12 +97,12 @@ export default class LoginForm extends HTMLElement {
 		this.phone.value = this.getMaskedValue(value);
 	};
 
-	checkIsInvalid() {
+	checkIsInvalid = () => {
 		if (this.phone.classList.contains('input-field_invalid')) {
 			this.phone.classList.remove('input-field_invalid');
 			this.setLabel('Phone');
 		}
-	}
+	};
 
 	logIn = () => {
 		this.submit.classList.add('submit_loading');
@@ -110,7 +110,7 @@ export default class LoginForm extends HTMLElement {
 		const phone = this.phone.value;
 
 		if (!phone || phone.length < 11) {
-			showInvalid();
+			this.showInvalid();
 			return;
 		}
 
@@ -122,30 +122,29 @@ export default class LoginForm extends HTMLElement {
 		});
 	};
 
-	connectedCallback() {
+	connectedCallback = () => {
 		if (!this.rendered) {
 			this.render();
 			this.rendered = true;
 		}
-	}
+	};
 
-	attributeChangedCallback(name, oldValue, newValue) {
-		// (4)
+	attributeChangedCallback = (name, oldValue, newValue) => {
 		this.render();
-	}
+	};
 
-	routeToNewPage() {
+	routeToNewPage = () =>{
 		router('login_code', {
 			phone: this.phone.value,
 		});
-	}
+	};
 
-	showInvalid() {
+	showInvalid = () => {
 		this.phone.classList.add('input-field_invalid');
 		this.phone.innerHTML = 'Invalid phone';
 		this.submit.classList.remove('submit_loading');
 		this.setSubmitLabel('NEXT');
-	}
+	};
 
 	onCountryOut = event => {
 		hide(this.popup);
