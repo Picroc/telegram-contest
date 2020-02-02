@@ -6,6 +6,7 @@ import { subscribe, htmlToElement, startLoading, stopLoading } from '../../helpe
 import ChatMain from './chat-main';
 import { updateSearchResults } from './contacts-menu';
 import topBar from '../chat-page/chat-main/top-bar';
+import { telegramApi } from '../../App';
 
 let prevId;
 let prevActive;
@@ -72,18 +73,20 @@ const loadData = async () => {
 	const { id } = await telegramApi.getUserInfo();
 
 	const load = data => {
-		data.forEach(user => {
+		console.log('data', data);
+		const { dialogs, messages } = data.result;
+		dialogs.forEach((user, i) => {
 			if (cached.filter(({ title }) => user.title === title).length > 0) {
 				return;
 			}
 
-			if (user.dialog_peer.user_id === id) {
+			if (user.peer.user_id === id) {
 				user = { ...user, savedMessages: true };
 			}
 
 			const d = htmlToElement(dialog(user));
-			const { dialog_peer } = user;
-			subscribe(d)('click', () => loadDialog(d, dialog_peer, user));
+			const { peer } = user;
+			subscribe(d)('click', () => loadDialog(d, peer, user));
 			userDialogs.appendChild(d);
 		});
 
@@ -100,8 +103,8 @@ const loadData = async () => {
 		window.updateRipple();
 	};
 
-	await telegramApi.getDialogsParsed(5).then(load);
-	// await telegramApi.getDialogs(100).then(load);
+	await telegramApi.getDialogs(0, 5).then(load);
+	await telegramApi.getDialogs(5, 30).then(load);
 	return left;
 };
 

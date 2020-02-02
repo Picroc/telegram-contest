@@ -14,6 +14,7 @@
   flex-direction: column;
   align-items: center;
 
+
   &__submit {
     margin-top: 24px;
   }
@@ -23,7 +24,7 @@
     max-height: 360px;
     overflow: auto;
     overflow-x: hidden;
-    box-shadow: -2px 10px 26px -7px var(--shadow);
+    box-shadow: -2px 10px 26px -7px rgba(0, 0, 0, 0.75);
     &::-webkit-scrollbar {
       width: 0 !important;
     }
@@ -46,7 +47,7 @@
       vertical-align: middle;
 
       &:hover {
-        background: var(--light-gray);
+        background: rgb(244, 244, 245);
       }
 
       & span {
@@ -82,7 +83,7 @@
 
     max-width: 230px;
 
-    color: var(--dark-gray);
+    color: rgb(106, 108, 111);
 
     font-size: 0.95em;
     font-weight: normal;
@@ -110,8 +111,8 @@
 
     & input {
       -webkit-appearance: none;
-      background-color: var(--white);
-      border: 1px solid var(--border-color);
+      background-color: white;
+      border: 1px solid rgba(218, 220, 224, 0.75);
       padding: 8px;
       border-radius: 3px;
       display: inline-flex;
@@ -124,7 +125,7 @@
       }
 
       &:checked {
-        background: var(--primary);
+        background: rgba(79, 164, 246, 1);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -157,7 +158,7 @@
   user-select: none;
 
   border-radius: 10px;
-  border: 2px solid var(--border-color);
+  border: 2px solid rgba(218, 220, 224, 0.75);
 
   font-size: 18px;
   line-height: 55px;
@@ -167,14 +168,14 @@
   &:focus {
     outline: none;
 
-    border: 2px solid var(--primary);
-    caret-color: var(--primary);
+    border: 2px solid rgba(79, 164, 246, 1);
+    caret-color: rgba(79, 164, 246, 1);
   }
 
   &_invalid,
   &_invalid:focus,
   &_invalid:valid {
-    border: 2px solid var(--red);
+    border: 2px solid rgb(197, 59, 57);
   }
 }
 
@@ -196,7 +197,7 @@
   }
 
   & label {
-    color: var(--dark-gray);
+    color: #999;
     font-size: 18px;
     font-weight: normal;
     position: absolute;
@@ -211,20 +212,20 @@
     bottom: 45px;
     font-size: 12px;
 
-    background: var(--black);
-    color: var(--primary);
+    background: white;
+    color: rgba(79, 164, 246, 1);
     padding: 2px;
   }
 
   & .input-field_invalid ~ label,
   & .input-field_invalid:focus ~ label,
   & .input-field_invalid:valid ~ label {
-    color: var(--red);
+    color: rgb(197, 59, 57);
   }
 
   &_select {
     & input:focus ~ &::after {
-      color: var(--primary);
+      color: rgba(79, 164, 246, 1);
     }
   }
 }
@@ -246,29 +247,29 @@
   cursor: pointer;
   position: relative;
 
-  background: var(--primary);
+  background: rgb(79, 164, 246);
 
   border: 0;
   border-radius: 10px;
 
-  color: var(--black);
+  color: white;
 
   font-size: 15px;
   font-weight: 500;
   outline: none;
 
-  --ripple-background: var(--black);
+  --ripple-background: black;
   --ripple-opacity: 0.08;
   --ripple-duration: 600ms;
 
-  -webkit-tap-highlight-color: var(--black);
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   transition: background-color 300ms;
 }
 
 [anim="ripple"] {
   //  Customize effect by defining the following
   //  variables on the parent element
-  //  --ripple-background: var(--black);
+  //  --ripple-background: white;
   //  --ripple-opacity: 0.3;
   //  --ripple-duration: 600ms;
   //  --ripple-easing: linear;
@@ -319,9 +320,9 @@
     border-radius: 50%;
     position: absolute;
     right: 16px;
-    border-bottom-color: var(--black);
-    border-right-color: var(--black);
-    border-top-color: var(--black);
+    border-bottom-color: white;
+    border-right-color: white;
+    border-top-color: white;
     animation: spin 1s ease-in-out infinite;
   }
 }

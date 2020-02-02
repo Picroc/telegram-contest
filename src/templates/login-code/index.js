@@ -2,7 +2,7 @@ import template from './login-code.html';
 import './login-code.scss';
 import { idle, track as peek } from '../../utils/anim-monkey';
 
-import lottie from '../../pages/login-validation/lottie-web';
+import lottie from 'lottie-web';
 
 const subscribe = element => {
 	return function (...args) {
@@ -41,7 +41,6 @@ const validateCode = event => {
 				router('chat_page');
 			})
 			.catch(err => {
-				console.log('Got error');
 				if (err.type === 'PHONE_NUMBER_UNOCCUPIED') {
 					router('register_page', { phone, code });
 				} else if (err.type === 'SESSION_PASSWORD_NEEDED') {
@@ -55,7 +54,7 @@ const validateCode = event => {
 	event.target.value = newText;
 };
 
-const getAnimationItem = (elem, data, options) =>
+const getAnimationItem = (elem, data, options) => () =>
 	lottie.loadAnimation({
 		container: document.querySelector(elem),
 		renderer: 'svg',
@@ -111,7 +110,6 @@ export default (elem, rt, data = {}) => {
 		auto: true,
 		loop: true,
 	});
-
 	const monkey_peek = getAnimationItem('.cd-tgsticker', peek, {
 		auto: false,
 	});

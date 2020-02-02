@@ -1,3 +1,7 @@
+$right-background: #e6ebee;
+$secondary: #777b7f;
+$hover-color: #f1f3f4;
+
 #left {
   width: 25vw;
   height: 100vh;
@@ -21,12 +25,12 @@
   --ripple-duration: 600ms;
 
   &:hover {
-    background-color: var(--light-gray);
+    background-color: $hover-color;
     cursor: pointer;
   }
 
   &_active {
-    background-color: var(--light-gray);
+    background-color: $hover-color;
   }
 
   &__saved {
@@ -36,7 +40,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: var(--primary);
+    background: #4ea4f6;
     svg {
       width: 24px;
       height: 24px;
@@ -65,8 +69,8 @@
         height: 8px;
         width: 8px;
         border-radius: 50%;
-        background: var(--green);
-        border: 1px solid var(--white);
+        background: #4dcd5e;
+        border: 1px solid white;
         right: 2px;
         bottom: 0;
       }
@@ -88,7 +92,7 @@
     grid-column: 2/3;
     grid-row: 2;
     align-self: flex-start;
-    color: var(--secondary);
+    color: $secondary;
     font-size: 14px;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -100,14 +104,14 @@
     grid-column: 3;
     padding: 0 8px 0 4px;
     justify-self: right;
-    color: var(--secondary);
+    color: $secondary;
     font-size: 12px;
   }
 
   &__unread-count {
     grid-row: 2;
     grid-column: 3;
-    color: var(--white);
+    color: white;
     display: flex;
     justify-content: right;
     align-items: center;
@@ -117,7 +121,7 @@
     margin-right: 8px;
     align-self: flex-start;
     border-radius: 24px;
-    background-color: var(--green);
+    background-color: #4dcd5e;
   }
 }
 
@@ -133,11 +137,11 @@
 }
 
 #right {
-  border-left: 1px solid var(--right-gray);
+  border-left: 1px solid #e6ebee;
   width: 75vw;
   min-width: 600px;
   height: 100vh;
-  background-color: var(--right-gray);
+  background-color: $right-background;
   position: relative;
   display: flex;
   justify-content: center;

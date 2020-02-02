@@ -1,7 +1,9 @@
+$hover-color: #f1f3f4;
+
 .sidebar {
   position: absolute;
   height: 100%;
-  background: var(--black);
+  background: white;
   z-index: 2;
   &_left {
     left: 0;
@@ -78,7 +80,7 @@
 
   &__phone {
     font-size: 14px;
-    color: var(--gray);
+    color: #9e9e9e;
   }
 
   .settings-list {
@@ -86,7 +88,7 @@
     grid-column: 1/4;
 
     &__logout {
-      color: var(--red);
+      color: #f44336;
     }
 
     &__item {
@@ -108,7 +110,7 @@
       }
 
       &:hover {
-        background-color: var(--light-gray);
+        background-color: $hover-color;
         cursor: pointer;
       }
     }

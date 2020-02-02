@@ -9,8 +9,6 @@ export default async elem => {
 	return menu;
 };
 
-const tApi = window.telegramApi;
-
 export const updateSearchResults = async res => {
 	const menu = document.createElement('div');
 	document.querySelector('#user-dialogs').appendChild(menu);

@@ -3,6 +3,7 @@ import template from './menu.html';
 import { subscribe, createInput, createDiv } from '../../../helpers';
 import img from './search.js';
 import settings from './settings/index';
+import { telegramApi } from '../../../App';
 
 export default (elem, type, callback) => {
 	const nav = document.createElement('nav');
@@ -34,9 +35,8 @@ export const onType = event => {
 };
 
 let currentSeacrhTimeout;
-const tApi = window.telegramApi;
 
-const onTypeContacts = (value, searchCallback = () => {}) => {
+const onTypeContacts = (value, searchCallback = () => { }) => {
 	if (value.length == 0) {
 		clearTimeout(currentSeacrhTimeout);
 		return;
@@ -47,7 +47,7 @@ const onTypeContacts = (value, searchCallback = () => {}) => {
 	}
 
 	currentSeacrhTimeout = setTimeout(() => {
-		tApi.searchPeers(value, 20).then(res => {
+		telegramApi.searchPeers(value, 20).then(res => {
 			console.log(res);
 			searchCallback(res);
 		});

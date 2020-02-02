@@ -11,6 +11,7 @@ import LoginCode from './pages/login-code/login-code';
 import TopBar from './components/top-bar/top-bar';
 import TelegramApi from './utils/TelegramApi/index';
 import LoginPassword from './pages/login-password/login-password';
+import ChatPage from './pages/chat-page/chat-page';
 
 customElements.define('my-router', Router);
 customElements.define('countries-popup-item', CountriesPopupItem);
@@ -22,6 +23,7 @@ customElements.define('top-bar', TopBar);
 customElements.define('login-form', LoginForm);
 customElements.define('login-code', LoginCode);
 customElements.define('login-password', LoginPassword);
+customElements.define('chat-page', ChatPage);
 
 const rt = document.getElementById('router');
 export const router = (route, attrs = {}) => {

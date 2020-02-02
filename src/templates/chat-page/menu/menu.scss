@@ -1,3 +1,6 @@
+$burger-color: #707579;
+$hover-color: #f4f4f5;
+
 .menu {
   display: grid;
   grid-template-columns: 60px auto;
@@ -30,20 +33,20 @@
     align-self: center;
     padding: 10px 10px 10px 30px;
     border: none;
-    background: var(--light-gray);
+    background: #f4f4f5;
 
     &::placeholder {
       color: #c5cacc;
     }
     &:focus {
       transition: 0.4s;
-      box-shadow: 0 0 0 1.5pt var(--primary);
+      box-shadow: 0 0 0 1.5pt rgba(79, 164, 246, 1);
       outline: none;
     }
   }
 
   input[type="search"]:focus + .menu__search-icon {
-    fill: var(--primary);
+    fill: rgba(79, 164, 246, 1);
   }
 
   &__checkbox {
@@ -60,7 +63,7 @@
     transition: 0.4s;
 
     // &:hover {
-    //   background:var(--light-gray);
+    //   background: $hover-color;
     //   border-radius: 50%;
     // }
   }
@@ -71,7 +74,7 @@
     left: 10px;
     max-width: 200px;
     overflow: hidden;
-    box-shadow: 1px 5px 14px -7px var(--shadow);
+    box-shadow: 1px 5px 14px -7px rgba(0, 0, 0, 0.75);
     transition: 0.4s;
 
     &_hidden {

@@ -1,0 +1,98 @@
+.message-input {
+  width: 600px;
+  min-height: 22px;
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.text-input {
+  max-width: 500px;
+  align-items: center;
+  flex: auto;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5px 10px 5px 10px;
+  background-color: #FFFFFF;
+  margin-right: 20px;
+  border-radius: .5em .5em 0 .5em;
+
+  &:after {
+    content: " ";
+    position: absolute;
+    right: -15px;
+    border: 20px solid transparent;
+    border-left-color: #FFFFFF;
+    border-right: 0;
+    border-bottom: 0;
+    bottom: 0;
+  }
+
+  &__input {
+    resize: none;
+    flex: auto;
+    align-self: center;
+    border: 0 solid transparent;
+    margin: 0 0 5px 10px;
+    width: 470px;
+    min-height: 15px;
+    outline: none;
+    padding-top: 12px;
+    padding-right: 20px;
+    & textarea {
+      position: relative;
+      resize: none;
+    }
+  }
+}
+
+
+.voice-message {
+  cursor: pointer;
+  background-color: #4ea4f6;
+  padding: 16px !important;
+  border-radius: 2.5em;
+  fill: #FFFFFF;
+
+  & svg {
+    opacity: 1 !important;
+  }
+}
+
+$send-button-size: 26px;
+
+.microphone, .send-arrow {
+  width: $send-button-size;
+  height: $send-button-size;
+}
+
+.microphone {
+  background: url("./microphone.svg") no-repeat;
+}
+
+.send-arrow {
+  background: url("./sendArrow.svg") no-repeat;
+}
+
+.svg {
+  align-self: flex-end;
+  padding-bottom: 6px;
+  svg {
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    opacity: .5;
+    &.active {
+      fill: #4ea4f6;
+      opacity: .7;
+    }
+  }
+}
+
+
+.attach-media {
+  position: absolute;
+  right: 15px;
+}

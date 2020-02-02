@@ -1,6 +1,8 @@
 import template from './login-password.html';
 import './login-password.scss';
 
+import lottie from 'lottie-web';
+
 import { idle, peek, close_peek } from '../../utils/anim-monkey';
 
 let router;
@@ -38,9 +40,7 @@ const getAnimationItem = (elem, data, options) => () =>
 	});
 
 const animFromCloseToPeek = reverse => {
-	if (window.current_animation) {
-		window.current_animation.destroy();
-	}
+	if (window.current_animation) window.current_animation.destroy();
 
 	const elem = '.cd-tgsticker';
 
@@ -58,9 +58,7 @@ const animFromCloseToPeek = reverse => {
 };
 
 const animFromCloseToIdle = reverse => {
-	if (window.current_animation) {
-		window.current_animation.destroy();
-	}
+	if (window.current_animation) window.current_animation.destroy();
 
 	const elem = '.cd-tgsticker';
 
