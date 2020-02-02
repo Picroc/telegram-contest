@@ -59,7 +59,7 @@ export default class TelegramApi {
 			},
 			mode: {
 				test: false,
-				debug: true,
+				debug: false,
 			},
 		});
 	}
@@ -721,6 +721,71 @@ export default class TelegramApi {
 		});
 	};
 
+	_checkFlag = (flags, idx) => {
+		return (flags & (2 ** idx)) === 2 ** idx;
+	};
+
+	_parseDialog = (dialog, chats, messages, users) => {
+		let peer = dialog.peer;
+		let title,
+			status,
+			photo,
+			is_supergroup = false;
+		if (peer._ === 'peerChat') {
+			const chat = chats[chats.findIndex(el => el.id === peer.chat_id)];
+			title = chat.title;
+			if (chat.photo._ !== 'chatPhotoEmpty') {
+				photo = chat.photo;
+			}
+		} else if (peer._ === 'peerChannel') {
+			const idx = chats.findIndex(el => el.id === peer.channel_id);
+			const channel = chats[idx];
+
+			is_supergroup = this._checkFlag(channel.flags, 8);
+
+			title = channel.title;
+			if (channel.photo._ !== 'chatPhotoEmpty') {
+				photo = channel.photo;
+			}
+			peer = {
+				...peer,
+				access_hash: channel.access_hash,
+			};
+		} else {
+			const user = users[users.findIndex(el => el.id === peer.user_id)];
+			const last_name = user.last_name ? ' ' + user.last_name : '';
+			title = user.first_name + last_name;
+			status = user.status;
+			if (user.photo && user.first_name !== 'Telegram') {
+				photo = user.photo;
+			}
+			peer = user.access_hash
+				? {
+						...peer,
+						access_hash: user.access_hash,
+				  }
+				: peer;
+		}
+		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
+		const { message: text, date } = message;
+		const unread_count = dialog.unread_count;
+
+		if (photo) {
+			photo = this.getChatPhoto(peer, photo);
+		}
+
+		return {
+			title: title,
+			isOnline: status && status._ === 'userStatusOnline',
+			text: text,
+			time: this._convertDate(date),
+			unreadCount: unread_count,
+			dialog_peer: peer,
+			is_supergroup,
+			photo,
+		};
+	};
+
 	getDialogsParsed = async limit => {
 		const { result } = await this.getDialogs(0, limit);
 
@@ -728,58 +793,8 @@ export default class TelegramApi {
 
 		const dialog_items = [];
 
-		await dialogs.forEach(async dialog => {
-			let peer = dialog.peer;
-			let title, status, photo, onlineInfo;
-			if (peer._ === 'peerChat') {
-				const chat = chats[chats.findIndex(el => el.id === peer.chat_id)];
-				title = chat.title;
-				if (chat.photo._ !== 'chatPhotoEmpty') {
-					photo = chat.photo;
-				}
-			} else if (peer._ === 'peerChannel') {
-				const idx = chats.findIndex(el => el.id === peer.channel_id);
-				const channel = chats[idx];
-				title = channel.title;
-				if (channel.photo._ !== 'chatPhotoEmpty') {
-					photo = channel.photo;
-				}
-				peer = {
-					...peer,
-					access_hash: channel.access_hash,
-				};
-			} else {
-				const user = users[users.findIndex(el => el.id === peer.user_id)];
-				const last_name = user.last_name ? ' ' + user.last_name : '';
-				title = user.first_name + last_name;
-				status = user.status;
-				if (user.photo && user.first_name !== 'Telegram') {
-					photo = user.photo;
-				}
-				peer = user.access_hash
-					? {
-							...peer,
-							access_hash: user.access_hash,
-					  }
-					: peer;
-			}
-			const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
-			const { message: text, date } = message;
-			const unread_count = dialog.unread_count;
-
-			if (photo) {
-				photo = this.getChatPhoto(peer, photo);
-			}
-
-			dialog_items.push({
-				title: title,
-				isOnline: status && status._ === 'userStatusOnline',
-				text: text,
-				time: this._convertDate(date),
-				unreadCount: unread_count,
-				dialog_peer: peer,
-				photo,
-			});
+		dialogs.forEach(dialog => {
+			dialog_items.push(this._parseDialog(dialog, chats, messages, users));
 		});
 
 		dialog_items.sort((a, b) => a.time - b.time);
@@ -838,6 +853,8 @@ export default class TelegramApi {
 				};
 			} else if (result._ === 'peerChannel') {
 				const channel = chats[chats.findIndex(el => el.id === result.channel_id)];
+				console.log('GOT CHANNEL', channel);
+				console.log('IS SUPERGROUP? ', (channel.flags & (2 ** 8)) === 2 ** 8);
 				title = channel.title;
 				text =
 					channel.participants_count > 1
@@ -909,7 +926,7 @@ export default class TelegramApi {
 			{ fileDownload: true }
 		)
 			.then(res => {
-				console.log('Got file!');
+				// console.log('Got file!');
 				return 'data:image/png;base64,' + btoa(String.fromCharCode(...new Uint8Array(res.bytes)));
 			})
 			.catch(err => {
@@ -921,8 +938,8 @@ export default class TelegramApi {
 
 	getChatPhoto = async (peer, photo) => {
 		photo = photo.photo_small;
-		console.log('PEER', peer);
-		console.log('PHOTO', photo);
+		// console.log('PEER', peer);
+		// console.log('PHOTO', photo);
 		return this.invokeApi('upload.getFile', {
 			location: {
 				_: 'inputPeerPhotoFileLocation',
@@ -933,7 +950,7 @@ export default class TelegramApi {
 			offset: 0,
 			limit: 1048576,
 		}).then(photo_file => {
-			console.log('Got file!');
+			// console.log('Got file!');
 			return 'data:image/png;base64,' + btoa(String.fromCharCode(...new Uint8Array(photo_file.bytes)));
 		});
 	};
