@@ -36,6 +36,8 @@ export default class LoginForm extends HTMLElement {
 		this.country.addEventListener('keyup', this.countryKeyListener);
 
 		this.phone.addEventListener('keyup', event => {
+			const enter = 13;
+
 			if (event.keyCode === enter) {
 				this.submit.click();
 			}

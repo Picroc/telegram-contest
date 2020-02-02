@@ -8,6 +8,7 @@ import BubbleMessage from './components/bubbles/bubbleMessage';
 import MessageInput from './components/message-input/messageInput';
 import ProfileImage from './components/profile-image/profile-image';
 import LoginCode from './pages/login-code/login-code';
+import TopBar from './components/top-bar/top-bar';
 
 customElements.define('my-router', Router);
 customElements.define('login-form', LoginForm);
@@ -29,7 +30,7 @@ export const router = (route, attrs) => {
 };
 
 const changeState = transform => {
-	return function(...args) {
+	return function (...args) {
 		const [oldState, newState] = [state, transform(...args)];
 
 		state = {
