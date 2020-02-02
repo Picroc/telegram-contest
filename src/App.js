@@ -10,21 +10,24 @@ import ProfileImage from './components/profile-image/profile-image';
 import LoginCode from './pages/login-code/login-code';
 import TopBar from './components/top-bar/top-bar';
 import TelegramApi from './utils/TelegramApi/index';
+import LoginPassword from './pages/login-password/login-password';
 
 customElements.define('my-router', Router);
-customElements.define('login-form', LoginForm);
 customElements.define('countries-popup-item', CountriesPopupItem);
 customElements.define('bubble-message', BubbleMessage);
 customElements.define('message-input', MessageInput);
 customElements.define('profile-image', ProfileImage);
 customElements.define('top-bar', TopBar);
+
+customElements.define('login-form', LoginForm);
 customElements.define('login-code', LoginCode);
+customElements.define('login-password', LoginPassword);
 
 const rt = document.getElementById('router');
-export const router = (route, attrs) => {
+export const router = (route, attrs = {}) => {
 	rt.setAttribute('route', route);
 	Object.keys(attrs).map(attr => {
-		rt.setAttribute(attr, JSON.stringify(attrs[attr]));
+		rt.firstChild.setAttribute(attr, JSON.stringify(attrs[attr]));
 	});
 };
 

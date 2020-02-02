@@ -2,10 +2,10 @@ import template from './login-code.html';
 import './login-code.scss';
 import { idle, track as peek } from '../../utils/anim-monkey';
 
-import lottie from 'lottie-web';
+import lottie from '../../pages/login-validation/lottie-web';
 
 const subscribe = element => {
-	return function(...args) {
+	return function (...args) {
 		document.querySelector(element).addEventListener(...args);
 	};
 };
