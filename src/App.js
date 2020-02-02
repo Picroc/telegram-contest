@@ -9,6 +9,7 @@ import MessageInput from './components/message-input/messageInput';
 import ProfileImage from './components/profile-image/profile-image';
 import LoginCode from './pages/login-code/login-code';
 import TopBar from './components/top-bar/top-bar';
+import TelegramApi from './utils/TelegramApi/index';
 
 customElements.define('my-router', Router);
 customElements.define('login-form', LoginForm);
@@ -19,8 +20,6 @@ customElements.define('profile-image', ProfileImage);
 customElements.define('top-bar', TopBar);
 customElements.define('login-code', LoginCode);
 
-const q = elem => document.querySelector(elem);
-const App = q('.root');
 const rt = document.getElementById('router');
 export const router = (route, attrs) => {
 	rt.setAttribute('route', route);
@@ -28,6 +27,8 @@ export const router = (route, attrs) => {
 		rt.setAttribute(attr, JSON.stringify(attrs[attr]));
 	});
 };
+
+export const telegramApi = new TelegramApi();
 
 const changeState = transform => {
 	return function (...args) {

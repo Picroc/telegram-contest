@@ -2,7 +2,6 @@ import './chat-page.scss';
 import template from './chat-page.html';
 import dialog from './dialog';
 import menu from './menu';
-import { TelegramApiWrapper } from '../../utils/services';
 import { subscribe, htmlToElement, startLoading, stopLoading } from '../../helpers/index';
 import ChatMain from './chat-main';
 import { updateSearchResults } from './contacts-menu';
@@ -38,8 +37,6 @@ export const loadDialog = (elem, peer, dialog) => {
 	});
 };
 
-const ta = new TelegramApiWrapper();
-
 const loadPhotos = async () => {
 	const dialogs = document.getElementById('user-dialogs');
 	cached.forEach((cachedItem, i) => {
@@ -48,11 +45,11 @@ const loadPhotos = async () => {
 				if (!cachedItem.photo) {
 					return;
 				}
-				ta.getPhotoFile(cachedItem.photo.photo_small).then(photo => {
+				telegramApi.getPhotoFile(cachedItem.photo.photo_small).then(photo => {
 					if (photo) {
 						try {
 							dialogs.data[ind].children[0].children[0].src = photo;
-						} catch {}
+						} catch { }
 					}
 				});
 			})(i),
@@ -103,8 +100,8 @@ const loadData = async () => {
 		window.updateRipple();
 	};
 
-	await ta.getDialogs(5).then(load);
-	await ta.getDialogs(100).then(load);
+	await telegramApi.getDialogsParsed(5).then(load);
+	// await telegramApi.getDialogs(100).then(load);
 	return left;
 };
 

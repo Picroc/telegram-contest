@@ -41,6 +41,7 @@ const validateCode = event => {
 				router('chat_page');
 			})
 			.catch(err => {
+				console.log('Got error');
 				if (err.type === 'PHONE_NUMBER_UNOCCUPIED') {
 					router('register_page', { phone, code });
 				} else if (err.type === 'SESSION_PASSWORD_NEEDED') {

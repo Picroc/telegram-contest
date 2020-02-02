@@ -2,7 +2,7 @@ import './login-form.scss';
 import template from './login-form.html';
 import { setInnerHTML, hide, htmlToElement, show, setNotActive, setActive } from '../../helpers/index';
 import countries from './countries.json';
-import { router } from '../../App';
+import { router, telegramApi } from '../../App';
 
 export default class LoginForm extends HTMLElement {
 	constructor() {
@@ -171,7 +171,7 @@ export default class LoginForm extends HTMLElement {
 		telegramApi.sendCode(phone).then(res => {
 			telegramApi.sendSms(phone, res.phone_code_hash, res.next_type).then(() => {
 				window.phone_code_hash = res.phone_code_hash;
-				router('login_code', { phone: phone });
+				router('login-code', { phone: phone });
 			});
 		});
 	};
