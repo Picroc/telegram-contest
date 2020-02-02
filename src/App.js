@@ -15,6 +15,7 @@ import ProfileImage from './pages/chat-page/profile-image/profileImage';
 customElements.define('bubble-message', BubbleMessage);
 customElements.define('message-input', MessageInput);
 customElements.define('profile-image', ProfileImage);
+customElements.define('top-bar', TopBar);
 
 const q = elem => document.querySelector(elem);
 const App = q('.root');
