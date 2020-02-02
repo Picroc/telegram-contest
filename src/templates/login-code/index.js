@@ -5,7 +5,7 @@ import { idle, track as peek } from '../../utils/anim-monkey';
 import lottie from 'lottie-web';
 
 const subscribe = element => {
-	return function (...args) {
+	return function(...args) {
 		document.querySelector(element).addEventListener(...args);
 	};
 };
@@ -54,7 +54,7 @@ const validateCode = event => {
 	event.target.value = newText;
 };
 
-const getAnimationItem = (elem, data, options) => () =>
+const getAnimationItem = (elem, data, options) =>
 	lottie.loadAnimation({
 		container: document.querySelector(elem),
 		renderer: 'svg',
@@ -110,6 +110,7 @@ export default (elem, rt, data = {}) => {
 		auto: true,
 		loop: true,
 	});
+
 	const monkey_peek = getAnimationItem('.cd-tgsticker', peek, {
 		auto: false,
 	});

@@ -14,7 +14,6 @@
   flex-direction: column;
   align-items: center;
 
-
   &__submit {
     margin-top: 24px;
   }
@@ -24,7 +23,7 @@
     max-height: 360px;
     overflow: auto;
     overflow-x: hidden;
-    box-shadow: -2px 10px 26px -7px rgba(0, 0, 0, 0.75);
+    box-shadow: -2px 10px 26px -7px var(--shadow);
     &::-webkit-scrollbar {
       width: 0 !important;
     }
@@ -47,7 +46,7 @@
       vertical-align: middle;
 
       &:hover {
-        background: rgb(244, 244, 245);
+        background: var(--light-gray);
       }
 
       & span {
@@ -83,7 +82,7 @@
 
     max-width: 230px;
 
-    color: rgb(106, 108, 111);
+    color: var(--dark-gray);
 
     font-size: 0.95em;
     font-weight: normal;
@@ -110,13 +109,14 @@
     overflow: hidden;
 
     & input {
+      width: 24px;
+      height: 24px;
       -webkit-appearance: none;
-      background-color: white;
-      border: 1px solid rgba(218, 220, 224, 0.75);
-      padding: 8px;
-      border-radius: 3px;
+      background-color: var(--white);
       display: inline-flex;
-      position: relative;
+      align-items: flex-start;
+      margin-top: -2px;
+      background: url("./empty.svg");
 
       &:active,
       &:checked:active,
@@ -125,27 +125,14 @@
       }
 
       &:checked {
-        background: rgba(79, 164, 246, 1);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      &:checked:before {
-        content: "";
-        width: 14px;
-        height: 14px;
-        position: absolute;
-        z-index: 1;
-        top: -2px;
-        left: 0;
-        background-image: url("./check.svg");
+        background: url("./filled.svg");
       }
     }
 
     & label {
       display: inline-block;
       margin-left: 32px;
+      user-select: none;
     }
   }
 }
@@ -158,7 +145,7 @@
   user-select: none;
 
   border-radius: 10px;
-  border: 2px solid rgba(218, 220, 224, 0.75);
+  border: 2px solid var(--border-color);
 
   font-size: 18px;
   line-height: 55px;
@@ -168,14 +155,14 @@
   &:focus {
     outline: none;
 
-    border: 2px solid rgba(79, 164, 246, 1);
-    caret-color: rgba(79, 164, 246, 1);
+    border: 2px solid var(--primary);
+    caret-color: var(--primary);
   }
 
   &_invalid,
   &_invalid:focus,
   &_invalid:valid {
-    border: 2px solid rgb(197, 59, 57);
+    border: 2px solid var(--red);
   }
 }
 
@@ -197,7 +184,7 @@
   }
 
   & label {
-    color: #999;
+    color: var(--dark-gray);
     font-size: 18px;
     font-weight: normal;
     position: absolute;
@@ -212,20 +199,20 @@
     bottom: 45px;
     font-size: 12px;
 
-    background: white;
-    color: rgba(79, 164, 246, 1);
+    background: var(--white);
+    color: var(--primary);
     padding: 2px;
   }
 
   & .input-field_invalid ~ label,
   & .input-field_invalid:focus ~ label,
   & .input-field_invalid:valid ~ label {
-    color: rgb(197, 59, 57);
+    color: var(--red);
   }
 
   &_select {
     & input:focus ~ &::after {
-      color: rgba(79, 164, 246, 1);
+      color: var(--primary);
     }
   }
 }
@@ -247,29 +234,29 @@
   cursor: pointer;
   position: relative;
 
-  background: rgb(79, 164, 246);
+  background: var(--primary);
 
   border: 0;
   border-radius: 10px;
 
-  color: white;
+  color: var(--white);
 
   font-size: 15px;
   font-weight: 500;
   outline: none;
 
-  --ripple-background: black;
+  --ripple-background: var(--black);
   --ripple-opacity: 0.08;
   --ripple-duration: 600ms;
 
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: var(--black);
   transition: background-color 300ms;
 }
 
 [anim="ripple"] {
   //  Customize effect by defining the following
   //  variables on the parent element
-  //  --ripple-background: white;
+  //  --ripple-background: var(--white);
   //  --ripple-opacity: 0.3;
   //  --ripple-duration: 600ms;
   //  --ripple-easing: linear;
@@ -320,9 +307,9 @@
     border-radius: 50%;
     position: absolute;
     right: 16px;
-    border-bottom-color: white;
-    border-right-color: white;
-    border-top-color: white;
+    border-bottom-color: var(--white);
+    border-right-color: var(--white);
+    border-top-color: var(--white);
     animation: spin 1s ease-in-out infinite;
   }
 }

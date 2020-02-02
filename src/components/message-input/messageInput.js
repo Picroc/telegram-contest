@@ -10,9 +10,7 @@ import attachSvg from './attach';
 import emojiSvg from './emoji';
 import sendArrow from './sendArrow.svg';
 import './messageInput.scss';
-
-import './bubbleMessage.scss';
-import { setInnerHTML, setAttribute } from '../../../../helpers/index';
+import { setInnerHTML, setAttribute } from '../../helpers/index';
 
 export default class MessageInput extends HTMLElement {
 	render() {

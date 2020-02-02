@@ -1,6 +1,3 @@
-$burger-color: #707579;
-$hover-color: #f4f4f5;
-
 .menu {
   display: grid;
   grid-template-columns: 60px auto;
@@ -33,20 +30,20 @@ $hover-color: #f4f4f5;
     align-self: center;
     padding: 10px 10px 10px 30px;
     border: none;
-    background: #f4f4f5;
+    background: var(--light-gray);
 
     &::placeholder {
       color: #c5cacc;
     }
     &:focus {
       transition: 0.4s;
-      box-shadow: 0 0 0 1.5pt rgba(79, 164, 246, 1);
+      box-shadow: 0 0 0 1.5pt var(--primary);
       outline: none;
     }
   }
 
   input[type="search"]:focus + .menu__search-icon {
-    fill: rgba(79, 164, 246, 1);
+    fill: var(--primary);
   }
 
   &__checkbox {
@@ -63,7 +60,7 @@ $hover-color: #f4f4f5;
     transition: 0.4s;
 
     // &:hover {
-    //   background: $hover-color;
+    //   background:var(--hover-color);
     //   border-radius: 50%;
     // }
   }
@@ -74,7 +71,7 @@ $hover-color: #f4f4f5;
     left: 10px;
     max-width: 200px;
     overflow: hidden;
-    box-shadow: 1px 5px 14px -7px rgba(0, 0, 0, 0.75);
+    box-shadow: 1px 5px 14px -7px var(--shadow);
     transition: 0.4s;
 
     &_hidden {

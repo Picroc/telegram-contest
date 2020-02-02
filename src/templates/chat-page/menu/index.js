@@ -37,7 +37,7 @@ export const onType = event => {
 let currentSeacrhTimeout;
 const tApi = new TelegramApiWrapper();
 
-const onTypeContacts = (value, searchCallback = () => { }) => {
+const onTypeContacts = (value, searchCallback = () => {}) => {
 	if (value.length == 0) {
 		clearTimeout(currentSeacrhTimeout);
 		return;
@@ -46,13 +46,12 @@ const onTypeContacts = (value, searchCallback = () => { }) => {
 	if (currentSeacrhTimeout) clearTimeout(currentSeacrhTimeout);
 
 	currentSeacrhTimeout = setTimeout(() => {
-		tApi.searchPeers(value, 20)
-			.then(res => {
-				console.log(res);
-				searchCallback(res);
-			});
+		tApi.searchPeers(value, 20).then(res => {
+			console.log(res);
+			searchCallback(res);
+		});
 	}, 1000);
-}
+};
 
 const search = (type, searchCallback) => {
 	const searchWrapper = createDiv('menu__search-wrapper');
@@ -63,7 +62,10 @@ const search = (type, searchCallback) => {
 	searchWrapper.appendChild(searchIcon);
 	search.id = 'search';
 	if (type === 'contacts') {
-		subscribe(search)('input', event => { onType(event); onTypeContacts(event.target.value, searchCallback) });
+		subscribe(search)('input', event => {
+			onType(event);
+			onTypeContacts(event.target.value, searchCallback);
+		});
 	} else {
 		subscribe(search)('input', onType);
 	}
