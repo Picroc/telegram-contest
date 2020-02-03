@@ -1,9 +1,10 @@
-export const cc = (cls, condition) => ({ class: cls, condition });
+export const cc = (cls, condition = true) => ({ class: cls, condition });
+export const tc = (cls1, cls2, conditional) => cc(conditional ? cls1 : cls2);
 
 export const clsx = (...clss) =>
 	clss
 		.map(item => {
-			if (typeof item == 'object') {
+			if (typeof item === 'object') {
 				return item.condition ? item.class : '';
 			}
 
