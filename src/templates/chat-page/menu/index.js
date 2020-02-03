@@ -12,8 +12,8 @@ export default (elem, type, callback) => {
 	nav.appendChild(search(type, callback));
 	elem.appendChild(nav);
 	const menu = document.querySelector('.menu-list');
-	subscribe('#menu__checkbox')('click', () => menu.classList.toggle('menu-list_hidden'));
-	subscribe('.menu-list__settings')('click', () => settings(elem, { name: 'Doge Dogeson', phone: '88005553535' }));
+	// subscribe('#menu__checkbox')('click', () => menu.classList.toggle('menu-list_hidden'));
+	// subscribe('.menu-list__settings')('click', () => settings(elem, { name: 'Doge Dogeson', phone: '88005553535' }));
 };
 
 export const onType = event => {
@@ -36,7 +36,7 @@ export const onType = event => {
 
 let currentSeacrhTimeout;
 
-const onTypeContacts = (value, searchCallback = () => { }) => {
+const onTypeContacts = (value, searchCallback = () => {}) => {
 	if (value.length == 0) {
 		clearTimeout(currentSeacrhTimeout);
 		return;

@@ -4,14 +4,13 @@
 <div class="sidebar sidebar_left settings sidebar_hidden">
     <div class="settings__back settings__icon icon"><img src="../svg/back.svg" alt=""></div>
     <div class="sidebar__title settings__title">Settings</div>
-    <div class="settings__more settings__icon icon"><img src="../svg/more.svg" alt="">
-        <div class="hide">
-            <!-- TODO: edit classes and styles for logout-->
-            <div class="settings-list__item settings-list__logout">
-            <img src="../svg/logout.svg" alt="">
-            <div class="settings-lit__text">Logout</div>
-            </div>
-        </div>
+    <div class="more settings__more settings__icon icon"><img src="../svg/more.svg" alt="">
+        <ul class="more-list popup hide">
+            <li class="more-list__logout popup-item">
+                <img src="../svg/logout.svg" class="logout__img">
+                <div class="more-list__text">Log Out</div>
+            </li>
+        </ul>
     </div>
     <div class="settings__info">
         <div class="settings__avatar"><img src="" /></div>
@@ -21,27 +20,23 @@
     <ul class="settings-list">
         <li class="settings-list__item settings-list__edit">
             <img src="../svg/edit.svg" alt="">
-            <div class="settings-lit__text">Edit profile</div>
+            <div class="settings-list__text">Edit profile</div>
         </li>
         <li class="settings-list__item settings-list__general-settings">
             <img src="../svg/settings.svg" alt="">
-            <div class="settings-lit__text">General settings</div>
+            <div class="settings-list__text">General settings</div>
         </li>
         <li class="settings-list__item settings-list__notifications">
             <img src="../svg/unmute.svg" alt="">
-            <div class="settings-lit__text">Notifications</div>
+            <div class="settings-list__text">Notifications</div>
         </li>
         <li class="settings-list__item settings-list__privacy">
             <img src="../svg/lock.svg" alt="">
-            <div class="settings-lit__text">Privacy and security</div>
+            <div class="settings-list__text">Privacy and security</div>
         </li>
         <li class="settings-list__item settings-list__language">
             <img src="../svg/language.svg" alt="">
-            <div class="settings-lit__text">Language</div>
+            <div class="settings-list__text">Language</div>
         </li>
-        <!-- <li class="settings-list__item settings-list__logout">
-            <img src="../svg/logout.svg" alt="">
-            <div class="settings-lit__text">Logout</div>
-        </li> -->
     </ul>
 </div>

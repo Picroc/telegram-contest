@@ -17,7 +17,7 @@
   width: 25vw;
   min-width: 260px;
   display: grid;
-  row-gap: 20px;
+  row-gap: 5px;
   grid-template-columns: 60px 1fr 60px;
   grid-template-rows: 60px 150px 2fr;
 
@@ -86,7 +86,7 @@
     grid-column: 1/4;
 
     &__logout {
-      color: var(--red);
+      // color: var(--red);
     }
 
     &__item {
@@ -111,6 +111,10 @@
         background-color: var(--light-gray);
         cursor: pointer;
       }
+
     }
+        &__text {
+          font-size: 14px;
+        }
   }
 }

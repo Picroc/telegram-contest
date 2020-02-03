@@ -58,7 +58,7 @@ export default class TelegramApi {
 				],
 			},
 			mode: {
-				test: true,
+				test: false,
 				debug: true,
 			},
 		});
@@ -758,9 +758,9 @@ export default class TelegramApi {
 				}
 				peer = user.access_hash
 					? {
-						...peer,
-						access_hash: user.access_hash,
-					}
+							...peer,
+							access_hash: user.access_hash,
+					  }
 					: peer;
 			}
 			const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
@@ -863,9 +863,9 @@ export default class TelegramApi {
 				photo = user.photo && user.photo._ !== 'userPhotoEmpty' && user.photo;
 				peer = user.access_hash
 					? {
-						...result,
-						access_hash: user.access_hash,
-					}
+							...result,
+							access_hash: user.access_hash,
+					  }
 					: result;
 			}
 

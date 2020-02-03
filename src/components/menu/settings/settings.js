@@ -3,6 +3,59 @@
 import template from './settings.html';
 import './settings.scss';
 import { setInnerHTML, setAttribute } from '../../../helpers/index';
+import { setUserInfo } from '../../../store/store';
+import TelegramApi from '../../../utils/TelegramApi/index';
+
+export default class Settings extends HTMLElement {
+	async render() {
+		this.id = 'setttings';
+		this.innerHTML = template;
+		const setHTML = setInnerHTML.bind(this);
+		const setAttr = setAttribute.bind(this);
+		// setUserInfo(await TelegramApi.getUserInfo());
+		// const userInfo = getUserInfo();
+		// console.log(userInfo);
+		this.avatar =
+			this.getAttribute('avatar') || 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg';
+		setAttr('.settings__avatar')('src', this.avatar);
+		console.log('this.avatar', this.avatar);
+		this.name = this.getAttribute('name') || 'Doge Dogenson';
+		setHTML('.settings__name')(this.name);
+		this.phone = this.getAttribute('phone') || '+7123456879';
+		setHTML('.settings__phone')(this.phone);
+
+		this.moreButton = this.querySelector('.settings__more');
+		const moreButtonListener = e => {
+			this.moreButton.children[1].classList.toggle('hide');
+		};
+		this.moreButton.addEventListener('click', moreButtonListener);
+
+		this.backButton = this.querySelector('.settings__back');
+		const backButtonListener = e => {
+			this.children[0].classList.toggle('sidebar_hidden');
+		};
+		this.backButton.addEventListener('click', backButtonListener);
+	}
+
+	connectedCallback() {
+		// (2)
+		if (!this.rendered) {
+			this.render();
+			this.rendered = true;
+		}
+	}
+
+	static get observedAttributes() {
+		// (3)
+		return ['avatar', 'name', 'phone'];
+	}
+
+	attributeChangedCallback(name, oldValue, newValue) {
+		// (4)
+		this.render();
+	}
+}
+
 // import { htmlToElement, subscribe } from '../../../../helpers/index';
 // import { routePage } from '../../../../App';
 // info - { avatar, phone, name }
@@ -45,41 +98,3 @@ import { setInnerHTML, setAttribute } from '../../../helpers/index';
 
 // 	setTimeout(() => show(cashed), 0);
 // };
-
-export default class Settings extends HTMLElement {
-	render() {
-		this.innerHTML = template;
-		const setHTML = setInnerHTML.bind(this);
-		const setAttr = setAttribute.bind(this);
-		const avatar =
-			this.getAttribute('avatar') || 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg';
-		setAttr('.settings__avatar')('src', avatar);
-		const name = this.getAttribute('name');
-		setHTML('settings__name')(name);
-		const phone = this.getAttribute('phone');
-		setHTML('settings__phone')(phone);
-		const moreButton = this.querySelector('.settings__more');
-		const moreButtonListener = event => {
-			this.children[0].classList.toggle('hide'); //TODO: написать обработчик нажатия на кнопку настроек
-		};
-		moreButton.addEventListener('click', moreButtonListener);
-	}
-
-	connectedCallback() {
-		// (2)
-		if (!this.rendered) {
-			this.render();
-			this.rendered = true;
-		}
-	}
-
-	static get observedAttributes() {
-		// (3)
-		return ['avatar', 'name', 'phone'];
-	}
-
-	attributeChangedCallback(name, oldValue, newValue) {
-		// (4)
-		this.render();
-	}
-}
