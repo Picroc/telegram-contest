@@ -722,8 +722,8 @@ export default class TelegramApi {
 	};
 
 	getDialogsParsed = async (offset, limit) => {
-		const { result } = await this.getDialogs(offset, limit);
-
+		const { result, offset: last } = await this.getDialogs(this.last, limit);
+		this.last = last;
 		const { chats, dialogs, messages, users } = result;
 
 		const dialog_items = [];

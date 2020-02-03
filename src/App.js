@@ -14,6 +14,7 @@ import LoginPassword from './pages/login-password/login-password';
 import Menu from './components/menu/menu';
 import Settings from './components/menu/settings/settings';
 import ChatPage from './pages/chat-page/chat-page';
+import UserDialogs from './components/user-dialogs/user-dialogs';
 
 customElements.define('my-router', Router);
 customElements.define('countries-popup-item', CountriesPopupItem);
@@ -23,6 +24,7 @@ customElements.define('profile-image', ProfileImage);
 customElements.define('top-bar', TopBar);
 customElements.define('my-menu', Menu);
 customElements.define('my-settings', Settings);
+customElements.define('user-dialogs', UserDialogs);
 
 customElements.define('login-form', LoginForm);
 customElements.define('login-code', LoginCode);
@@ -59,7 +61,7 @@ telegramApi
 	});
 
 const changeState = transform => {
-	return function(...args) {
+	return function (...args) {
 		const [oldState, newState] = [state, transform(...args)];
 
 		state = {
