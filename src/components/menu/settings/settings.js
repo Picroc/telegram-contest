@@ -3,9 +3,8 @@
 import template from './settings.html';
 import './settings.scss';
 import { setInnerHTML, setAttribute } from '../../../helpers/index';
-import { setUserInfo, getUser } from '../../../store/store';
-import TelegramApi from '../../../utils/TelegramApi/index';
-import { telegramApi } from '../../../App';
+import { telegramApi, router } from '../../../App';
+import { getUser } from '../../../store/store';
 
 export default class Settings extends HTMLElement {
 	render() {
@@ -28,17 +27,17 @@ export default class Settings extends HTMLElement {
 		this.backButton.addEventListener('click', this.backButtonListener);
 
 		this.logout = this.querySelector('.more-list__logout');
-		this.logout.addEventListener('click', this.logout);
+		this.logout.addEventListener('click', this.logoutHandler);
 	}
-
-	logout = () => {
-		telegramApi.logOut().then(() => {
-			routePage('login');
-		});
-	};
 
 	backButtonListener = e => {
 		this.classList.toggle('sidebar_hidden');
+	};
+
+	logoutHandler = () => {
+		telegramApi.logOut().then(() => {
+			router('login');
+		});
 	};
 
 	moreButtonListener = e => {
