@@ -5,6 +5,8 @@
   --light-gray: #f5f5f5;
   --right-gray: #eee;
   --dark-gray: rgb(106, 108, 111);
+  --gray-300: #e0e0e0;
+  --pinned: #c4c9cc;
 
   --green: #4dcd5e;
   --shadow: rgba(0, 0, 0, 0.75);
@@ -16,7 +18,8 @@
 }
 
 img,
-svg {
+svg,
+.icon {
   transition: 0.4s;
 }
 

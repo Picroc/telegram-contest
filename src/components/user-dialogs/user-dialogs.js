@@ -1,7 +1,7 @@
 import { getDialogs, SET_DIALOGS, APPEND_DIALOGS } from '../../store/store';
 import { htmlToElement, startLoading, stopLoading } from '../../helpers/index';
 import chatMain from '../../templates/chat-page/chat-main/index';
-
+import './user-dialogs.scss';
 export default class UserDialogs extends HTMLElement {
 	render() {
 		this.id = 'user-dialogs';
@@ -10,10 +10,15 @@ export default class UserDialogs extends HTMLElement {
 	}
 
 	renderDialog = dialog => {
-		const { id } = dialog;
+		const { id, pinned } = dialog;
+		if (this.prevRendered && this.prevRendered.pinned && !pinned) {
+			const delim = htmlToElement(`<div class='divider'></div>`);
+			this.appendChild(delim);
+		}
 		const elem = htmlToElement(`<my-dialog anim="ripple" class="dialog" id="dialog_${id}"></my-dialog>`);
 		elem.addEventListener('click', () => this.loadDialog(elem, dialog));
 		this.appendChild(elem);
+		this.prevRendered = dialog;
 	};
 
 	loadDialog = (elem, dialog) => {
