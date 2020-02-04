@@ -1,7 +1,6 @@
 import './menu.scss';
 import template from './menu.html';
 import { subscribe, createInput, createDiv } from '../../helpers';
-import TelegramApi from '../../utils/TelegramApi/index';
 
 export const onType = event => {
 	const userDialogs = document.getElementById('user-dialogs');
@@ -24,7 +23,7 @@ export const onType = event => {
 let currentSeacrhTimeout;
 const tApi = window.telegramApi;
 
-const onTypeContacts = (value, searchCallback = () => {}) => {
+const onTypeContacts = (value, searchCallback = () => { }) => {
 	if (value.length == 0) {
 		clearTimeout(currentSeacrhTimeout);
 		return;
@@ -77,7 +76,7 @@ export default class Menu extends HTMLElement {
 		subscribe('.menu-list__settings')('click', settingsClick);
 		subscribe('.menu__search')('input', event => {
 			onType(event);
-			onTypeContacts(event.target.value, () => {});
+			onTypeContacts(event.target.value, () => { });
 		});
 	}
 
