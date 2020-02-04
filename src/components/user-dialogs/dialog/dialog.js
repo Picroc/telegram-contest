@@ -22,7 +22,6 @@ export default class Dialog extends HTMLElement {
 
 		this.dialog = dialog;
 		this.innerHTML = template(dialog);
-		// this.addEventListener(UPDATE_DIALOG, this.updateDialogListener);
 		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updateDialogPhotoListener);
 	}
 

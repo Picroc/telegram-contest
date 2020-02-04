@@ -1,4 +1,5 @@
 .dialog {
+  padding: 4px 8px;
   max-height: 10vh;
   min-height: 50px;
   display: grid;
@@ -88,13 +89,30 @@
     overflow: hidden;
   }
 
-  &__time {
+  &__info {
     grid-row: 1;
     grid-column: 3;
-    padding: 0 8px 0 4px;
+    gap: 4px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     justify-self: right;
+  }
+
+  &__time {
     color: var(--secondary);
     font-size: 12px;
+    align-self: center;
+  }
+
+  .full {
+    grid-column: 1/3;
+  }
+
+  &__out {
+    fill: var(--green);
+    align-self: flex-start;
+    justify-self: flex-end;
+    height: 19px;
   }
 
   &_right_bottom {
@@ -102,7 +120,6 @@
     grid-column: 3;
     color: var(--white);
     justify-self: flex-end;
-    margin-right: 8px;
     align-self: flex-start;
     height: 24px;
     display: flex;
