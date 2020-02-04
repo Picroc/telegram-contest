@@ -1,37 +1,35 @@
-import mute from './svg/mute.svg';
-import template from './top-bar.html';
+import template from './top-bar.html.js';
 import './top-bar.scss';
+import { getDialogs, mapId, UPDATE_DIALOG_PHOTO } from '../../store/store.js';
 
 export default class TopBar extends HTMLElement {
 	render() {
-		this.innerHTML = template;
-		const setHTML = setInnerHTML.bind(this);
-		const setAttr = setAttribute.bind(this);
-		const avatar =
-			this.getAttribute('avatar') || 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg';
-		setAttr('.top-bar__avatar')('src', avatar);
-		const title = this.getAttribute('title');
-		setHTML('.top-bar__title')(title);
-		const onlineInfo = this.getAttribute('onlineInfo'); //Maybe 'last seen recently' also to be a part of onlineInfo?
-		const isOnline = this.getAttribute('isOnline');
-		const onlineInfoElem = this.querySelector('top-bar__online-info');
-		if (isOnline) {
-			onlineInfoElem.classList.add('top-bar__online-info_online');
-			setHTML('.top-bar__online-info')(onlineInfo || 'online');
-		} else {
-			onlineInfoElem.classList.remove('top-bar__online-info_online');
-			setHTML('.top-bar__online-info')(onlineInfo); //TODO: last seen long time ago (or make it part of onlineInfo)
-		}
-		const info = this.getAttribute('info'); //TODO: Edit with regards to new interface
-		setHTML('.top-bar__info')(info);
-		const isMuted = this.getAttribute('channel');
-		if (isMuted) {
-			const muteIcon = document.createElement('img');
-			muteIcon.className = 'top-bar__mute';
-			muteIcon.src = mute;
-			this.appendChild(muteIcon);
-		}
+		this.className = 'top-bar';
+		const id = this.getAttribute('user_id');
+		const dialog = getDialogs()[mapId(id)];
+		this.innerHTML = template(dialog);
+		this.searchIcon = this.querySelector('.top-bar__search');
+		this.avatarSrc = this.querySelector('.top-bar__avatar').src;
+		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updatePhotoListener);
+		this.searchIcon.addEventListener('click', this.searchClick);
 	}
+
+	updatePhotoListener = event => {
+		console.log('top-bar', event);
+		const id = this.getAttribute('user_id');
+		const {
+			detail: { id: eventId },
+		} = event;
+		if (id === eventId) {
+			const { photo } = getDialogs()[mapId(id)];
+			this.avatarSrc = photo;
+		}
+	};
+
+	searchClick = event => {
+		const search = document.getElementById('search');
+		search.focus();
+	};
 
 	connectedCallback() {
 		// (2)
@@ -39,11 +37,6 @@ export default class TopBar extends HTMLElement {
 			this.render();
 			this.rendered = true;
 		}
-	}
-
-	static get observedAttributes() {
-		// (3)
-		return ['avatar', 'title', 'onlineInfo', 'isOnline', 'info', 'channel'];
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {

@@ -3,6 +3,7 @@ export const tc = (cls1, cls2, conditional) => cc(conditional ? cls1 : cls2);
 
 export const clsx = (...clss) =>
 	clss
+		.filter(Boolean)
 		.map(item => {
 			if (typeof item === 'object') {
 				return item.condition ? item.class : '';
@@ -10,7 +11,6 @@ export const clsx = (...clss) =>
 
 			return item;
 		})
-		.filter(Boolean)
 		.join(' ');
 
 export const subscribe = element => {

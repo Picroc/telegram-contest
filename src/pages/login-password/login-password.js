@@ -31,6 +31,9 @@ export default class LoginPassword extends HTMLElement {
 		telegramApi
 			.signIn2FA(this.password.value)
 			.then(res => {
+				telegramApi.getUserInfo().then(user => {
+					setUser(user);
+				});
 				router('chat-page');
 			})
 			.catch(err => {

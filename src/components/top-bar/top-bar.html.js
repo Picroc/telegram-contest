@@ -1,7 +1,7 @@
 import search from './svg/search.svg';
 import more from './svg/more.svg';
 import mute from './svg/mute.svg';
-import { clsx, cc } from '../../../../helpers/index';
+import { clsx, cc } from '../../helpers/index';
 
 export default ({
 	avatar = 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
@@ -11,6 +11,7 @@ export default ({
 	voice,
 	channel,
 	onlineInfo,
+	photo,
 }) => {
 	const online = onlineInfo ? onlineInfo : isOnline ? 'online' : 'last seen recently';
 	let muteIcon = channel && `<img src=${mute} class="top-bar__mute"></img>`;
@@ -18,8 +19,13 @@ export default ({
 
 	info = info || '';
 	muteIcon = muteIcon || '';
+
+	if (!(photo instanceof Promise) && photo) {
+		avatar = photo;
+	}
+
 	const onlineInfoCls = clsx('top-bar__online-info', cc('top-bar__online-info_online', isOnline));
-	return `<nav class="top-bar">
+	return `
             <img src=${avatar} class="top-bar__avatar"></img>
             <div class="top-bar__title">${title}</div>
             <div class="${onlineInfoCls}">${online}</div>
@@ -31,6 +37,5 @@ export default ({
             <div class="top-bar__more icon">
                 <img src=${more}></img>
             </div>
-        </nav>
     `;
 };

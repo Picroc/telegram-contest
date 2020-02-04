@@ -4,6 +4,7 @@ import { createDiv } from '../../../helpers';
 import './messages.scss';
 import './chatMain.scss';
 import { telegramApi } from '../../../App';
+import { createElement } from '../../../helpers/index';
 
 async function* fetchMessages(peer, limit = 30) {
 	let offsetId = 0;

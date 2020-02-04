@@ -27,6 +27,10 @@ export default class LoginCode extends HTMLElement {
 					if (res.type === 'SESSION_PASSWORD_NEEDED') {
 						router('login-password');
 					}
+					telegramApi.getUserInfo().then(user => {
+						console.log('HERE WE GO', user);
+						setUser(user);
+					});
 					router('chat-page');
 				})
 				.catch(err => {

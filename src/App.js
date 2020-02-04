@@ -1,19 +1,23 @@
 import './assets/fonts.css';
 import './assets/globals.scss';
 import './assets/popup.scss';
-import LoginForm from './pages/login-form/login-form';
+import { setUser } from './store/store';
 import Router from './components/router';
+import LoginForm from './pages/login-form/login-form';
+import LoginCode from './pages/login-code/login-code';
+import LoginPassword from './pages/login-password/login-password';
+import ChatPage from './pages/chat-page/chat-page';
+
 import CountriesPopupItem from './components/countries-popup-item/countries-popup-item';
 import BubbleMessage from './components/bubbles/bubbleMessage';
 import MessageInput from './components/message-input/messageInput';
 import ProfileImage from './components/profile-image/profile-image';
-import LoginCode from './pages/login-code/login-code';
 import TopBar from './components/top-bar/top-bar';
 import TelegramApi from './utils/TelegramApi/index';
-import LoginPassword from './pages/login-password/login-password';
 import Menu from './components/menu/menu';
 import Settings from './components/menu/settings/settings';
-import ChatPage from './pages/chat-page/chat-page';
+import UserDialogs from './components/user-dialogs/user-dialogs';
+import Dialog from './components/user-dialogs/dialog/dialog';
 
 customElements.define('my-router', Router);
 customElements.define('countries-popup-item', CountriesPopupItem);
@@ -23,6 +27,8 @@ customElements.define('profile-image', ProfileImage);
 customElements.define('top-bar', TopBar);
 customElements.define('my-menu', Menu);
 customElements.define('my-settings', Settings);
+customElements.define('user-dialogs', UserDialogs);
+customElements.define('my-dialog', Dialog);
 
 customElements.define('login-form', LoginForm);
 customElements.define('login-code', LoginCode);
@@ -43,6 +49,7 @@ telegramApi
 	.getUserInfo()
 	.then(user => {
 		console.log('HERE WE GO', user);
+		setUser(user);
 		if (user.id) {
 			router('chat-page');
 		} else {
@@ -59,7 +66,7 @@ telegramApi
 	});
 
 const changeState = transform => {
-	return function(...args) {
+	return function (...args) {
 		const [oldState, newState] = [state, transform(...args)];
 
 		state = {

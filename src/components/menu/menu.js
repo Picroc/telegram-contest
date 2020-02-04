@@ -1,7 +1,7 @@
 import './menu.scss';
 import template from './menu.html';
 import { subscribe, createInput, createDiv } from '../../helpers';
-import TelegramApi from '../../utils/TelegramApi/index';
+import { getUser } from '../../store/store';
 
 export const onType = event => {
 	const userDialogs = document.getElementById('user-dialogs');
@@ -66,12 +66,13 @@ export default class Menu extends HTMLElement {
 	render() {
 		this.innerHTML = template;
 		const menuList = this.querySelector('.menu-list');
-		const settings = this.querySelector('my-settings');
+		const settings = document.querySelector('my-settings');
 		const menuClick = e => {
 			menuList.classList.toggle('menu-list_hidden');
+			console.log('getUser()', getUser());
 		};
 		const settingsClick = e => {
-			settings.children[0].classList.toggle('sidebar_hidden');
+			settings.classList.toggle('sidebar_hidden');
 		};
 		subscribe('.menu__checkbox')('click', menuClick);
 		subscribe('.menu-list__settings')('click', settingsClick);

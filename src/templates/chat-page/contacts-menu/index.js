@@ -1,7 +1,7 @@
 import './contacts-menu.scss';
 import Contact from './contact';
 import { subscribe } from '../../../helpers';
-import { loadDialog } from '..';
+import { loadDialog } from '../';
 
 export default async elem => {
 	menu = document.createElement('div');
@@ -32,8 +32,10 @@ export const updateSearchResults = async res => {
 			});
 
 			menu.appendChild(item);
+			const { peer } = el;
+
 			subscribe(item)('click', () => {
-				loadDialog(el.peer);
+				loadDialog(item, peer, el);
 			});
 		});
 
