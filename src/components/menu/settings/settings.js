@@ -3,6 +3,7 @@
 import template from './settings.html';
 import './settings.scss';
 import { setInnerHTML, setAttribute } from '../../../helpers/index';
+import { telegramApi, router } from '../../../App';
 import { getUser } from '../../../store/store';
 
 export default class Settings extends HTMLElement {
@@ -21,17 +22,28 @@ export default class Settings extends HTMLElement {
 		setHTML('.settings__phone')(this.phone);
 
 		this.moreButton = this.querySelector('.settings__more');
-		const moreButtonListener = e => {
-			this.moreButton.children[1].classList.toggle('hide');
-		};
-		this.moreButton.addEventListener('click', moreButtonListener);
+		this.moreButton.addEventListener('click', this.moreButtonListener);
 
 		this.backButton = this.querySelector('.settings__back');
-		const backButtonListener = e => {
-			this.classList.toggle('sidebar_hidden');
-		};
-		this.backButton.addEventListener('click', backButtonListener);
+		this.backButton.addEventListener('click', this.backButtonListener);
+
+		this.logout = this.querySelector('.more-list__logout');
+		this.logout.addEventListener('click', this.logoutHandler);
 	}
+
+	backButtonListener = e => {
+		this.classList.toggle('sidebar_hidden');
+	};
+
+	logoutHandler = () => {
+		telegramApi.logOut().then(() => {
+			router('login');
+		});
+	};
+
+	moreButtonListener = e => {
+		this.moreButton.children[1].classList.toggle('hide');
+	};
 
 	connectedCallback() {
 		// (2)
@@ -62,12 +74,6 @@ export default class Settings extends HTMLElement {
 
 // const show = settings => {
 // 	settings.classList.toggle('sidebar_hidden', false);
-// };
-
-// const logout = () => {
-// 	telegramApi.logOut().then(() => {
-// 		routePage('login');
-// 	});
 // };
 
 // let cashed;

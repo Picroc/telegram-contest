@@ -32,7 +32,6 @@ export default class LoginPassword extends HTMLElement {
 			.signIn2FA(this.password.value)
 			.then(res => {
 				telegramApi.getUserInfo().then(user => {
-					console.log('HERE WE GO', user);
 					setUser(user);
 				});
 				telegramApi

@@ -17,8 +17,13 @@ export default class TopBar extends HTMLElement {
 	updatePhotoListener = event => {
 		console.log('top-bar', event);
 		const id = this.getAttribute('user_id');
-		const { photo } = getDialogs()[mapId(id)];
-		this.avatarSrc = photo;
+		const {
+			detail: { id: eventId },
+		} = event;
+		if (id === eventId) {
+			const { photo } = getDialogs()[mapId(id)];
+			this.avatarSrc = photo;
+		}
 	};
 
 	searchClick = event => {
