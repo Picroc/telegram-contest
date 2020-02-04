@@ -8,10 +8,13 @@ export default class UserDialogs extends HTMLElement {
 		this.id = 'user-dialogs';
 		this.addEventListener(SET_DIALOGS, this.setListener, { capture: true });
 		this.addEventListener(APPEND_DIALOGS, this.updateListener, { capture: true });
-
 		telegramApi.subscribeToUpdates('dialogs', data => {
 			const { from_peer, to_peer, message, date } = data;
 			console.log('data', data);
+			const { id } = to_peer;
+
+			const dialog = document.getElementById(`dialog_${id}`);
+			dialog.querySelector('.dialog__short-msg').innerHTML = message;
 		});
 	}
 
