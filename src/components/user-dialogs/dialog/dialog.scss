@@ -1,19 +1,19 @@
 my-dialog {
-  max-height: 10vh;
-  min-height: 50px;
-  display: grid;
-  grid-template-columns: 50px 1fr 60px;
-  gap: 4px;
-  grid-template-rows: 1fr 1fr;
-  align-items: center;
-  margin: 0 8px;
-  border-radius: 8px;
-  user-select: none;
-  cursor: pointer;
-  --ripple-background: var(--black);
-  --ripple-opacity: 0.08;
-  --ripple-duration: 600ms;
   .dialog {
+    max-height: 10vh;
+    min-height: 50px;
+    display: grid;
+    grid-template-columns: 50px 1fr 60px;
+    gap: 4px;
+    grid-template-rows: 1fr 1fr;
+    align-items: center;
+    margin: 0 8px;
+    border-radius: 8px;
+    user-select: none;
+    --ripple-background: var(--black);
+    --ripple-opacity: 0.08;
+    --ripple-duration: 600ms;
+
     &:hover {
       background-color: var(--hover-color);
       cursor: pointer;

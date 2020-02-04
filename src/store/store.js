@@ -51,6 +51,8 @@ export const UPDATE_DIALOG_PHOTO = `UPDATE_DIALOG_PHOTO`;
 export const updateDialogPhoto = (id, photo) => {
 	window.store.dialogs[mapId(id)].photo = photo;
 	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_PHOTO, { id }));
+	const topBar = document.querySelector('top-bar');
+	topBar && topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_PHOTO, { id }));
 };
 
 export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);

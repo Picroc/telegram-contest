@@ -15,6 +15,11 @@
   --border-color: rgba(218, 220, 224, 0.75);
 }
 
+img,
+svg {
+  transition: 0.4s;
+}
+
 * {
   margin: 0;
   padding: 0;

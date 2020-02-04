@@ -1,11 +1,11 @@
 import './dialog.scss';
 import template from './dialog.html.js';
 import { mapId, getDialogs, UPDATE_DIALOG_PHOTO, updateDialogPhoto, getUser } from '../../../store/store';
+import ChatMain from '../../../templates/chat-page/chat-main/index';
 
 export default class Dialog extends HTMLElement {
 	render() {
 		const id = this.getAttribute('id').replace('dialog_', '');
-		console.log('dialog_id', id);
 		const dialogs = getDialogs();
 		const dialog = dialogs[mapId(id)];
 		if (dialog.photo instanceof Promise) {
@@ -17,7 +17,6 @@ export default class Dialog extends HTMLElement {
 		const { id: userId } = getUser();
 		if (id == userId) {
 			dialog.savedMessages = true;
-			console.log('id', id);
 		}
 
 		this.dialog = dialog;
