@@ -13,6 +13,7 @@ import { nextRandomInt } from './js/lib/bin_utils';
 import { isArray, isFunction, forEach, map, min } from './js/Etc/Helper';
 import $timeout from './js/Etc/angular/$timeout';
 import { Config } from './js/lib/config';
+import AppUpdatesManagerModule from './js/App/AppUpdatesManager';
 
 export default class TelegramApi {
 	options = { dcID: 2, createNetworker: true };
@@ -26,6 +27,8 @@ export default class TelegramApi {
 	MtpPasswordManager = new MtpPasswordManagerModule();
 	FileSaver = new FileSaverModule();
 	MtpNetworkerFactory = MtpNetworkerFactoryModule();
+
+	AppUpdatesManager = new AppUpdatesManagerModule();
 
 	constructor() {
 		this.MtpNetworkerFactory.setUpdatesProcessor(message => {
@@ -59,7 +62,7 @@ export default class TelegramApi {
 			},
 			mode: {
 				test: false,
-				debug: true,
+				debug: false,
 			},
 		});
 	}
@@ -515,12 +518,8 @@ export default class TelegramApi {
 		return this.MtpApiManager.invokeApi('messages.deleteMessages', { id: ids });
 	};
 
-	subscribe = (id, handler) => {
-		this.MtpNetworkerFactory.subscribe(id, handler);
-	};
-
-	unSubscribe = id => {
-		this.MtpNetworkerFactory.unSubscribe(id);
+	subscribeToUpdates = (type, handler) => {
+		this.AppUpdatesManager.subscribe(type, handler);
 	};
 
 	getPeerByID = (id, type) => {
