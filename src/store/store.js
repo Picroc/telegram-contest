@@ -3,6 +3,7 @@ export const updateStoreEvent = (type, options) =>
 	new CustomEvent(type, { bubbles: false, cancelable: true, detail: options });
 
 const mapAndIdx = (dialog, idx) => {
+	//TODO: отхендлить естественное изменение порядка диалогов
 	const {
 		dialog_peer: { user_id, channel_id, chat_id },
 	} = dialog;

@@ -1,23 +1,22 @@
 import './menu.scss';
 import template from './menu.html';
 import { subscribe } from '../../helpers';
+import { getDialogs } from '../../store/store';
+import { hide, show } from '../../helpers/index';
 
 export const onType = event => {
-	const userDialogs = document.getElementById('user-dialogs');
-	if (!userDialogs.data) {
-		userDialogs.data = Array.from(userDialogs.children);
-	}
-	userDialogs.innerHTML = '';
+	//TODO: добавить поиск по алиасу ( и мб что-то ещё кроме названия чата)
+	const dialogs = getDialogs();
 	const string = event.target.value.toLowerCase();
-	Array.from(
-		userDialogs.data.filter(el =>
-			el
-				.getAttribute('name')
-				.toLowerCase()
-				.includes(string)
-		),
-		el => userDialogs.appendChild(el)
-	);
+	for (const dialog of dialogs) {
+		const el = document.getElementById(`dialog_${dialog.id}`);
+		dialog.title = dialog.title.toLowerCase();
+		if (!dialog.title.includes(string)) {
+			hide(el);
+		} else {
+			show(el);
+		}
+	}
 };
 
 let currentSeacrhTimeout;
@@ -81,7 +80,7 @@ export default class Menu extends HTMLElement {
 		subscribe('.menu-list__settings')('click', settingsClick);
 		subscribe('.menu__search')('input', event => {
 			onType(event);
-			onTypeContacts(event.target.value, () => {});
+			// onTypeContacts(event.target.value, () => {});
 		});
 	}
 
