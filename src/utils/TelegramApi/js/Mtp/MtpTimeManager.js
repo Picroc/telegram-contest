@@ -1,6 +1,7 @@
 import StorageModule from '../Etc/Storage';
 import { nextRandomInt, longFromInts } from '../lib/bin_utils';
 import { tsNow, dT } from '../lib/utils';
+import { Config } from '../lib/config';
 
 export default function MtpTimeManagerModule() {
 	window.lastMessageID = [0, 0];
@@ -37,7 +38,7 @@ export default function MtpTimeManagerModule() {
 
 		window.lastMessageID = [0, 0];
 		window.timeOffset = newTimeOffset;
-		console.log(dT(), 'Apply server time', serverTime, localTime, newTimeOffset, changed);
+		Config.Modes.debug && console.log(dT(), 'Apply server time', serverTime, localTime, newTimeOffset, changed);
 
 		return changed;
 	};

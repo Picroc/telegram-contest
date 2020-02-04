@@ -137,7 +137,7 @@ export default function MtpNetworkerFactoryModule() {
 				};
 
 			if (Config.Modes.debug) {
-				console.log(dT(), 'MT call', method, params, messageID, seqNo);
+				Config.Modes.debug && console.log(dT(), 'MT call', method, params, messageID, seqNo);
 			}
 
 			return this.pushMessage(message, options);
@@ -160,7 +160,7 @@ export default function MtpNetworkerFactoryModule() {
 				};
 
 			if (Config.Modes.debug) {
-				console.log(dT(), 'MT message', object, messageID, seqNo);
+				Config.Modes.debug && console.log(dT(), 'MT message', object, messageID, seqNo);
 			}
 
 			return this.pushMessage(message, options);
@@ -199,7 +199,7 @@ export default function MtpNetworkerFactoryModule() {
 			if (Config.Modes.debug) {
 				console.log(dT(), 'Api call', method, params, messageID, seqNo, options);
 			} else {
-				console.log(dT(), 'Api call', method);
+				Config.Modes.debug && console.log(dT(), 'Api call', method);
 			}
 
 			return this.pushMessage(message, options);
@@ -248,7 +248,7 @@ export default function MtpNetworkerFactoryModule() {
 					setZeroTimeout(self.checkLongPoll.bind(self));
 				},
 				() => {
-					console.log('Long-poll failed');
+					Config.Modes.debug && console.log('Long-poll failed');
 				}
 			);
 		};
@@ -256,7 +256,7 @@ export default function MtpNetworkerFactoryModule() {
 		pushMessage = (message, options) => {
 			const self = this;
 
-			console.log(dT(), 'Push message ', message, options);
+			Config.Modes.debug && console.log(dT(), 'Push message ', message, options);
 
 			return new Promise((resolve, reject) => {
 				self.sentMessages[message.msg_id] = extend(message, options || {}, {
@@ -358,7 +358,7 @@ export default function MtpNetworkerFactoryModule() {
 		};
 
 		checkConnection = event => {
-			console.log(dT(), 'Check connection', event);
+			Config.Modes.debug && console.log(dT(), 'Check connection', event);
 			$timeout.cancel(this.checkConnectionPromise);
 
 			const serializer = new TLSerialization({
@@ -384,7 +384,7 @@ export default function MtpNetworkerFactoryModule() {
 					self.toggleOffline(false);
 				},
 				() => {
-					console.log(dT(), 'Delay ', self.checkConnectionPeriod * 1000);
+					Config.Modes.debug && console.log(dT(), 'Delay ', self.checkConnectionPeriod * 1000);
 					self.checkConnectionPromise = $timeout(
 						self.checkConnection.bind(self),
 						parseInt(self.checkConnectionPeriod * 1000)
@@ -434,7 +434,7 @@ export default function MtpNetworkerFactoryModule() {
 		performSheduledRequest = () => {
 			// console.log(dT(), 'sheduled', this.dcID, this.iii);
 			if (this.offline || akStopped) {
-				console.log(dT(), 'Cancel sheduled');
+				Config.Modes.debug && console.log(dT(), 'Cancel sheduled');
 				return false;
 			}
 			delete this.nextReq;
@@ -627,7 +627,7 @@ export default function MtpNetworkerFactoryModule() {
 					});
 				},
 				error => {
-					console.log('Encrypted request failed', error);
+					Config.Modes.debug && ('Encrypted request failed', error);
 
 					if (message.container) {
 						forEach(message.inner, msgID => {
@@ -894,7 +894,7 @@ export default function MtpNetworkerFactoryModule() {
 		};
 
 		reqResendMessage = msgID => {
-			console.log(dT(), 'Req resend', msgID);
+			Config.Modes.debug && console.log(dT(), 'Req resend', msgID);
 			this.pendingResends.push(msgID);
 			this.sheduleRequest(100);
 		};
@@ -962,10 +962,10 @@ export default function MtpNetworkerFactoryModule() {
 					break;
 
 				case 'bad_server_salt':
-					console.log(dT(), 'Bad server salt', message);
+					Config.Modes.debug && console.log(dT(), 'Bad server salt', message);
 					sentMessage = this.sentMessages[message.bad_msg_id];
 					if (!sentMessage || sentMessage.seq_no != message.bad_msg_seqno) {
-						console.log(message.bad_msg_id, message.bad_msg_seqno);
+						Config.Modes.debug && console.log(message.bad_msg_id, message.bad_msg_seqno);
 						throw new Error('Bad server salt for invalid message');
 					}
 
@@ -975,10 +975,10 @@ export default function MtpNetworkerFactoryModule() {
 					break;
 
 				case 'bad_msg_notification':
-					console.log(dT(), 'Bad msg notification', message);
+					Config.Modes.debug && console.log(dT(), 'Bad msg notification', message);
 					sentMessage = this.sentMessages[message.bad_msg_id];
 					if (!sentMessage || sentMessage.seq_no != message.bad_msg_seqno) {
-						console.log(message.bad_msg_id, message.bad_msg_seqno);
+						Config.Modes.debug && console.log(message.bad_msg_id, message.bad_msg_seqno);
 						throw new Error('Bad msg notification for invalid message');
 					}
 
@@ -990,7 +990,7 @@ export default function MtpNetworkerFactoryModule() {
 									.toString(10)
 							)
 						) {
-							console.log(dT(), 'Update session');
+							Config.Modes.debug && console.log(dT(), 'Update session');
 							this.updateSession();
 						}
 						badMessage = this.updateSentMessage(message.bad_msg_id);
@@ -1062,7 +1062,7 @@ export default function MtpNetworkerFactoryModule() {
 						const deferred = sentMessage.deferred;
 						if (message.result._ == 'rpc_error') {
 							const error = this.processError(message.result);
-							console.log(dT(), 'Rpc error', error);
+							Config.Modes.debug && console.log(dT(), 'Rpc error', error);
 							if (deferred) {
 								deferred.reject(error);
 							}
@@ -1079,7 +1079,7 @@ export default function MtpNetworkerFactoryModule() {
 											dRes = message.result;
 										}
 									}
-									console.log(dT(), 'Rpc response', dRes);
+									Config.Modes.debug && console.log(dT(), 'Rpc response', dRes);
 								}
 								sentMessage.deferred.resolve(message.result);
 							}
@@ -1117,7 +1117,7 @@ export default function MtpNetworkerFactoryModule() {
 
 	return {
 		getNetworker: (dcID, authKey, serverSalt, options) => {
-			console.log('NETWORKER', dcID, authKey, serverSalt, options);
+			Config.Modes.debug && console.log('NETWORKER', dcID, authKey, serverSalt, options);
 			return new MtpNetworker(dcID, authKey, serverSalt, options);
 		},
 		setUpdatesProcessor: callback => {

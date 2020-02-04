@@ -7,6 +7,7 @@ import { bytesFromHex, bytesToHex } from '../lib/bin_utils';
 import MtpNetworkerFactoryModule from './MtpNetworkerFactory';
 import MtpAuthorizerModule from './MtpAuthorizer';
 import { dT, tsNow } from '../lib/utils';
+import { Config } from '../lib/config';
 
 export default function MtpApiManagerModule() {
 	const cachedNetworkers = {};
@@ -120,7 +121,7 @@ export default function MtpApiManagerModule() {
 					storeObj[ssk] = bytesToHex(auth.serverSalt);
 					Storage.set(storeObj);
 
-					console.log('AUTH', auth);
+					Config.Modes.debug && console.log('AUTH', auth);
 
 					return (cache[dcID] = MtpNetworkerFactory.getNetworker(
 						dcID,
@@ -130,7 +131,7 @@ export default function MtpApiManagerModule() {
 					));
 				},
 				error => {
-					console.log('Get networker error', error, error.stack);
+					Config.Modes.debug && ('Get networker error', error, error.stack);
 					return Promise.reject(error);
 				}
 			);
@@ -183,13 +184,15 @@ export default function MtpApiManagerModule() {
 						resolve(result);
 					},
 					error => {
-						console.error(dT(), 'Error', error.code, error.type, baseDcID, dcID);
+						if (Config.Modes.debug) {
+							console.error(dT(), 'Error', error.code, error.type, baseDcID, dcID);
+						}
 						if (error.code == 401 && baseDcID == dcID && error.type !== 'SESSION_PASSWORD_NEEDED') {
 							Storage.remove('dc', 'user_auth');
 							telegramMeNotify(false);
 							rejectPromise(error);
 						} else if (error.code == 401 && baseDcID && dcID != baseDcID) {
-							console.log('Exporting auth...');
+							Config.Modes.debug && console.log('Exporting auth...');
 							if (cachedExportPromise[dcID] === undefined) {
 								const exportPromise = new Promise((exportResolve, exportReject) => {
 									mtpInvokeApi(
@@ -247,7 +250,7 @@ export default function MtpApiManagerModule() {
 												{ noErrorBox: true }
 											).then(
 												exportedAuth => {
-													console.log(exportedAuth);
+													Config.Modes.debug && console.log(exportedAuth);
 													mtpInvokeApi(
 														'auth.importAuthorization',
 														{
@@ -280,7 +283,7 @@ export default function MtpApiManagerModule() {
 													resolve(result);
 												},
 												e => {
-													console.log('WRAP FAILED', e);
+													Config.Modes.debug && console.log('WRAP FAILED', e);
 													return rejectPromise;
 												}
 											);

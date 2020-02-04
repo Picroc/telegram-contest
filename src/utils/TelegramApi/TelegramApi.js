@@ -59,7 +59,7 @@ export default class TelegramApi {
 			},
 			mode: {
 				test: false,
-				debug: true,
+				debug: false,
 			},
 		});
 	}
@@ -258,7 +258,7 @@ export default class TelegramApi {
 
 	getUserPhoto = size => {
 		return this.getFullUserInfo().then(user => {
-			console.log('USER', user);
+			Config.Modes.debug && console.log('USER', user);
 			if (!user.profile_photo) {
 				return null;
 			}
@@ -843,8 +843,8 @@ export default class TelegramApi {
 				};
 			} else if (result._ === 'peerChannel') {
 				const channel = chats[chats.findIndex(el => el.id === result.channel_id)];
-				console.log('GOT CHANNEL', channel);
-				console.log('IS SUPERGROUP? ', (channel.flags & (2 ** 8)) === 2 ** 8);
+				Config.Modes.debug && console.log('GOT CHANNEL', channel);
+				Config.Modes.debug && console.log('IS SUPERGROUP? ', (channel.flags & (2 ** 8)) === 2 ** 8);
 				title = channel.title;
 				text =
 					channel.participants_count > 1

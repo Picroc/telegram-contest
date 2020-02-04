@@ -32,7 +32,7 @@ export default function MtpSingleInstanceServiceModule() {
 				// $(window).on('beforeunload', clearInstance);
 				window.addEventListener('beforeunload', clearInstance);
 			} catch (e) {
-				console.log('Error starting instance: ', e);
+				Config.Modes.debug && console.log('Error starting instance: ', e);
 			}
 		}
 	};
@@ -45,7 +45,7 @@ export default function MtpSingleInstanceServiceModule() {
 		if (masterInstance || deactivated) {
 			return false;
 		}
-		console.log(dT(), 'deactivate');
+		Config.Modes.debug && console.log(dT(), 'deactivate');
 		deactivatePromise = false;
 		deactivated = true;
 		clearInstance();
