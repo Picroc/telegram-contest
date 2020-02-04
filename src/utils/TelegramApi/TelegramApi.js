@@ -793,14 +793,17 @@ export default class TelegramApi {
 		const { chats, dialogs, messages, users } = result;
 
 		const dialog_items = [];
+		const archived_items = [];
 
 		dialogs.forEach(dialog => {
-			dialog_items.push(this._parseDialog(dialog, chats, messages, users));
+			(parsed_dialog => {
+				(parsed_dialog.archived && archived_items.push(parsed_dialog)) || dialog_items.push(parsed_dialog);
+			})(this._parseDialog(dialog, chats, messages, users));
 		});
 
 		dialog_items.sort((a, b) => a.time - b.time);
 
-		return dialog_items;
+		return { dialog_items, archived_items };
 	};
 
 	mapPeerToTruePeer = peer => {
