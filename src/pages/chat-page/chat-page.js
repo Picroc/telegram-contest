@@ -19,7 +19,7 @@ export default class ChatPage extends HTMLElement {
 
 	loadData = async () => {
 		let first = true;
-		const load = data => {
+		const load = ({ dialog_items: data }) => {
 			console.log('dialogs', data);
 			if (first) {
 				const left = document.getElementById('left');

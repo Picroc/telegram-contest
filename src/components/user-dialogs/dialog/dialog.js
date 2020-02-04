@@ -2,6 +2,7 @@ import './dialog.scss';
 import template from './dialog.html.js';
 import { mapId, getDialogs, UPDATE_DIALOG_PHOTO, updateDialogPhoto, getUser } from '../../../store/store';
 import ChatMain from '../../../templates/chat-page/chat-main/index';
+import { telegramApi } from '../../../App';
 
 export default class Dialog extends HTMLElement {
 	render() {
@@ -31,7 +32,6 @@ export default class Dialog extends HTMLElement {
 
 	updateDialogPhotoListener = event => {
 		event.preventDefault();
-		console.log('event', event);
 		const { id } = event.detail;
 		const elem = this.querySelector('.dialog__avatar-wrapper img');
 		if (elem) {
