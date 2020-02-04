@@ -8,8 +8,10 @@ export default class TopBar extends HTMLElement {
 		const id = this.getAttribute('user_id');
 		const dialog = getDialogs()[mapId(id)];
 		this.innerHTML = template(dialog);
+		this.searchIcon = this.querySelector('.top-bar__search');
 		this.avatarSrc = this.querySelector('.top-bar__avatar').src;
 		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updatePhotoListener);
+		this.searchIcon.addEventListener('click', this.searchClick);
 	}
 
 	updatePhotoListener = event => {
@@ -17,6 +19,11 @@ export default class TopBar extends HTMLElement {
 		const id = this.getAttribute('user_id');
 		const { photo } = getDialogs()[mapId(id)];
 		this.avatarSrc = photo;
+	};
+
+	searchClick = event => {
+		const search = document.getElementById('search');
+		search.focus();
 	};
 
 	connectedCallback() {
