@@ -59,7 +59,7 @@ export default class TelegramApi {
 			},
 			mode: {
 				test: false,
-				debug: false,
+				debug: true,
 			},
 		});
 	}
@@ -709,6 +709,17 @@ export default class TelegramApi {
 		return (flags & (2 ** idx)) === 2 ** idx;
 	};
 
+	_checkMessageFlags = msg_flags => ({
+		out: this._checkFlag(msg_flags, 1),
+		mentioned: this._checkFlag(msg_flags, 4),
+		media_unread: this._checkFlag(msg_flags, 5),
+		muted: this._checkFlag(msg_flags, 13),
+		channel_post: this._checkFlag(msg_flags, 14),
+		scheduled: this._checkFlag(msg_flags, 18),
+		legacy: this._checkFlag(msg_flags, 19),
+		hide_edit: this._checkFlag(msg_flags, 21),
+	});
+
 	_parseDialog = (dialog, chats, messages, users) => {
 		let peer = dialog.peer;
 		let title,
@@ -751,7 +762,7 @@ export default class TelegramApi {
 				: peer;
 		}
 		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
-		const { message: text, date } = message;
+		const { message: text, date, flags: msg_flags } = message;
 		const unread_count = dialog.unread_count;
 
 		if (photo) {
@@ -762,6 +773,11 @@ export default class TelegramApi {
 			title: title,
 			isOnline: status && status._ === 'userStatusOnline',
 			text: text,
+			message_info: this._checkMessageFlags(msg_flags),
+			pinned: this._checkFlag(dialog.flags, 2),
+			muted: this._checkFlag(dialog.notify_settings.flags, 1),
+			draft: dialog.draft && dialog.draft._ !== 'draftMessageEmpty' ? dialog.draft : null,
+			archived: dialog.folder_id && dialog.folder_id === 1,
 			time: this._convertDate(date),
 			unreadCount: unread_count,
 			dialog_peer: peer,
