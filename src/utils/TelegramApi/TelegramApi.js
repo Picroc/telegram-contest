@@ -756,9 +756,9 @@ export default class TelegramApi {
 			}
 			peer = user.access_hash
 				? {
-						...peer,
-						access_hash: user.access_hash,
-				  }
+					...peer,
+					access_hash: user.access_hash,
+				}
 				: peer;
 		}
 		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
@@ -787,7 +787,8 @@ export default class TelegramApi {
 	};
 
 	getDialogsParsed = async limit => {
-		const { result, offset } = await this.getDialogs(0, limit);
+		const last = this.last || 0;
+		const { result, offset } = await this.getDialogs(last, limit);
 		this.last = offset;
 		const { chats, dialogs, messages, users } = result;
 
@@ -880,9 +881,9 @@ export default class TelegramApi {
 				photo = user.photo && user.photo._ !== 'userPhotoEmpty' && user.photo;
 				peer = user.access_hash
 					? {
-							...result,
-							access_hash: user.access_hash,
-					  }
+						...result,
+						access_hash: user.access_hash,
+					}
 					: result;
 			}
 

@@ -20,6 +20,7 @@ export default class ChatPage extends HTMLElement {
 	loadData = async () => {
 		let first = true;
 		const load = data => {
+			console.log('dialogs', data);
 			if (first) {
 				const left = document.getElementById('left');
 				stopLoading(left);
@@ -32,7 +33,7 @@ export default class ChatPage extends HTMLElement {
 			window.updateRipple();
 		};
 
-		await telegramApi.getDialogsParsed(0, 5).then(load);
-		await telegramApi.getDialogsParsed(0, 30).then(load);
+		await telegramApi.getDialogsParsed(5).then(load);
+		await telegramApi.getDialogsParsed(30).then(load);
 	};
 }

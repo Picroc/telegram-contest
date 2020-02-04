@@ -52,7 +52,9 @@ export const updateDialogPhoto = (id, photo) => {
 	window.store.dialogs[mapId(id)].photo = photo;
 	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_PHOTO, { id }));
 	const topBar = document.querySelector('top-bar');
-	topBar && topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_PHOTO, { id }));
+	if (topBar && topBar.getAttribute('user_id') == id) {
+		topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_PHOTO, { id }));
+	}
 };
 
 export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);

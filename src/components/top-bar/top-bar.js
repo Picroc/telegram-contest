@@ -9,7 +9,7 @@ export default class TopBar extends HTMLElement {
 		const dialog = getDialogs()[mapId(id)];
 		this.innerHTML = template(dialog);
 		this.searchIcon = this.querySelector('.top-bar__search');
-		this.avatarSrc = this.querySelector('.top-bar__avatar').src;
+		this.avatar = this.querySelector('.top-bar__avatar');
 		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updatePhotoListener);
 		this.searchIcon.addEventListener('click', this.searchClick);
 	}
@@ -22,7 +22,7 @@ export default class TopBar extends HTMLElement {
 		} = event;
 		if (id === eventId) {
 			const { photo } = getDialogs()[mapId(id)];
-			this.avatarSrc = photo;
+			this.avatar.src = photo;
 		}
 	};
 
