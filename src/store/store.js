@@ -3,7 +3,7 @@ export const updateStoreEvent = (type, options) =>
 	new CustomEvent(type, { bubbles: false, cancelable: true, detail: options });
 
 const mapAndIdx = (dialog, idx) => {
-	//TODO: отхендлить естественное изменение порядка диалогов
+	//TODO: отхендлить естественное изменение порядка диалогов (сортировка по дате при новом сообщении?)
 	const {
 		dialog_peer: { user_id, channel_id, chat_id },
 	} = dialog;
@@ -31,6 +31,23 @@ export const appendDialogs = dialogs => {
 	document.getElementById('user-dialogs').dispatchEvent(updateStoreEvent(APPEND_DIALOGS, { length }));
 };
 
+export const SET_ARCHIEVES = 'SET_ARCHIEVES';
+export const setArchives = archives => {
+	window.store.mapId = {};
+	window.store.archives = archives.map(mapAndIdx);
+
+	document.getElementById('user-archives').dispatchEvent(updateStoreEvent(SET_ARCHIEVES));
+};
+
+export const APPEND_ARCHIEVES = 'APPEND_ARCHIEVES';
+export const appendArchieves = archieves => {
+	const { length } = window.store.archieves;
+	archieves = archieves.map(mapAndIdx);
+	window.store.archieves = [...window.store.archieves, ...archieves];
+	window.store.archieves = window.store.archieves.map(mapAndIdx);
+	document.getElementById('user-archieves').dispatchEvent(updateStoreEvent(APPEND_ARCHIEVES, { length }));
+};
+
 export const SET_USER = 'SET_USER';
 export const setUser = user => {
 	window.store.user = user;
@@ -41,9 +58,10 @@ export const getUser = () => {
 	return window.store.user;
 };
 
+export const ADD_TO_USER = 'ADD_TO_USER';
 export const addToUser = (propName, value) => {
 	window.store.user = { ...window.store.user, [propName]: value };
-	document.dispatchEvent(updateStoreEvent(SET_USER));
+	document.dispatchEvent(updateStoreEvent(ADD_TO_USER));
 };
 
 export const UPDATE_DIALOG = `UPDATE_DIALOG`;
