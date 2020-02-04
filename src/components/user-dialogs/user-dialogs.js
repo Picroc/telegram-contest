@@ -18,7 +18,14 @@ export default class UserDialogs extends HTMLElement {
 	}
 
 	renderDialog = dialog => {
-		const { id, title } = dialog;
+		const { id, title, photo } = dialog;
+		const user = getUser();
+		const { id: user_id } = user;
+		if (id == user_id) {
+			photo.then(avatar => {
+				setUser({ ...user, avatar });
+			});
+		}
 		this.appendChild(htmlToElement(`<my-dialog anim="ripple" id="dialog_${id}"></my-dialog>`));
 	};
 

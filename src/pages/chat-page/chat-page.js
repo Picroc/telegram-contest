@@ -1,5 +1,5 @@
 import { router, telegramApi } from '../../App';
-import { setDialogs, appendDialogs, getDialogs } from '../../store/store';
+import { setDialogs, appendDialogs, getDialogs, getUser, setUser } from '../../store/store';
 import template from './chat-page.html';
 import { stopLoading } from '../../helpers/index';
 import './chat-page.scss';
@@ -12,6 +12,10 @@ export default class ChatPage extends HTMLElement {
 		// chatPage(this);
 		this.innerHTML = template;
 		this.loadData();
+		// const user = getUser();
+		// if (user.photo === undefined) {
+		// 	telegramApi.getUserPhoto('blob', 'small').then(avatar => setUser({ avatar, ...user }));
+		// }
 	}
 
 	connectedCallback() {
