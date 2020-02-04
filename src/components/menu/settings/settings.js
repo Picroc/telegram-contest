@@ -8,18 +8,14 @@ import TelegramApi from '../../../utils/TelegramApi/index';
 import { telegramApi } from '../../../App';
 
 export default class Settings extends HTMLElement {
-	async render() {
-		this.id = 'setttings';
+	render() {
+		this.id = 'settings';
+		this.className = 'sidebar sidebar_left settings sidebar_hidden';
 		this.innerHTML = template;
 		const setHTML = setInnerHTML.bind(this);
-		const setAttr = setAttribute.bind(this);
-		// setUserInfo(await TelegramApi.getUserInfo());
-		// const userInfo = getUserInfo();
-		// console.log(userInfo);
 		const user = getUser();
-
-		// this.avatar = user.photo.pho 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg';
-		setAttr('.settings__avatar')('src', this.avatar);
+		// this.avatar = user.photo.pho 'https://pcentr.by/assets/images/users/  7756f7da389c7a20eab610d826a25ec7.jpg';
+		// setAttr('.settings__avatar')('src', this.avatar);TODO: Дождаться пока Лёха поменяет апи
 		this.name = user.first_name + (user.last_name ? ` ${user.last_name}` : '');
 		setHTML('.settings__name')(this.name);
 		this.phone = user.phone;
@@ -28,14 +24,12 @@ export default class Settings extends HTMLElement {
 		this.moreButton = this.querySelector('.settings__more');
 		const moreButtonListener = e => {
 			this.moreButton.children[1].classList.toggle('hide');
-			console.log('user', user);
-			console.log('Tapi', telegramApi.getUserPhoto('blob', 'small').then(res => console.log(res)));
 		};
 		this.moreButton.addEventListener('click', moreButtonListener);
 
 		this.backButton = this.querySelector('.settings__back');
 		const backButtonListener = e => {
-			this.children[0].classList.toggle('sidebar_hidden');
+			this.classList.toggle('sidebar_hidden');
 		};
 		this.backButton.addEventListener('click', backButtonListener);
 	}
