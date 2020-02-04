@@ -1,6 +1,5 @@
 import { getDialogs, SET_DIALOGS, APPEND_DIALOGS } from '../../store/store';
 import { htmlToElement, startLoading, stopLoading } from '../../helpers/index';
-import topBar from '../../templates/chat-page/chat-main/top-bar';
 import chatMain from '../../templates/chat-page/chat-main/index';
 
 export default class UserDialogs extends HTMLElement {

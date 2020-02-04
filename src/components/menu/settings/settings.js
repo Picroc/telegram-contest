@@ -3,8 +3,9 @@
 import template from './settings.html';
 import './settings.scss';
 import { setInnerHTML, setAttribute } from '../../../helpers/index';
-import { setUserInfo } from '../../../store/store';
+import { setUserInfo, getUser } from '../../../store/store';
 import TelegramApi from '../../../utils/TelegramApi/index';
+import { telegramApi } from '../../../App';
 
 export default class Settings extends HTMLElement {
 	async render() {
@@ -15,18 +16,20 @@ export default class Settings extends HTMLElement {
 		// setUserInfo(await TelegramApi.getUserInfo());
 		// const userInfo = getUserInfo();
 		// console.log(userInfo);
-		this.avatar =
-			this.getAttribute('avatar') || 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg';
+		const user = getUser();
+
+		// this.avatar = user.photo.pho 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg';
 		setAttr('.settings__avatar')('src', this.avatar);
-		console.log('this.avatar', this.avatar);
-		this.name = this.getAttribute('name') || 'Doge Dogenson';
+		this.name = user.first_name + (user.last_name ? ` ${user.last_name}` : '');
 		setHTML('.settings__name')(this.name);
-		this.phone = this.getAttribute('phone') || '+7123456879';
+		this.phone = user.phone;
 		setHTML('.settings__phone')(this.phone);
 
 		this.moreButton = this.querySelector('.settings__more');
 		const moreButtonListener = e => {
 			this.moreButton.children[1].classList.toggle('hide');
+			console.log('user', user);
+			console.log('Tapi', telegramApi.getUserPhoto('blob', 'small').then(res => console.log(res)));
 		};
 		this.moreButton.addEventListener('click', moreButtonListener);
 
