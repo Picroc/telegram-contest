@@ -13,6 +13,9 @@
   overflow: auto;
   overflow-y: -moz-scrollbars-none;
   -ms-overflow-style: none;
+  overflow: hidden;
+  box-shadow: 1px 5px 14px -7px var(--shadow);
+  transition: 0.4s;
 
   &::-webkit-scrollbar {
     width: 0 !important;

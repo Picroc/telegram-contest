@@ -8,6 +8,8 @@ my-dialog {
   align-items: center;
   margin: 0 8px;
   border-radius: 8px;
+  user-select: none;
+  cursor: pointer;
   --ripple-background: var(--black);
   --ripple-opacity: 0.08;
   --ripple-duration: 600ms;

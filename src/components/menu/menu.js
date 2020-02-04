@@ -1,19 +1,7 @@
 import './menu.scss';
 import template from './menu.html';
 import { subscribe, createInput, createDiv } from '../../helpers';
-// import img from './search.js';
-// import settings from './settings/index';
-
-// export default (elem, type, callback) => {
-// 	const nav = document.createElement('nav');
-// 	nav.className = 'menu';
-// 	nav.innerHTML = template;
-// 	nav.appendChild(search(type, callback));
-// 	elem.appendChild(nav);
-// 	const menu = document.querySelector('.menu-list');
-// 	subscribe('#menu__checkbox')('click', () => menu.classList.toggle('menu-list_hidden'));
-// 	subscribe('.menu-list__settings')('click', () => settings(elem, { name: 'Doge Dogeson', phone: '88005553535' }));
-// };
+import TelegramApi from '../../utils/TelegramApi/index';
 
 export const onType = event => {
 	const userDialogs = document.getElementById('user-dialogs');
@@ -78,7 +66,15 @@ export default class Menu extends HTMLElement {
 	render() {
 		this.innerHTML = template;
 		const menuList = this.querySelector('.menu-list');
-		subscribe('.menu__checkbox')('click', () => menuList.classList.toggle('menu-list_hidden'));
+		const settings = this.querySelector('my-settings');
+		const menuClick = e => {
+			menuList.classList.toggle('menu-list_hidden');
+		};
+		const settingsClick = e => {
+			settings.children[0].classList.toggle('sidebar_hidden');
+		};
+		subscribe('.menu__checkbox')('click', menuClick);
+		subscribe('.menu-list__settings')('click', settingsClick);
 		subscribe('.menu__search')('input', event => {
 			onType(event);
 			onTypeContacts(event.target.value, () => {});

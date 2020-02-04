@@ -66,13 +66,10 @@
   }
 
   .menu-list {
-    transition: 0.4s;
     top: 40px;
     left: 10px;
     max-width: 200px;
-    overflow: hidden;
-    box-shadow: 1px 5px 14px -7px var(--shadow);
-    transition: 0.4s;
+
 
     &_hidden {
       opacity: 0;
