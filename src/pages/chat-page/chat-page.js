@@ -1,5 +1,5 @@
 import { router, telegramApi } from '../../App';
-import { setDialogs, appendDialogs, getDialogs, getUser, setUser } from '../../store/store';
+import { setDialogs, appendDialogs } from '../../store/store';
 import template from './chat-page.html';
 import { stopLoading } from '../../helpers/index';
 import './chat-page.scss';
@@ -10,7 +10,7 @@ export default class ChatPage extends HTMLElement {
 
 	render() {
 		this.innerHTML = template;
-		this.loadData().then;
+		this.loadData();
 	}
 
 	connectedCallback() {
@@ -23,7 +23,7 @@ export default class ChatPage extends HTMLElement {
 			if (first) {
 				const left = document.getElementById('left');
 				stopLoading(left);
-				left.innerHTML = `<my-settings></my-settings><my-menu></my-menu><user-dialogs></user-dialogs>`;
+				left.innerHTML = `<my-menu></my-menu><user-dialogs></user-dialogs>`;
 				setDialogs(data);
 				first = false;
 			} else {
@@ -32,7 +32,7 @@ export default class ChatPage extends HTMLElement {
 			window.updateRipple();
 		};
 
-		await telegramApi.getDialogsParsed(0, 5).then(load);
-		await telegramApi.getDialogsParsed(0, 30).then(load);
+		await telegramApi.getDialogsParsed(5).then(load);
+		await telegramApi.getDialogsParsed(30).then(load);
 	};
 }

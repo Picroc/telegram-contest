@@ -3,6 +3,7 @@ export const updateStoreEvent = (type, options) =>
 	new CustomEvent(type, { bubbles: false, cancelable: true, detail: options });
 
 const mapAndIdx = (dialog, idx) => {
+	//TODO: отхендлить естественное изменение порядка диалогов
 	const {
 		dialog_peer: { user_id, channel_id, chat_id },
 	} = dialog;
@@ -38,6 +39,11 @@ export const setUser = user => {
 
 export const getUser = () => {
 	return window.store.user;
+};
+
+export const addToUser = (propName, value) => {
+	window.store.user = { ...window.store.user, [propName]: value };
+	document.dispatchEvent(updateStoreEvent(SET_USER));
 };
 
 export const UPDATE_DIALOG = `UPDATE_DIALOG`;

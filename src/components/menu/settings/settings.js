@@ -13,11 +13,12 @@ export default class Settings extends HTMLElement {
 		this.innerHTML = template;
 		const setHTML = setInnerHTML.bind(this);
 		const user = getUser();
-		// this.avatar = user.photo.pho 'https://pcentr.by/assets/images/users/  7756f7da389c7a20eab610d826a25ec7.jpg';
-		// setAttr('.settings__avatar')('src', this.avatar);TODO: Дождаться пока Лёха поменяет апи
+		this.avatar = user.avatar;
+		document.querySelector('.settings__avatar_img').src = user.avatar;
 		this.name = user.first_name + (user.last_name ? ` ${user.last_name}` : '');
 		setHTML('.settings__name')(this.name);
 		this.phone = user.phone;
+
 		setHTML('.settings__phone')(this.phone);
 
 		this.moreButton = this.querySelector('.settings__more');

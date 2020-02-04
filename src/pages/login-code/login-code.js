@@ -2,6 +2,7 @@ import template from './login-code.html';
 import './login-code.scss';
 
 import { router, telegramApi } from '../../App';
+import { getUser, addToUser } from '../../store/store';
 
 export default class LoginCode extends HTMLElement {
 	constructor() {
@@ -31,7 +32,12 @@ export default class LoginCode extends HTMLElement {
 						console.log('HERE WE GO', user);
 						setUser(user);
 					});
-					router('chat-page');
+					telegramApi
+						.getUserPhoto(1)
+						.then(res => {
+							addToUser('avatar', res);
+						})
+						.catch(err => console.log('err', err));
 				})
 				.catch(err => {
 					console.log('Got error');
