@@ -9,13 +9,8 @@ export default class ChatPage extends HTMLElement {
 	}
 
 	render() {
-		// chatPage(this);
 		this.innerHTML = template;
-		this.loadData();
-		// const user = getUser();
-		// if (user.photo === undefined) {
-		// 	telegramApi.getUserPhoto('blob', 'small').then(avatar => setUser({ avatar, ...user }));
-		// }
+		this.loadData().then;
 	}
 
 	connectedCallback() {
@@ -28,7 +23,7 @@ export default class ChatPage extends HTMLElement {
 			if (first) {
 				const left = document.getElementById('left');
 				stopLoading(left);
-				left.innerHTML = `<my-menu></my-menu><user-dialogs></user-dialogs>`;
+				left.innerHTML = `<my-settings></my-settings><my-menu></my-menu><user-dialogs></user-dialogs>`;
 				setDialogs(data);
 				first = false;
 			} else {
