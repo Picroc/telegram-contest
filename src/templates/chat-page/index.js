@@ -102,7 +102,7 @@ const loadData = async () => {
 		window.updateRipple();
 	};
 
-	await telegramApi.getDialogsParsed(0, 5).then(load);
+	await telegramApi.getDialogsParsed(0, 25).then(load);
 	await telegramApi.getDialogsParsed(5, 30).then(load);
 	return left;
 };
