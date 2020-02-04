@@ -6,6 +6,7 @@ import { subscribe, htmlToElement, startLoading, stopLoading } from '../../helpe
 import ChatMain from './chat-main';
 import { updateSearchResults } from './contacts-menu';
 import topBar from '../chat-page/chat-main/top-bar';
+import { telegramApi } from '../../App';
 
 let prevId;
 let prevActive;
@@ -49,7 +50,7 @@ const loadPhotos = async () => {
 					if (photo) {
 						try {
 							dialogs.data[ind].children[0].children[0].src = photo;
-						} catch {}
+						} catch { }
 					}
 				});
 			})(i),
@@ -72,7 +73,8 @@ const loadData = async () => {
 	const { id } = await telegramApi.getUserInfo();
 
 	const load = data => {
-		data.forEach(user => {
+		console.log('data', data);
+		data.forEach((user, i) => {
 			if (cached.filter(({ title }) => user.title === title).length > 0) {
 				return;
 			}
@@ -100,8 +102,8 @@ const loadData = async () => {
 		window.updateRipple();
 	};
 
-	await telegramApi.getDialogsParsed(5).then(load);
-	// await telegramApi.getDialogs(100).then(load);
+	await telegramApi.getDialogsParsed(0, 25).then(load);
+	await telegramApi.getDialogsParsed(5, 30).then(load);
 	return left;
 };
 

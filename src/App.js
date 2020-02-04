@@ -1,23 +1,72 @@
-import Login from './templates/login-form';
-import LoginCode from './templates/login-code';
-import LoginPassword from './templates/login-password';
-
 import './assets/fonts.css';
 import './assets/globals.scss';
 import './assets/popup.scss';
-import chatPage from './templates/chat-page';
-import RegisterPage from './templates/register-page/index';
+import { setUser } from './store/store';
+import Router from './components/router';
+import LoginForm from './pages/login-form/login-form';
+import LoginCode from './pages/login-code/login-code';
+import LoginPassword from './pages/login-password/login-password';
+import ChatPage from './pages/chat-page/chat-page';
+
+import CountriesPopupItem from './components/countries-popup-item/countries-popup-item';
+import BubbleMessage from './components/bubbles/bubbleMessage';
+import MessageInput from './components/message-input/messageInput';
+import ProfileImage from './components/profile-image/profile-image';
+import TopBar from './components/top-bar/top-bar';
 import TelegramApi from './utils/TelegramApi/index';
+import Menu from './components/menu/menu';
+import Settings from './components/menu/settings/settings';
+import UserDialogs from './components/user-dialogs/user-dialogs';
+import Dialog from './components/user-dialogs/dialog/dialog';
 
-const q = elem => document.querySelector(elem);
-const App = q('.root');
+customElements.define('my-router', Router);
+customElements.define('countries-popup-item', CountriesPopupItem);
+customElements.define('bubble-message', BubbleMessage);
+customElements.define('message-input', MessageInput);
+customElements.define('profile-image', ProfileImage);
+customElements.define('top-bar', TopBar);
+customElements.define('my-menu', Menu);
+customElements.define('my-settings', Settings);
+customElements.define('user-dialogs', UserDialogs);
+customElements.define('my-dialog', Dialog);
 
-let state = {
-	history: ['login'],
+customElements.define('login-form', LoginForm);
+customElements.define('login-code', LoginCode);
+customElements.define('login-password', LoginPassword);
+customElements.define('chat-page', ChatPage);
+
+const rt = document.getElementById('router');
+export const router = (route, attrs = {}) => {
+	rt.setAttribute('route', route);
+	Object.keys(attrs).map(attr => {
+		rt.firstChild.setAttribute(attr, JSON.stringify(attrs[attr]));
+	});
 };
 
+export const telegramApi = new TelegramApi();
+
+telegramApi
+	.getUserInfo()
+	.then(user => {
+		console.log('HERE WE GO', user);
+		setUser(user);
+		if (user.id) {
+			router('chat-page');
+		} else {
+			return true;
+		}
+	})
+	.then(res => {
+		if (res) {
+			router('login-form');
+		}
+	})
+	.catch(err => {
+		console.log('LOGIN ERR', err);
+	});
+
 const changeState = transform => {
-	return function(...args) {
+	return function (...args) {
 		const [oldState, newState] = [state, transform(...args)];
 
 		state = {
@@ -25,36 +74,6 @@ const changeState = transform => {
 			...newState,
 		};
 	};
-};
-
-const subscribe = element => {
-	return function(...args) {
-		document.querySelector(element).addEventListener(...args);
-	};
-};
-
-const switchPage = page => {
-	switch (page) {
-		case 'login':
-			return Login;
-		case 'login_code':
-			return LoginCode;
-		case 'login_password':
-			return LoginPassword;
-		case 'register_page':
-			return RegisterPage;
-		case 'chat_page':
-			return chatPage;
-		default:
-			return () => {
-				throw new ReferenceError('No such page');
-			};
-	}
-};
-
-export const routePage = (page, ...args) => {
-	changeState(() => ({ history: [...state.history, page] }))();
-	switchPage(page)(App, routePage, ...args);
 };
 
 window.updateRipple = () => {
@@ -69,15 +88,3 @@ window.updateRipple = () => {
 		});
 	});
 };
-
-function render() {
-	const telegramApi = new TelegramApi();
-	window.telegramApi = telegramApi;
-	Login(App, routePage);
-}
-
-function onDocumentReady(callback) {
-	document.addEventListener('DOMContentLoaded', callback);
-}
-
-onDocumentReady(render);

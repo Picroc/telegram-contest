@@ -3,13 +3,14 @@ import InputMessage from './message-input';
 import { createDiv } from '../../../helpers';
 import './messages.scss';
 import './chatMain.scss';
+import { telegramApi } from '../../../App';
+import { createElement } from '../../../helpers/index';
 
 async function* fetchMessages(peer, limit = 30) {
-	const ta = window.telegramApi;
 	let offsetId = 0;
 	let loadAll = false;
 	while (!loadAll) {
-		const messages = await ta.getMessagesFromPeer(peer, limit, offsetId);
+		const messages = await telegramApi.getMessagesFromPeer(peer, limit, offsetId);
 		const mes = messages.messages;
 		offsetId = (mes[mes.length - 1] && mes[mes.length - 1].id) || 0;
 		loadAll = messages.messages.length === 0;
@@ -31,6 +32,8 @@ const loadMessages = async (elem, messageGenerator) => {
 		}
 		messages.push(resp.value);
 	}
+
+	console.log('messages', messages);
 
 	let previousSentDate;
 	let previousId = 0;
@@ -105,7 +108,6 @@ export default async (elem, peer) => {
 	const chatMessage = createDiv('chat-messages');
 	let messageInput = InputMessage();
 	chatMain.append(...[statusInfo, chatMessage, messageInput]);
-
 	const limit = 30;
 	const messageGenerator = fetchMessages(peer, limit);
 	await loadMessages(chatMessage, messageGenerator);
@@ -115,8 +117,7 @@ export default async (elem, peer) => {
 		}
 	});
 
-	elem.innerHTML = '';
-	elem.append(chatMain);
+	elem.innerHTML = chatMain.outerHTML;
 	const textarea = elem.querySelector('.text-input__input');
 	textarea.addEventListener('input', () => {
 		const sendButton = document.getElementById('send-button');

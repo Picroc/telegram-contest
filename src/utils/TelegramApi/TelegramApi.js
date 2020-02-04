@@ -771,8 +771,8 @@ export default class TelegramApi {
 	};
 
 	getDialogsParsed = async limit => {
-		const { result } = await this.getDialogs(0, limit);
-
+		const { result, offset } = await this.getDialogs(0, limit);
+		this.last = offset;
 		const { chats, dialogs, messages, users } = result;
 
 		const dialog_items = [];
@@ -788,26 +788,32 @@ export default class TelegramApi {
 
 	mapPeerToTruePeer = peer => {
 		const type = peer._;
-		if (type === 'peerUser') {
-			return {
-				...peer,
-				_: 'inputPeerUser',
-				user_id: peer.user_id.toString(),
-			};
-		} else if (type === 'peerChat') {
-			return {
-				...peer,
-				_: 'inputPeerChat',
-				chat_id: peer.chat_id.toString(),
-			};
-		} else if (type === 'peerChannel') {
-			return {
-				...peer,
-				_: 'inputPeerChannel',
-				channel_id: peer.channel_id.toString(),
-			};
+
+		switch (type) {
+			case 'peerUser':
+				return {
+					...peer,
+					_: 'inputPeerUser',
+					user_id: peer.user_id.toString(),
+				};
+
+			case 'peerChat':
+				return {
+					...peer,
+					_: 'inputPeerChat',
+					chat_id: peer.chat_id.toString(),
+				};
+
+			case 'peerChannel':
+				return {
+					...peer,
+					_: 'inputPeerChannel',
+					channel_id: peer.channel_id.toString(),
+				};
+
+			default:
+				return peer;
 		}
-		return peer;
 	};
 
 	searchPeers = async (subsrt, limit) => {

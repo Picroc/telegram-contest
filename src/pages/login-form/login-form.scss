@@ -1,0 +1,319 @@
+.login-page {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  vertical-align: middle;
+  align-items: center;
+  * {
+    user-select: none;
+  }
+}
+
+.login-form {
+  display: flex;
+
+  max-width: 370px;
+
+  flex-direction: column;
+  align-items: center;
+
+  &__submit {
+    margin-top: 24px;
+  }
+
+  &__popup {
+    max-width: 360px;
+    max-height: 360px;
+    overflow: auto;
+    overflow-x: hidden;
+    box-shadow: -2px 10px 26px -7px var(--shadow);
+    &::-webkit-scrollbar {
+      width: 0 !important;
+    }
+
+    & img {
+      height: 40px;
+    }
+
+    & li {
+      cursor: pointer;
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+
+      height: 50px;
+      min-height: 50px;
+      width: 360px;
+      padding-left: 15px;
+      padding-right: 15px;
+      vertical-align: middle;
+
+      &:hover {
+        background: var(--light-gray);
+      }
+
+      & span {
+        display: inline-block;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  &__icon {
+    width: 160px;
+    height: 160px;
+  }
+
+  &__title {
+    display: inline-block;
+    margin-block-start: 0;
+    margin-block-end: 0;
+
+    margin-top: 45px;
+
+    font-size: 30px;
+    font-weight: normal;
+  }
+
+  &__description {
+    display: inline-block;
+    margin-top: 15px;
+    margin-bottom: 0;
+
+    max-width: 230px;
+
+    color: var(--dark-gray);
+
+    font-size: 0.95em;
+    font-weight: normal;
+    line-height: 1.4em;
+
+    text-align: center;
+  }
+
+  &__country {
+    margin-top: 50px;
+  }
+
+  &__phone {
+    margin-top: 22px;
+  }
+
+  &__keep {
+    display: flex;
+    margin-top: 26px;
+    width: 360px;
+    padding-left: 32px;
+    position: relative;
+
+    overflow: hidden;
+
+    & input {
+      width: 24px;
+      height: 24px;
+      -webkit-appearance: none;
+      background-color: var(--white);
+      display: inline-flex;
+      align-items: flex-start;
+      margin-top: -2px;
+      background: url("./empty.svg");
+
+      &:active,
+      &:checked:active,
+      &:focus {
+        outline: none;
+      }
+
+      &:checked {
+        background: url("./filled.svg");
+      }
+    }
+
+    & label {
+      display: inline-block;
+      margin-left: 32px;
+      user-select: none;
+    }
+  }
+}
+
+.input-field {
+  box-sizing: border-box;
+  width: 360px;
+  height: 55px;
+
+  user-select: none;
+
+  border-radius: 10px;
+  border: 2px solid var(--border-color);
+
+  font-size: 18px;
+  line-height: 55px;
+
+  padding-left: 14px;
+
+  &:focus {
+    outline: none;
+
+    border: 2px solid var(--primary);
+    caret-color: var(--primary);
+  }
+
+  &_invalid,
+  &_invalid:focus,
+  &_invalid:valid {
+    border: 2px solid var(--red);
+  }
+}
+
+.login-form__country:focus ~ .input-group__img {
+  background: url("./up.svg");
+}
+
+.input-group {
+  position: relative;
+
+  &__img {
+    position: absolute;
+    width: 31px;
+    height: 31px;
+    background: url("./down.svg");
+    background-size: 31px;
+    bottom: 11px;
+    right: 10px;
+  }
+
+  & label {
+    color: var(--dark-gray);
+    font-size: 18px;
+    font-weight: normal;
+    position: absolute;
+    pointer-events: none;
+    left: 14px;
+    bottom: 18px;
+    transition: 0.2s ease all;
+  }
+
+  & input:focus ~ label,
+  & input:valid ~ label {
+    bottom: 45px;
+    font-size: 12px;
+
+    background: var(--white);
+    color: var(--primary);
+    padding: 2px;
+  }
+
+  & .input-field_invalid ~ label,
+  & .input-field_invalid:focus ~ label,
+  & .input-field_invalid:valid ~ label {
+    color: var(--red);
+  }
+
+  &_select {
+    & input:focus ~ &::after {
+      color: var(--primary);
+    }
+  }
+}
+
+.popup-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  & * {
+    display: flex;
+  }
+}
+
+.submit {
+  width: 360px;
+  height: 54px;
+
+  cursor: pointer;
+  position: relative;
+
+  background: var(--primary);
+
+  border: 0;
+  border-radius: 10px;
+
+  color: var(--white);
+
+  font-size: 15px;
+  font-weight: 500;
+  outline: none;
+
+  --ripple-background: var(--black);
+  --ripple-opacity: 0.08;
+  --ripple-duration: 600ms;
+
+  -webkit-tap-highlight-color: var(--black);
+  transition: background-color 300ms;
+}
+
+[anim="ripple"] {
+  //  Customize effect by defining the following
+  //  variables on the parent element
+  //  --ripple-background: var(--white);
+  //  --ripple-opacity: 0.3;
+  //  --ripple-duration: 600ms;
+  //  --ripple-easing: linear;
+
+  position: relative;
+  overflow: hidden;
+
+  &:before {
+    content: "";
+    position: absolute;
+    display: block;
+    background: var(--ripple-background, white);
+    border-radius: 50%;
+    pointer-events: none;
+
+    //  position and size
+    top: calc(var(--y) * 1px);
+    left: calc(var(--x) * 1px);
+    width: calc(var(--d) * 1px);
+    height: calc(var(--d) * 1px);
+
+    //  animated properties
+    opacity: calc(var(--o, 1) * var(--ripple-opacity, 0.3));
+    transition: calc(var(--t, 0) * var(--ripple-duration, 600ms)) var(--ripple-easing, linear);
+    transform: translate(-50%, -50%) scale(var(--s, 1));
+    transform-origin: center;
+  }
+}
+
+.hidden {
+  display: none !important;
+}
+
+.cd-tgsticker svg {
+  opacity: 1;
+}
+
+.submit_loading span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &::after {
+    content: "";
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    position: absolute;
+    right: 16px;
+    border-bottom-color: var(--white);
+    border-right-color: var(--white);
+    border-top-color: var(--white);
+    animation: spin 1s ease-in-out infinite;
+  }
+}

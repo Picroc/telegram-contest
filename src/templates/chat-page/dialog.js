@@ -6,24 +6,24 @@ const saved = `<svg fill="#fff" xmlns="http://www.w3.org/2000/svg">
 `;
 
 export default ({
-    avatar = 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
-    unreadCount,
-    title,
-    isOnline,
-    text,
-    time,
-    savedMessages,
-    pinned
+	avatar = 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
+	unreadCount,
+	title,
+	isOnline,
+	text,
+	time,
+	savedMessages,
+	pinned,
 }) => {
-    const icon = savedMessages ? saved : `<img src="${avatar}" alt="avatar" class="dialog__avatar">`;
+	const icon = savedMessages ? saved : `<img src="${avatar}" alt="avatar" class="dialog__avatar">`;
 
-    return (`
+	return `
         <div class="dialog" name="${title}" anim="ripple">
             <div class="${clsx(
-        "dialog__avatar-wrapper",
-        cc("dialog__avatar_online", isOnline),
-        cc("dialog__saved", savedMessages)
-    )}">
+		'dialog__avatar-wrapper',
+		cc('dialog__avatar_online', isOnline),
+		cc('dialog__saved', savedMessages)
+	)}">
                 ${icon}
             </div>
             <div class="dialog__name">${savedMessages ? 'Saved Messages' : title}</div>
@@ -31,5 +31,5 @@ export default ({
             <div class="dialog__time">${time}</div>
             ${unreadCount > 0 ? `<div class="dialog__unread-count">${unreadCount}</div>` : ''}
         </div>
-    `);
-}
+    `;
+};

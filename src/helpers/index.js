@@ -1,9 +1,11 @@
-export const cc = (cls, condition) => ({ class: cls, condition });
+export const cc = (cls, condition = true) => ({ class: cls, condition });
+export const tc = (cls1, cls2, conditional) => cc(conditional ? cls1 : cls2);
 
 export const clsx = (...clss) =>
 	clss
+		.filter(Boolean)
 		.map(item => {
-			if (typeof item == 'object') {
+			if (typeof item === 'object') {
 				return item.condition ? item.class : '';
 			}
 
@@ -19,11 +21,41 @@ export const subscribe = element => {
 };
 
 export const htmlToElement = html => {
-	var template = document.createElement('template');
+	const template = document.createElement('template');
 	html = html.trim(); // Never return a text node of whitespace as the result
 	template.innerHTML = html;
 	return template.content.firstChild;
 };
+
+export const setInnerHTML = function (selector) {
+	return value => {
+		this.querySelector(selector).innerHTML = value;
+	};
+};
+
+const toggle = cls => force => elem => {
+	elem.classList.toggle(cls, force);
+};
+
+const toggleHide = toggle('hide');
+const toggleActive = force => elem => {
+	if (force) {
+		elem.setAttribute('active', 'true');
+	} else {
+		elem.removeAttribute('active');
+	}
+};
+
+export const hide = toggleHide(true);
+export const show = toggleHide(false);
+export const setAttribute = function (selector) {
+	return attribute => value => {
+		this.querySelector(selector).setAttribute(attribute, value);
+	};
+};
+
+export const setActive = toggleActive(true);
+export const setNotActive = toggleActive(false);
 
 export const startLoading = elem => {
 	elem.innerHTML = '';

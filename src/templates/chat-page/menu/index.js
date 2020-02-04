@@ -3,6 +3,7 @@ import template from './menu.html';
 import { subscribe, createInput, createDiv } from '../../../helpers';
 import img from './search.js';
 import settings from './settings/index';
+import { telegramApi } from '../../../App';
 
 export default (elem, type, callback) => {
 	const nav = document.createElement('nav');
@@ -11,8 +12,8 @@ export default (elem, type, callback) => {
 	nav.appendChild(search(type, callback));
 	elem.appendChild(nav);
 	const menu = document.querySelector('.menu-list');
-	subscribe('#menu__checkbox')('click', () => menu.classList.toggle('menu-list_hidden'));
-	subscribe('.menu-list__settings')('click', () => settings(elem, { name: 'Doge Dogeson', phone: '88005553535' }));
+	// subscribe('#menu__checkbox')('click', () => menu.classList.toggle('menu-list_hidden'));
+	// subscribe('.menu-list__settings')('click', () => settings(elem, { name: 'Doge Dogeson', phone: '88005553535' }));
 };
 
 export const onType = event => {
@@ -34,7 +35,6 @@ export const onType = event => {
 };
 
 let currentSeacrhTimeout;
-const tApi = window.telegramApi;
 
 const onTypeContacts = (value, searchCallback = () => {}) => {
 	if (value.length == 0) {
@@ -47,7 +47,7 @@ const onTypeContacts = (value, searchCallback = () => {}) => {
 	}
 
 	currentSeacrhTimeout = setTimeout(() => {
-		tApi.searchPeers(value, 20).then(res => {
+		telegramApi.searchPeers(value, 20).then(res => {
 			console.log(res);
 			searchCallback(res);
 		});
