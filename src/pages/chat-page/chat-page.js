@@ -1,6 +1,8 @@
 import { router, telegramApi } from '../../App';
 import { setDialogs, appendDialogs, getDialogs } from '../../store/store';
 import template from './chat-page.html';
+import { stopLoading } from '../../helpers/index';
+import './chat-page.scss';
 export default class ChatPage extends HTMLElement {
 	constructor() {
 		super();
@@ -20,6 +22,9 @@ export default class ChatPage extends HTMLElement {
 		let first = true;
 		const load = data => {
 			if (first) {
+				const left = document.getElementById('left');
+				stopLoading(left);
+				left.innerHTML = `<my-menu></my-menu><user-dialogs></user-dialogs>`;
 				setDialogs(data);
 				first = false;
 			} else {
