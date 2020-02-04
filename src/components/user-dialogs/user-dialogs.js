@@ -34,6 +34,7 @@ export default class UserDialogs extends HTMLElement {
 		chatMain(right, peer).then(() => {
 			stopLoading(right);
 			const topBar = document.createElement('top-bar');
+			topBar.setAttribute('user_id', id);
 			right.prepend(topBar);
 		});
 	};
