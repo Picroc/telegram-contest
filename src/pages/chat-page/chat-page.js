@@ -19,8 +19,9 @@ export default class ChatPage extends HTMLElement {
 
 	loadData = async () => {
 		let first = true;
-		const load = ({ dialog_items: data }) => {
+		const load = ({ dialog_items: data, archived_items }) => {
 			console.log('dialogs', data);
+			console.log('archivedItems', archived_items);
 			if (first) {
 				const left = document.getElementById('left');
 				stopLoading(left);
