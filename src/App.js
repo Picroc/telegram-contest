@@ -1,7 +1,7 @@
 import './assets/fonts.css';
 import './assets/globals.scss';
 import './assets/popup.scss';
-import { setUser } from './store/store';
+import { setUser, addToUser } from './store/store';
 import Router from './components/router';
 import LoginForm from './pages/login-form/login-form';
 import LoginCode from './pages/login-code/login-code';
@@ -65,8 +65,15 @@ telegramApi
 		console.log('LOGIN ERR', err);
 	});
 
+telegramApi
+	.getUserPhoto(1)
+	.then(res => {
+		addToUser('avatar', res);
+	})
+	.catch(err => console.log('err', err));
+
 const changeState = transform => {
-	return function (...args) {
+	return function(...args) {
 		const [oldState, newState] = [state, transform(...args)];
 
 		state = {

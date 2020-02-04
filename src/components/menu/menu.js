@@ -1,7 +1,6 @@
 import './menu.scss';
 import template from './menu.html';
-import { subscribe, createInput, createDiv } from '../../helpers';
-import { getUser } from '../../store/store';
+import { subscribe } from '../../helpers';
 
 export const onType = event => {
 	const userDialogs = document.getElementById('user-dialogs');
@@ -66,13 +65,17 @@ export default class Menu extends HTMLElement {
 	render() {
 		this.innerHTML = template;
 		const menuList = this.querySelector('.menu-list');
-		const settings = document.querySelector('my-settings');
 		const menuClick = e => {
 			menuList.classList.toggle('menu-list_hidden');
-			console.log('getUser()', getUser());
 		};
 		const settingsClick = e => {
-			settings.classList.toggle('sidebar_hidden');
+			const left = document.querySelector('#left');
+			let settings = document.querySelector('#settings');
+			if (!settings) {
+				settings = document.createElement('my-settings');
+				left.appendChild(settings);
+			}
+			setTimeout(() => settings.classList.toggle('sidebar_hidden'), 0);
 		};
 		subscribe('.menu__checkbox')('click', menuClick);
 		subscribe('.menu-list__settings')('click', settingsClick);

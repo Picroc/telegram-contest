@@ -40,6 +40,11 @@ export const getUser = () => {
 	return window.store.user;
 };
 
+export const addToUser = (propName, value) => {
+	window.store.user = { ...window.store.user, [propName]: value };
+	document.dispatchEvent(updateStoreEvent(SET_USER));
+};
+
 export const UPDATE_DIALOG = `UPDATE_DIALOG`;
 export const updateDialog = dialog => {
 	const { id } = dialog;

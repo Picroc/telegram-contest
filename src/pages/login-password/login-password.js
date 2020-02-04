@@ -35,6 +35,12 @@ export default class LoginPassword extends HTMLElement {
 					console.log('HERE WE GO', user);
 					setUser(user);
 				});
+				telegramApi
+					.getUserPhoto(1)
+					.then(res => {
+						addToUser('avatar', res);
+					})
+					.catch(err => console.log('err', err));
 				router('chat-page');
 			})
 			.catch(err => {

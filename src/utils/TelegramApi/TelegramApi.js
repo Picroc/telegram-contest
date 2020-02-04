@@ -59,7 +59,7 @@ export default class TelegramApi {
 			},
 			mode: {
 				test: false,
-				debug: true,
+				debug: false,
 			},
 		});
 	}
