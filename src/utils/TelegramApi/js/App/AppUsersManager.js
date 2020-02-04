@@ -5,6 +5,7 @@ import { safeReplaceObject, tsNow } from '../lib/utils';
 
 export default class AppUsersManagerModule {
 	users = {};
+	fullUsers = {};
 	userAccess = {};
 	myID;
 	serverTimeOffset = 0;
@@ -67,6 +68,46 @@ export default class AppUsersManagerModule {
 		}
 	};
 
+	saveFullUser = (user, noReplace) => {
+		const { user: apiUser } = user;
+		if (
+			!isObject(user) ||
+			(noReplace && isObject(this.fullUsers[apiUser.id]) && this.fullUsers[apiUser.id].first_name)
+		) {
+			return;
+		}
+
+		const userID = apiUser.id;
+
+		apiUser.num = (Math.abs(userID) % 8) + 1;
+
+		if (apiUser.pFlags === undefined) {
+			apiUser.pFlags = {};
+		}
+
+		if (apiUser.status) {
+			if (apiUser.status.expires) {
+				apiUser.status.expires -= this.serverTimeOffset;
+			}
+			if (apiUser.status.was_online) {
+				apiUser.status.was_online -= this.serverTimeOffset;
+			}
+		}
+		if (apiUser.pFlags.bot) {
+			apiUser.sortStatus = -1;
+		} else {
+			apiUser.sortStatus = this.getUserStatusForSort(apiUser.status);
+		}
+
+		let result = this.fullUsers[userID];
+
+		if (result === undefined) {
+			result = this.fullUsers[userID] = user;
+		} else {
+			safeReplaceObject(result, user);
+		}
+	};
+
 	getUserStatusForSort = status => {
 		if (status) {
 			const expires = status.expires || status.was_online;
@@ -92,6 +133,13 @@ export default class AppUsersManagerModule {
 			return id;
 		}
 		return this.users[id] || { id: id, deleted: true, num: 1, access_hash: this.userAccess[id] };
+	};
+
+	getFullUser = id => {
+		if (isObject(id)) {
+			return id;
+		}
+		return this.fullUsers[id] || { id: id, deleted: true, num: 1, access_hash: this.userAccess[id] };
 	};
 
 	getSelf = () => {

@@ -59,7 +59,7 @@ export default class TelegramApi {
 			},
 			mode: {
 				test: false,
-				debug: false,
+				debug: true,
 			},
 		});
 	}
@@ -240,46 +240,30 @@ export default class TelegramApi {
 			}
 		});
 
-	getUserPhoto = (type, size) => {
-		return this.getUserInfo().then(user => {
-			if (!user.photo) {
+	getFullUserInfo = () =>
+		this.MtpApiManager.getUserID().then(id => {
+			const user = this.AppUsersManager.getFullUser(id);
+
+			if (user.user && (!user.user.id || !user.user.deleted)) {
+				return user;
+			} else {
+				return this.MtpApiManager.invokeApi('users.getFullUser', {
+					id: { _: 'inputUserSelf' },
+				}).then(userInfoFull => {
+					this.AppUsersManager.saveFullUser(userInfoFull);
+					return this.AppUsersManager.getFullUser(id);
+				});
+			}
+		});
+
+	getUserPhoto = size => {
+		return this.getFullUserInfo().then(user => {
+			console.log('USER', user);
+			if (!user.profile_photo) {
 				return null;
 			}
 
-			const photo = size === 'small' ? user.photo.photo_small : user.photo.photo_big;
-			const location = {
-				_: 'inputFileLocation',
-				local_id: photo.local_id,
-				secret: photo.secret,
-				volume_id: photo.volume_id,
-			};
-			const params = {
-				dcID: this.options.dcID,
-				fileDownload: true,
-				singleInRequest: window.safari !== undefined,
-				createNetworker: true,
-			};
-
-			return this.MtpApiManager.invokeApi(
-				'upload.getFile',
-				{
-					location: location,
-					offset: 0,
-					limit: 524288,
-				},
-				params
-			).then(result => {
-				switch (type) {
-					case 'byteArray':
-						return result.bytes;
-					case 'base64':
-						return 'data:image/jpeg;base64,' + btoa(String.fromCharCode.apply(null, result.bytes));
-					case 'blob':
-						return new Blob([result.bytes], { type: 'image/jpeg' });
-					default:
-						return result.bytes;
-				}
-			});
+			return this.getPhotoFile(user.profile_photo, size);
 		});
 	};
 
@@ -904,21 +888,20 @@ export default class TelegramApi {
 		});
 	};
 
-	getPhotoFile = async location => {
+	getPhotoFile = async (photo, size) => {
+		const { id, access_hash, file_reference } = photo;
+		const photo_size =
+			size >= photo.sizes.length ? photo.sizes[photo.sizes.length - 1].type : photo.sizes[size].type;
+
 		return await this.invokeApi(
 			'upload.getFile',
 			{
 				location: {
-					_: 'inputFileLocation',
-					// dc_id: 2,
-					// local_id: 100767,
-					// secret: "6658604105320603709",
-					// volume_id: "257713757",
-					dc_id: location.dc_id,
-					local_id: location.local_id,
-					secret: location.secret,
-					volume_id: location.volume_id,
-					file_reference: location.file_reference,
+					_: 'inputPhotoFileLocation',
+					id,
+					access_hash,
+					thumb_size: photo_size,
+					file_reference,
 				},
 				offset: 0,
 				limit: 1048576,
