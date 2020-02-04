@@ -2,11 +2,17 @@ import { getDialogs, SET_DIALOGS, APPEND_DIALOGS } from '../../store/store';
 import { htmlToElement, startLoading, stopLoading } from '../../helpers/index';
 import chatMain from '../../templates/chat-page/chat-main/index';
 import './user-dialogs.scss';
+import { telegramApi } from '../../App';
 export default class UserDialogs extends HTMLElement {
 	render() {
 		this.id = 'user-dialogs';
 		this.addEventListener(SET_DIALOGS, this.setListener, { capture: true });
 		this.addEventListener(APPEND_DIALOGS, this.updateListener, { capture: true });
+
+		telegramApi.subscribeToUpdates('dialogs', data => {
+			const { from_peer, to_peer, message, date } = data;
+			console.log('data', data);
+		});
 	}
 
 	renderDialog = dialog => {

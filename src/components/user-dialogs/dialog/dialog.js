@@ -20,11 +20,6 @@ export default class Dialog extends HTMLElement {
 			dialog.savedMessages = true;
 		}
 
-		telegramApi.subscribeToUpdates('dialogs', data => {
-			const { from_peer, to_peer, message, date } = data;
-			console.log('data', data);
-		});
-
 		this.dialog = dialog;
 		this.innerHTML = template(dialog);
 		// this.addEventListener(UPDATE_DIALOG, this.updateDialogListener);
