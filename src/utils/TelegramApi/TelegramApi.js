@@ -646,7 +646,7 @@ export default class TelegramApi {
 
 			return {
 				result: dialogsResult,
-				offset: min(dates),
+				offset: Math.max(...dates),
 			};
 		});
 	};
@@ -788,7 +788,8 @@ export default class TelegramApi {
 	getDialogsParsed = async limit => {
 		const last = this.last || 0;
 		const { result, offset } = await this.getDialogs(last, limit);
-		this.last = offset;
+		console.log('result', result);
+		this.last = offset - 100;
 		const { chats, dialogs, messages, users } = result;
 
 		const dialog_items = [];

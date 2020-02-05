@@ -33,7 +33,7 @@ export default class ChatPage extends HTMLElement {
 			window.updateRipple();
 		};
 
-		await telegramApi.getDialogsParsed(5).then(load);
-		await telegramApi.getDialogsParsed(30).then(load);
+		await telegramApi.getDialogsParsed(15).then(load);
+		await telegramApi.getDialogsParsed(100).then(load);
 	};
 }

@@ -20,6 +20,9 @@ export default class UserDialogs extends HTMLElement {
 
 	renderDialog = dialog => {
 		const { id, pinned } = dialog;
+		if (document.getElementById(`dialog_${id}`)) {
+			return;
+		}
 		if (this.prevRendered && this.prevRendered.pinned && !pinned) {
 			const delim = htmlToElement(`<div class='divider'></div>`);
 			this.appendChild(delim);
