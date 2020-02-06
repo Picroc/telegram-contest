@@ -10,7 +10,6 @@ export default class Archives extends HTMLElement {
 		this.className = 'sidebar sidebar_left archives sidebar_hidden';
 		this.userDialogs = this.querySelector('user-dialogs');
 		this.userDialogs.id = 'archivesUserDialogs';
-		console.log('user-dialogs', this.userDialogs);
 		this.addEventListener(SET_ARCHIVES, this.setListener, { capture: true });
 		this.addEventListener(APPEND_ARCHIVES, this.updateListener, { capture: true });
 		this.backButton = this.querySelector('.archives__back');
