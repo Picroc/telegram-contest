@@ -1,26 +1,26 @@
 import './dialog.scss';
 import template from './dialog.html.js';
-import { mapId, getDialogs, UPDATE_DIALOG_PHOTO, updateDialogPhoto, getUser } from '../../../store/store';
+import { mapId, getArchives, UPDATE_DIALOG_PHOTO, updateDialogPhoto, getUser } from '../../../store/store';
 import ChatMain from '../../../templates/chat-page/chat-main/index';
 import { telegramApi } from '../../../App';
 
 export default class Dialog extends HTMLElement {
 	render() {
 		const id = this.getAttribute('id').replace('dialog_', '');
-		const dialogs = getDialogs();
-		const dialog = dialogs[mapId(id)];
+		const archives = getArchives();
+		const dialog = archives[mapId(id)];
 		if (dialog.photo instanceof Promise) {
 			dialog.photo.then(photo => {
 				updateDialogPhoto(id, photo);
 			});
 		}
 
-		const { id: userId } = getUser();
-		if (id == userId) {
-			dialog.savedMessages = true;
-		}
+		// const { id: userId } = getUser();
+		// if (id == userId) {
+		// 	dialog.savedMessages = true;
+		// }
 
-		telegramApi.subscribeToUpdates('dialogs', data => {
+		telegramApi.subscribeToUpdates('archives', data => {
 			const { from_peer, to_peer, message, date } = data;
 			console.log('data', data);
 		});
@@ -40,7 +40,7 @@ export default class Dialog extends HTMLElement {
 		const { id } = event.detail;
 		const elem = this.querySelector('.dialog__avatar-wrapper img');
 		if (elem) {
-			elem.src = getDialogs()[mapId(id)].photo;
+			elem.src = getArchives()[mapId(id)].photo;
 		}
 	};
 

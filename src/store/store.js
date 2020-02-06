@@ -31,21 +31,21 @@ export const appendDialogs = dialogs => {
 	document.getElementById('user-dialogs').dispatchEvent(updateStoreEvent(APPEND_DIALOGS, { length }));
 };
 
-export const SET_ARCHIEVES = 'SET_ARCHIEVES';
+export const SET_ARCHIVES = 'SET_ARCHIVES';
 export const setArchives = archives => {
 	window.store.mapId = {};
 	window.store.archives = archives.map(mapAndIdx);
 
-	document.getElementById('user-archives').dispatchEvent(updateStoreEvent(SET_ARCHIEVES));
+	document.getElementById('archives').dispatchEvent(updateStoreEvent(SET_ARCHIVES));
 };
 
-export const APPEND_ARCHIEVES = 'APPEND_ARCHIEVES';
-export const appendArchieves = archieves => {
-	const { length } = window.store.archieves;
-	archieves = archieves.map(mapAndIdx);
-	window.store.archieves = [...window.store.archieves, ...archieves];
-	window.store.archieves = window.store.archieves.map(mapAndIdx);
-	document.getElementById('user-archieves').dispatchEvent(updateStoreEvent(APPEND_ARCHIEVES, { length }));
+export const APPEND_ARCHIVES = 'APPEND_ARCHIVES';
+export const appendArchives = archives => {
+	const { length } = window.store.archives;
+	archives = archives.map(mapAndIdx);
+	window.store.archives = [...window.store.archives, ...archives];
+	window.store.archives = window.store.archives.map(mapAndIdx);
+	document.getElementById('archives').dispatchEvent(updateStoreEvent(APPEND_ARCHIVES, { length }));
 };
 
 export const SET_USER = 'SET_USER';
@@ -82,5 +82,6 @@ export const updateDialogPhoto = (id, photo) => {
 };
 
 export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);
+export const getArchives = (offset = 0) => window.store.archives.slice(offset);
 
 export const mapId = id => window.store.mapId[id];
