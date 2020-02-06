@@ -58,21 +58,21 @@ $status-size: 15px;
 }
 
 .sending {
-  background: url("./sending.svg") no-repeat;
+  background: url("sending.svg") no-repeat;
   background-size: $status-size $status-size;
 }
 
 .sending-error {
-  background: url("./sending-error.svg") no-repeat;
+  background: url("sending-error.svg") no-repeat;
   background-size: $status-size $status-size;
 }
 
 .check-sent {
-  background: url("./check-sent.svg") no-repeat;
+  background: url("check-sent.svg") no-repeat;
   background-size: $status-size $status-size;
 }
 
 .check-read {
-  background: url("./check-read.svg") no-repeat;
+  background: url("check-read.svg") no-repeat;
   background-size: $status-size $status-size;
 }

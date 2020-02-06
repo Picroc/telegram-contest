@@ -3,9 +3,9 @@ import template from './chat-page.html';
 import dialog from './dialog';
 import menu from './menu';
 import { subscribe, htmlToElement, startLoading, stopLoading } from '../../helpers/index';
-import ChatMain from './chat-main';
+import ChatMain from '../../pages/chat-main';
 import { updateSearchResults } from './contacts-menu';
-import topBar from '../chat-page/chat-main/top-bar';
+import topBar from '../../pages/chat-main/top-bar';
 import { telegramApi } from '../../App';
 
 let prevId;
