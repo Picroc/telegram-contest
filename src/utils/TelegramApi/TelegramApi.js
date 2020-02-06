@@ -18,12 +18,16 @@ import AppUpdatesManagerModule from './js/App/AppUpdatesManager';
 export default class TelegramApi {
 	options = { dcID: 2, createNetworker: true };
 
-	MtpApiManager = new MtpApiManagerModule();
-	AppPeersManager = new AppPeersManagerModule();
-	MtpApiFileManager = new MtpApiFileManagerModule();
-	AppUsersManager = new AppUsersManagerModule();
-	AppProfileManager = new AppProfileManagerModule();
+	user = {};
+
 	AppChatsManager = new AppsChatsManagerModule();
+	AppUsersManager = new AppUsersManagerModule();
+
+	AppPeersManager = new AppPeersManagerModule();
+	AppProfileManager = new AppProfileManagerModule();
+
+	MtpApiManager = new MtpApiManagerModule();
+	MtpApiFileManager = new MtpApiFileManagerModule();
 	MtpPasswordManager = new MtpPasswordManagerModule();
 	FileSaver = new FileSaverModule();
 	MtpNetworkerFactory = MtpNetworkerFactoryModule();
@@ -65,6 +69,37 @@ export default class TelegramApi {
 				debug: false,
 			},
 		});
+
+		this.getUserInfo()
+			.then(meUser => {
+				if (meUser.id) {
+					this.user = meUser;
+				}
+			})
+			.catch(err => {
+				if (Config.Modes.debug) {
+					console.log('User not found', err);
+				}
+			});
+
+		// To be removed
+		const updateTestHandler = payload => {
+			console.log(payload);
+
+			if (this.user.id === payload.from_id || payload.message_info.out) {
+				console.log('Got peer', this.user);
+			} else {
+				this.getPeerByID(payload.from_id)
+					.then(peer => {
+						console.log('Got peer', peer);
+					})
+					.catch(err => {
+						console.log('Peer not found', err);
+					});
+			}
+		};
+
+		// this.subscribeToUpdates('dialogs', updateTestHandler);
 	}
 
 	invokeApi = (method, params) => this.MtpApiManager.invokeApi(method, params);
@@ -98,6 +133,7 @@ export default class TelegramApi {
 			this.MtpApiManager.setUserAuth(this.options.dcID, {
 				id: result.user.id,
 			});
+			this.user = result.user;
 			return result;
 		});
 
@@ -107,6 +143,7 @@ export default class TelegramApi {
 				this.MtpApiManager.setUserAuth(this.options.dcID, {
 					id: result.user.id,
 				});
+				this.user = result.user;
 				return result;
 			});
 		});
@@ -136,6 +173,7 @@ export default class TelegramApi {
 			this.MtpApiManager.setUserAuth(this.options.dcID, {
 				id: result.user.id,
 			});
+			this.user = result.user;
 		});
 
 	sendMessage = (id, message) =>
@@ -539,6 +577,7 @@ export default class TelegramApi {
 			let offsetDate = 0;
 			let dialogsLoaded = 0;
 			let totalCount = 0;
+			let load;
 
 			(load = () => {
 				this.MtpApiManager.invokeApi('messages.getDialogs', {
@@ -637,6 +676,7 @@ export default class TelegramApi {
 			offset_date: offset,
 			limit: limit,
 		}).then(dialogsResult => {
+			// console.log('Saving users', dialogsResult);
 			this.AppUsersManager.saveApiUsers(dialogsResult.users);
 			this.AppChatsManager.saveApiChats(dialogsResult.chats);
 
@@ -755,9 +795,9 @@ export default class TelegramApi {
 			}
 			peer = user.access_hash
 				? {
-					...peer,
-					access_hash: user.access_hash,
-				}
+						...peer,
+						access_hash: user.access_hash,
+				  }
 				: peer;
 		}
 		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
@@ -884,9 +924,9 @@ export default class TelegramApi {
 				photo = user.photo && user.photo._ !== 'userPhotoEmpty' && user.photo;
 				peer = user.access_hash
 					? {
-						...result,
-						access_hash: user.access_hash,
-					}
+							...result,
+							access_hash: user.access_hash,
+					  }
 					: result;
 			}
 

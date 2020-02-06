@@ -23,16 +23,21 @@ export default class AppUsersManagerModule {
 		this.MtpApiManager.getUserID().then(id => {
 			this.myID = id;
 		});
+
+		window.usersManagerStore = window.usersManagerStore || {};
+		window.fullUsers = window.fullUsers || {};
+		window.userAccess = window.userAccess || {};
 	}
 
 	saveApiUsers = apiUsers => {
-		forEach(apiUsers, this.saveApiUsers);
+		// console.log('Api Users', apiUsers);
+		forEach(apiUsers, this.saveApiUser);
 	};
 
 	saveApiUser = (apiUser, noReplace) => {
 		if (
 			!isObject(apiUser) ||
-			(noReplace && isObject(this.users[apiUser.id]) && this.users[apiUser.id].first_name)
+			(noReplace && isObject(usersManagerStore[apiUser.id]) && usersManagerStore[apiUser.id].first_name)
 		) {
 			return;
 		}
@@ -59,10 +64,12 @@ export default class AppUsersManagerModule {
 			apiUser.sortStatus = this.getUserStatusForSort(apiUser.status);
 		}
 
-		let result = this.users[userID];
+		let result = usersManagerStore[userID];
+
+		// console.log('Saveing user', apiUser);
 
 		if (result === undefined) {
-			result = this.users[userID] = apiUser;
+			result = usersManagerStore[userID] = apiUser;
 		} else {
 			safeReplaceObject(result, apiUser);
 		}
@@ -70,10 +77,7 @@ export default class AppUsersManagerModule {
 
 	saveFullUser = (user, noReplace) => {
 		const { user: apiUser } = user;
-		if (
-			!isObject(user) ||
-			(noReplace && isObject(this.fullUsers[apiUser.id]) && this.fullUsers[apiUser.id].first_name)
-		) {
+		if (!isObject(user) || (noReplace && isObject(fullUsers[apiUser.id]) && fullUsers[apiUser.id].first_name)) {
 			return;
 		}
 
@@ -99,10 +103,10 @@ export default class AppUsersManagerModule {
 			apiUser.sortStatus = this.getUserStatusForSort(apiUser.status);
 		}
 
-		let result = this.fullUsers[userID];
+		let result = fullUsers[userID];
 
 		if (result === undefined) {
-			result = this.fullUsers[userID] = user;
+			result = fullUsers[userID] = user;
 		} else {
 			safeReplaceObject(result, user);
 		}
@@ -132,14 +136,14 @@ export default class AppUsersManagerModule {
 		if (isObject(id)) {
 			return id;
 		}
-		return this.users[id] || { id: id, deleted: true, num: 1, access_hash: this.userAccess[id] };
+		return usersManagerStore[id] || { id: id, deleted: true, num: 1, access_hash: userAccess[id] };
 	};
 
 	getFullUser = id => {
 		if (isObject(id)) {
 			return id;
 		}
-		return this.fullUsers[id] || { id: id, deleted: true, num: 1, access_hash: this.userAccess[id] };
+		return fullUsers[id] || { id: id, deleted: true, num: 1, access_hash: userAccess[id] };
 	};
 
 	getSelf = () => {
