@@ -1,8 +1,9 @@
-import { getDialogs, SET_DIALOGS, APPEND_DIALOGS, updateDialog, getUser } from '../../store/store';
+import { getDialogs, SET_DIALOGS, APPEND_DIALOGS, updateDialog, getUser, getDialog } from '../../store/store';
 import { htmlToElement, startLoading, stopLoading, createDiv } from '../../helpers/index';
 import chatMain from '../../templates/chat-page/chat-main/index';
 import './user-dialogs.scss';
 import { telegramApi } from '../../App';
+import { outSvg } from './dialog/dialog.html';
 export default class UserDialogs extends HTMLElement {
 	render() {
 		this.id = 'user-dialogs';
@@ -19,13 +20,24 @@ export default class UserDialogs extends HTMLElement {
 			const { to_peer, from_peer, message, date } = data;
 			const time = telegramApi._convertDate(date);
 			let { id } = to_peer;
+			const dialog = document.getElementById(`dialog_${id}`);
 			if (to_peer._ === 'user' && from_peer._ === 'user' && !from_peer.pFlags.self) {
 				id = from_peer.id;
 			}
-			const dialog = document.getElementById(`dialog_${id}`);
+			if (from_peer.id === getUser().id && from_peer.id !== to_peer.id) {
+				const info = dialog.querySelector('.dialog__info');
+				if (!info.querySelector('.dialog__out')) {
+					if (!this.out) {
+						this.out = htmlToElement(`<div class="dialog__out">${outSvg}</div>`);
+					}
+					info.querySelector('.dialog__time').classList.remove('full', true);
+					info.prepend(this.out);
+				}
+			}
+
 			dialog.querySelector('.dialog__short-msg').innerHTML = message;
 			dialog.querySelector('.dialog__time').innerHTML = time;
-			if (!dialog.pinned) {
+			if (!getDialog(id).pinned) {
 				this.normal.prepend(dialog);
 			}
 		});
