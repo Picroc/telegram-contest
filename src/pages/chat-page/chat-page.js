@@ -1,5 +1,5 @@
 import { router, telegramApi } from '../../App';
-import { setDialogs, appendDialogs } from '../../store/store';
+import { setDialogs, appendDialogs, setArchives, appendArchives } from '../../store/store';
 import template from './chat-page.html';
 import { stopLoading } from '../../helpers/index';
 import './chat-page.scss';
@@ -25,11 +25,13 @@ export default class ChatPage extends HTMLElement {
 			if (first) {
 				const left = document.getElementById('left');
 				stopLoading(left);
-				left.innerHTML = `<my-menu></my-menu><user-dialogs></user-dialogs>`;
+				left.innerHTML = `<my-archives></my-archives><my-menu></my-menu><user-dialogs></user-dialogs>`;
 				setDialogs(data);
+				setArchives(archived_items);
 				first = false;
 			} else {
 				appendDialogs(data);
+				appendArchives(archived_items);
 			}
 			window.updateRipple();
 		};

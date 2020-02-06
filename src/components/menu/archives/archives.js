@@ -1,24 +1,31 @@
-//TODO: сделать
-import { getArchieves, SET_ARCHIEVES, APPEND_ARCHIEVES } from '../../store/store';
-import { htmlToElement, startLoading, stopLoading } from '../../helpers/index';
-import chatMain from '../../templates/chat-page/chat-main/index';
-import './user-dialogs.scss';
-export default class Archieves extends HTMLElement {
+import './archives.scss';
+import chatMain from '../../../templates/chat-page/chat-main/index';
+import { htmlToElement, startLoading, stopLoading } from '../../../helpers/index';
+import { getArchives, SET_ARCHIVES, APPEND_ARCHIVES } from '../../../store/store';
+import template from './archives.html';
+export default class Archives extends HTMLElement {
 	render() {
-		this.id = 'archieves';
-		this.addEventListener(SET_ARCHIEVES, this.setListener, { capture: true });
-		this.addEventListener(APPEND_ARCHIEVES, this.updateListener, { capture: true });
+		this.innerHTML = template;
+		this.id = 'archives';
+		this.className = 'sidebar sidebar_left archives sidebar_hidden';
+		this.userDialogs = this.querySelector('user-dialogs');
+		this.userDialogs.id = 'archievesUserDialogs';
+		console.log('user-dialogs', this.userDialogs);
+		this.addEventListener(SET_ARCHIVES, this.setListener, { capture: true });
+		this.addEventListener(APPEND_ARCHIVES, this.updateListener, { capture: true });
+		this.backButton = this.querySelector('.archives__back');
+		this.backButton.addEventListener('click', this.backButtonListener);
 	}
 
 	renderDialog = dialog => {
 		const { id, pinned } = dialog;
 		if (this.prevRendered && this.prevRendered.pinned && !pinned) {
 			const delim = htmlToElement(`<div class='divider'></div>`);
-			this.appendChild(delim);
+			this.userDialogs.appendChild(delim);
 		}
 		const elem = htmlToElement(`<my-dialog anim="ripple" class="dialog" id="dialog_${id}"></my-dialog>`);
 		elem.addEventListener('click', () => this.loadDialog(elem, dialog));
-		this.appendChild(elem);
+		this.userDialogs.appendChild(elem);
 		this.prevRendered = dialog;
 	};
 
@@ -46,13 +53,17 @@ export default class Archieves extends HTMLElement {
 	};
 
 	setListener = event => {
-		this.innerHTML = '';
-		getArchieves().forEach(this.renderDialog);
+		// this.innerHTML = '';
+		getArchives().forEach(this.renderDialog);
 	};
 
 	updateListener = event => {
-		const archieves = getArchieves(event.detail.length);
-		archieves.forEach(this.renderDialog);
+		const archives = getArchives(event.detail.length);
+		archives.forEach(this.renderDialog);
+	};
+
+	backButtonListener = e => {
+		this.classList.toggle('sidebar_hidden');
 	};
 
 	connectedCallback() {
