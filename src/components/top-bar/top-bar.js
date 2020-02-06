@@ -1,18 +1,21 @@
 import template from './top-bar.html.js';
 import './top-bar.scss';
 import { getDialogs, mapId, UPDATE_DIALOG_PHOTO } from '../../store/store.js';
+import { telegramApi } from '../../App.js';
 
 export default class TopBar extends HTMLElement {
 	render() {
 		this.className = 'top-bar';
 		const id = this.getAttribute('user_id');
-		const dialog = getDialogs()[mapId(id)];
+		const dialog = this.getInfo(id);
 		this.innerHTML = template(dialog);
 		this.searchIcon = this.querySelector('.top-bar__search');
-		this.avatar = this.querySelector('.top-bar__avatar');
+		this.avatar = this.querySelector('.top-bar__avatar img');
 		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updatePhotoListener);
 		this.searchIcon.addEventListener('click', this.searchClick);
 	}
+
+	getInfo = id => getDialogs()[mapId(id)];
 
 	updatePhotoListener = event => {
 		console.log('top-bar', event);

@@ -25,7 +25,15 @@ export const setDialogs = dialogs => {
 export const APPEND_DIALOGS = 'APPEND_DIALOGS';
 export const appendDialogs = dialogs => {
 	const { length } = window.store.dialogs;
-	dialogs = dialogs.map(mapAndIdx);
+	dialogs = dialogs.filter(dialog => {
+		const {
+			dialog_peer: { user_id, channel_id, chat_id },
+			savedMessages,
+		} = dialog;
+		const id = user_id || channel_id || chat_id;
+		console.log('savedMessages', savedMessages);
+		return !(mapId(id) || document.getElementById(`dialog_${id}`));
+	});
 	window.store.dialogs = [...window.store.dialogs, ...dialogs];
 	window.store.dialogs = window.store.dialogs.map(mapAndIdx);
 	document.getElementById('user-dialogs').dispatchEvent(updateStoreEvent(APPEND_DIALOGS, { length }));
@@ -39,6 +47,10 @@ export const setUser = user => {
 
 export const getUser = () => {
 	return window.store.user;
+};
+
+export const updateMap = (id, idx) => {
+	window.store.mapId[id] = idx;
 };
 
 export const addToUser = (propName, value) => {

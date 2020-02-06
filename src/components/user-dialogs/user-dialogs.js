@@ -1,5 +1,5 @@
-import { getDialogs, SET_DIALOGS, APPEND_DIALOGS } from '../../store/store';
-import { htmlToElement, startLoading, stopLoading } from '../../helpers/index';
+import { getDialogs, SET_DIALOGS, APPEND_DIALOGS, updateDialog, getUser } from '../../store/store';
+import { htmlToElement, startLoading, stopLoading, createDiv } from '../../helpers/index';
 import chatMain from '../../templates/chat-page/chat-main/index';
 import './user-dialogs.scss';
 import { telegramApi } from '../../App';
@@ -8,29 +8,45 @@ export default class UserDialogs extends HTMLElement {
 		this.id = 'user-dialogs';
 		this.addEventListener(SET_DIALOGS, this.setListener, { capture: true });
 		this.addEventListener(APPEND_DIALOGS, this.updateListener, { capture: true });
+		this.pinned = createDiv('pinned');
+		this.pinned.id = 'pinned_dialogs';
+		this.normal = createDiv('normal');
+		this.normal.id = 'normal_dialogs';
+		this.appendChild(this.pinned);
+		this.appendChild(this.normal);
+		telegramApi.subscribeToUpdates('messages', data => console.log('data', data));
 		telegramApi.subscribeToUpdates('dialogs', data => {
-			const { from_peer, to_peer, message, date } = data;
-			console.log('data', data);
-			const { id } = to_peer;
-
+			const { to_peer, from_peer, message, date } = data;
+			const time = telegramApi._convertDate(date);
+			let { id } = to_peer;
+			if (to_peer._ === 'user' && from_peer._ === 'user' && !from_peer.pFlags.self) {
+				id = from_peer.id;
+			}
 			const dialog = document.getElementById(`dialog_${id}`);
 			dialog.querySelector('.dialog__short-msg').innerHTML = message;
+			dialog.querySelector('.dialog__time').innerHTML = time;
+			if (!dialog.pinned) {
+				this.normal.prepend(dialog);
+			}
 		});
 	}
 
 	renderDialog = dialog => {
 		const { id, pinned } = dialog;
-		if (document.getElementById(`dialog_${id}`)) {
-			return;
+		const { id: userId } = getUser();
+		if (id == userId) {
+			dialog.savedMessages = true;
+			dialog.title = 'Saved Messages';
 		}
-		if (this.prevRendered && this.prevRendered.pinned && !pinned) {
-			const delim = htmlToElement(`<div class='divider'></div>`);
-			this.appendChild(delim);
-		}
+
 		const elem = htmlToElement(`<my-dialog anim="ripple" class="dialog" id="dialog_${id}"></my-dialog>`);
 		elem.addEventListener('click', () => this.loadDialog(elem, dialog));
-		this.appendChild(elem);
-		this.prevRendered = dialog;
+
+		if (pinned) {
+			this.pinned.appendChild(elem);
+		} else {
+			this.normal.appendChild(elem);
+		}
 	};
 
 	loadDialog = (elem, dialog) => {
@@ -57,12 +73,12 @@ export default class UserDialogs extends HTMLElement {
 	};
 
 	setListener = event => {
-		this.innerHTML = '';
 		getDialogs().forEach(this.renderDialog);
 	};
 
 	updateListener = event => {
 		const dialogs = getDialogs(event.detail.length);
+		console.log('dialogs', dialogs);
 		dialogs.forEach(this.renderDialog);
 	};
 

@@ -1,5 +1,5 @@
 .dialog {
-  padding: 4px 8px;
+  padding: 8px;
   max-height: 10vh;
   min-height: 60px;
   display: grid;
@@ -7,7 +7,7 @@
   column-gap: 8px;
   grid-template-rows: 1fr 1fr;
   align-items: center;
-  margin: 8px;
+  margin: 0 8px;
   border-radius: 8px;
   user-select: none;
   --ripple-background: var(--black);
