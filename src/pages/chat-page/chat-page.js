@@ -20,8 +20,6 @@ export default class ChatPage extends HTMLElement {
 	loadData = async () => {
 		let first = true;
 		const load = ({ dialog_items: data, archived_items }) => {
-			console.log('dialogs', data);
-			console.log('archivedItems', archived_items);
 			if (first) {
 				const left = document.getElementById('left');
 				stopLoading(left);
@@ -36,7 +34,7 @@ export default class ChatPage extends HTMLElement {
 			window.updateRipple();
 		};
 
-		await telegramApi.getDialogsParsed(5).then(load);
-		await telegramApi.getDialogsParsed(30).then(load);
+		await telegramApi.getDialogsParsed(15).then(load);
+		await telegramApi.getDialogsParsed(100).then(load);
 	};
 }

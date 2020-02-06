@@ -20,6 +20,23 @@
     height: 40px;
     border-radius: 50%;
   }
+
+  &__saved {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+    background: var(--primary);
+    svg {
+      width: 24px;
+      height: 24px;
+      opacity: 1;
+    }
+  }
+
   &__title {
     align-self: flex-end;
     grid-row: 1;

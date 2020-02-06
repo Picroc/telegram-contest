@@ -10,8 +10,7 @@ export const onType = event => {
 	const string = event.target.value.toLowerCase();
 	for (const dialog of dialogs) {
 		const el = document.getElementById(`dialog_${dialog.id}`);
-		dialog.title = dialog.title.toLowerCase();
-		if (!dialog.title.includes(string)) {
+		if (!dialog.title.toLowerCase().includes(string)) {
 			hide(el);
 		} else {
 			show(el);
@@ -22,7 +21,7 @@ export const onType = event => {
 let currentSeacrhTimeout;
 const tApi = window.telegramApi;
 
-const onTypeContacts = (value, searchCallback = () => {}) => {
+const onTypeContacts = (value, searchCallback = () => { }) => {
 	if (value.length == 0) {
 		clearTimeout(currentSeacrhTimeout);
 		return;

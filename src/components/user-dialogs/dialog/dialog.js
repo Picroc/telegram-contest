@@ -15,14 +15,8 @@ export default class Dialog extends HTMLElement {
 			});
 		}
 
-		const { id: userId } = getUser();
-		if (id == userId) {
-			dialog.savedMessages = true;
-		}
-
 		this.dialog = dialog;
 		this.innerHTML = template(dialog);
-		// this.addEventListener(UPDATE_DIALOG, this.updateDialogListener);
 		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updateDialogPhotoListener);
 	}
 
