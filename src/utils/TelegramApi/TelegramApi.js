@@ -66,7 +66,7 @@ export default class TelegramApi {
 			},
 			mode: {
 				test: false,
-				debug: false,
+				debug: true,
 			},
 		});
 
@@ -485,7 +485,7 @@ export default class TelegramApi {
 			role: { _: 'channelRoleEditor' },
 		});
 
-	getFullChat = chat_id => this.MtpApiManager.invokeApi('messages.getFullChat', { chat_id: chat_id });
+	getFullChat = chat_id => this.MtpApiManager.invokeApi('messages.getFullChat', { chat_id });
 
 	downloadPhoto = (photo, progress, autosave) => {
 		const photoSize = photo.sizes[photo.sizes.length - 1];

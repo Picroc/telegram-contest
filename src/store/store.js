@@ -77,4 +77,6 @@ export const updateDialogPhoto = (id, photo) => {
 
 export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);
 
+export const getMessages = peer => messageId => window.store.messages[peer][messageId];
+
 export const mapId = id => window.store.mapId[id];
