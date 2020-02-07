@@ -1,6 +1,6 @@
 import { getDialogs, SET_DIALOGS, APPEND_DIALOGS, updateDialog, getUser, getDialog } from '../../store/store';
 import { htmlToElement, startLoading, stopLoading, createDiv } from '../../helpers/index';
-import chatMain from '../../templates/chat-page/chat-main/index';
+import chatMain from '../../pages/chat-main/index';
 import './user-dialogs.scss';
 import { telegramApi } from '../../App';
 import { outSvg } from './dialog/dialog.html';
