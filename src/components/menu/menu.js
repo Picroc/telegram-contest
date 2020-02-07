@@ -62,10 +62,21 @@ const onTypeContacts = (value, searchCallback = () => { }) => {
 export default class Menu extends HTMLElement {
 	render() {
 		this.innerHTML = template;
-		this.menuList = this.querySelector('.menu-list');
-		subscribe('.menu__checkbox')('click', this.menuClick);
-		subscribe('.menu-list__settings')('click', this.settingsClick);
-		subscribe('.menu-list__archived')('click', this.archivesClick);
+		const menuList = this.querySelector('.menu-list');
+		const menuClick = e => {
+			menuList.classList.toggle('menu-list_hidden');
+		};
+		const settingsClick = e => {
+			const left = document.querySelector('#left');
+			let settings = document.querySelector('#settings');
+			if (!settings) {
+				settings = document.createElement('my-settings');
+				left.appendChild(settings);
+			}
+			setTimeout(() => settings.classList.toggle('sidebar_hidden'), 0);
+		};
+		subscribe('.menu__checkbox')('click', menuClick);
+		subscribe('.menu-list__settings')('click', settingsClick);
 		subscribe('.menu__search')('input', event => {
 			onType(event);
 			// onTypeContacts(event.target.value, () => {});
@@ -79,25 +90,6 @@ export default class Menu extends HTMLElement {
 			this.rendered = true;
 		}
 	}
-
-	archivesClick = e => {
-		const archives = document.querySelector('#archives');
-		archives.classList.toggle('sidebar_hidden');
-	};
-
-	settingsClick = e => {
-		const left = document.querySelector('#left');
-		let settings = document.querySelector('#settings');
-		if (!settings) {
-			settings = document.createElement('my-settings');
-			left.appendChild(settings);
-		}
-		setTimeout(() => settings.classList.toggle('sidebar_hidden'), 0);
-	};
-
-	menuClick = e => {
-		this.menuList.classList.toggle('menu-list_hidden');
-	};
 
 	static get observedAttributes() {
 		// (3)

@@ -18,7 +18,6 @@ import Menu from './components/menu/menu';
 import Settings from './components/menu/settings/settings';
 import UserDialogs from './components/user-dialogs/user-dialogs';
 import Dialog from './components/user-dialogs/dialog/dialog';
-import Archives from './components/menu/archives/archives';
 import ChatMessage from "./components/chat-message/chatMessage";
 
 customElements.define('my-router', Router);
@@ -36,7 +35,6 @@ customElements.define('login-form', LoginForm);
 customElements.define('login-code', LoginCode);
 customElements.define('login-password', LoginPassword);
 customElements.define('chat-page', ChatPage);
-customElements.define('my-archives', Archives);
 customElements.define('chat-message', ChatMessage);
 
 const rt = document.getElementById('router');
