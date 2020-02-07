@@ -46,19 +46,20 @@ export default ({
 	const rightBottom =
 		unreadCount > 0
 			? `<div class="${clsx(
-				'dialog_right_bottom',
-				'dialog__unread-count',
-				muted && 'dialog_muted'
-			)}"><div class="count">${unreadCount}</div></div>`
+					'dialog_right_bottom',
+					'dialog__unread-count',
+					muted && 'dialog_muted'
+			  )}"><div class="count">${unreadCount}</div></div>`
 			: pinned
-				? `<div class="${clsx('dialog_right_bottom', 'dialog__pinned')}">${pinnedSvg}</div>`
-				: '';
+			? `<div class="${clsx('dialog_right_bottom', 'dialog__pinned')}">${pinnedSvg}</div>`
+			: '';
+
 	return `
             <div class="${clsx(
-		'dialog__avatar-wrapper',
-		isOnline && 'dialog__avatar_online',
-		savedMessages && 'dialog__saved'
-	)}">
+				'dialog__avatar-wrapper',
+				isOnline && 'dialog__avatar_online',
+				savedMessages && 'dialog__saved'
+			)}">
                 ${icon}
             </div>
             <div class="dialog__name">${title}</div>
@@ -68,6 +69,6 @@ export default ({
             	<div class="${clsx('dialog__time', !out && 'full')}">${time}</div>
 			</div>
             ${rightBottom}
-	
+
     `;
 };
