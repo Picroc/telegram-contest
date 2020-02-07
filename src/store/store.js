@@ -3,7 +3,7 @@ export const updateStoreEvent = (type, options) =>
 	new CustomEvent(type, { bubbles: false, cancelable: true, detail: options });
 
 const mapAndIdx = (dialog, idx) => {
-	//TODO: отхендлить естественное изменение порядка диалогов (сортировка по дате при новом сообщении?)
+	//TODO: отхендлить естественное изменение порядка диалогов
 	const {
 		dialog_peer: { user_id, channel_id, chat_id },
 	} = dialog;
@@ -39,23 +39,6 @@ export const appendDialogs = dialogs => {
 	document.getElementById('user-dialogs').dispatchEvent(updateStoreEvent(APPEND_DIALOGS, { length }));
 };
 
-export const SET_ARCHIVES = 'SET_ARCHIVES';
-export const setArchives = archives => {
-	window.store.mapId = {};
-	window.store.archives = archives.map(mapAndIdx);
-
-	document.getElementById('archives').dispatchEvent(updateStoreEvent(SET_ARCHIVES));
-};
-
-export const APPEND_ARCHIVES = 'APPEND_ARCHIVES';
-export const appendArchives = archives => {
-	const { length } = window.store.archives;
-	archives = archives.map(mapAndIdx);
-	window.store.archives = [...window.store.archives, ...archives];
-	window.store.archives = window.store.archives.map(mapAndIdx);
-	document.getElementById('archives').dispatchEvent(updateStoreEvent(APPEND_ARCHIVES, { length }));
-};
-
 export const SET_USER = 'SET_USER';
 export const setUser = user => {
 	window.store.user = user;
@@ -66,16 +49,13 @@ export const getUser = () => {
 	return window.store.user;
 };
 
-
-export const ADD_TO_USER = 'ADD_TO_USER';
-
 export const updateMap = (id, idx) => {
 	window.store.mapId[id] = idx;
 };
 
 export const addToUser = (propName, value) => {
 	window.store.user = { ...window.store.user, [propName]: value };
-	document.dispatchEvent(updateStoreEvent(ADD_TO_USER));
+	document.dispatchEvent(updateStoreEvent(SET_USER));
 };
 
 export const UPDATE_DIALOG = `UPDATE_DIALOG`;
@@ -96,7 +76,6 @@ export const updateDialogPhoto = (id, photo) => {
 };
 
 export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);
-export const getArchives = (offset = 0) => window.store.archives.slice(offset);
 
 export const getDialog = id => window.store.dialogs[mapId(id)];
 export const getMessages = peer => messageId => window.store.messages[peer][messageId];
