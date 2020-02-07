@@ -4,13 +4,13 @@ import checkRead from './check-read.svg';
 import checkSent from './check-sent.svg';
 import sending from './sending.svg';
 import sendingError from './sending-error.svg';
-import { clsx, tc, cc } from "../../../../helpers";
-import { telegramApi } from "../../../../App";
+import { clsx, tc, cc } from "../../helpers";
 
 export default async ({
                           id,
                           date,
                           toId,
+                          userId,
                           message,
                           out = true,
                           mentioned = false,
@@ -33,7 +33,6 @@ export default async ({
                           isChannel = false,
                           isLastFromUser = false,
                       }) => {
-    const { id: userId } = await telegramApi.getUserInfo();
     const isOutgoing = out && fromId === userId;
     const wasForward = !!forwardFrom;
     const hasReply = !!replyToMessageId;
@@ -66,6 +65,7 @@ export default async ({
 
     const formattedMessage = getFormattedMessage({ message, entities });
 
+    // TODO add handlers for reply & message
     return `
         <div class=${ chatMessageClass }>
             <div class="replay"></div>
@@ -113,6 +113,7 @@ const getPhotoTemplate = ({
     // TODO implement logic for all other sizes
 };
 
+// TODO implement formatted message
 function getFormattedMessage({ message, entities }) {
     return message;
 }
