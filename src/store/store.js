@@ -1,4 +1,5 @@
 window.store = {};
+window.store.mapId = {};
 export const updateStoreEvent = (type, options) =>
 	new CustomEvent(type, { bubbles: false, cancelable: true, detail: options });
 
@@ -14,30 +15,42 @@ const mapAndIdx = (dialog, idx) => {
 	return dialog;
 };
 
-export const SET_DIALOGS = 'SET_DIALOGS';
-export const setDialogs = dialogs => {
-	window.store.mapId = {};
-	window.store.dialogs = dialogs.map(mapAndIdx);
+const setChats = (storeString, elem, event) => chats => {
+	window.store[storeString] = chats.map(mapAndIdx);
 
-	document.getElementById('user-dialogs').dispatchEvent(updateStoreEvent(SET_DIALOGS));
+	elem.dispatchEvent(updateStoreEvent(event));
 };
 
-export const APPEND_DIALOGS = 'APPEND_DIALOGS';
-export const appendDialogs = dialogs => {
-	const { length } = window.store.dialogs;
-	dialogs = dialogs.filter(dialog => {
+export const SET_DIALOGS = 'SET_DIALOGS';
+export const setDialogs = dialogs => setChats('dialogs', document.getElementById('user-dialogs'), SET_DIALOGS)(dialogs);
+
+export const SET_ARCHIVES = 'SET_ARCHIVES';
+export const setArchives = archives =>
+	setChats('archives', document.getElementById('archives'), SET_ARCHIVES)(archives);
+
+const appendChats = (storeString, element, event) => chats => {
+	const { length } = window.store[storeString];
+	chats = chats.filter(chat => {
 		const {
 			dialog_peer: { user_id, channel_id, chat_id },
 			savedMessages,
-		} = dialog;
+		} = chat;
 		const id = user_id || channel_id || chat_id;
 		console.log('savedMessages', savedMessages);
 		return !(mapId(id) || document.getElementById(`dialog_${id}`));
 	});
-	window.store.dialogs = [...window.store.dialogs, ...dialogs];
-	window.store.dialogs = window.store.dialogs.map(mapAndIdx);
-	document.getElementById('user-dialogs').dispatchEvent(updateStoreEvent(APPEND_DIALOGS, { length }));
+	window.store[storeString] = [...window.store[storeString], ...chats];
+	window.store[storeString] = window.store[storeString].map(mapAndIdx);
+	element.dispatchEvent(updateStoreEvent(event, { length }));
 };
+
+export const APPEND_DIALOGS = 'APPEND_DIALOGS';
+export const appendDialogs = dialogs =>
+	appendChats('dialogs', document.getElementById('user-dialogs'), APPEND_DIALOGS)(dialogs);
+
+export const APPEND_ARCHIVES = 'APPEND_ARCHIVES';
+export const appendArchives = archives =>
+	appendChats('archives', document.getElementById('archives'), APPEND_DIALOGS)(archives);
 
 export const SET_USER = 'SET_USER';
 export const setUser = user => {
@@ -76,6 +89,7 @@ export const updateDialogPhoto = (id, photo) => {
 };
 
 export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);
+export const getArchives = (offset = 0) => window.store.archives.slice(offset);
 
 export const getDialog = id => window.store.dialogs[mapId(id)];
 export const getMessages = peer => messageId => window.store.messages[peer][messageId];
