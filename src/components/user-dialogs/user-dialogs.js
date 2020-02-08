@@ -20,6 +20,7 @@ export const renderDialog = (component, archived = false) => dialog => {
 
 	if (pinned) {
 		component.pinned.appendChild(elem);
+    this.pinned.classList.add('pinned_exist');
 	} else {
 		component.normal.appendChild(elem);
 	}
