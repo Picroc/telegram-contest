@@ -18,7 +18,8 @@ import Menu from './components/menu/menu';
 import Settings from './components/menu/settings/settings';
 import UserDialogs from './components/user-dialogs/user-dialogs';
 import Dialog from './components/user-dialogs/dialog/dialog';
-import ChatMessage from "./components/chat-message/chatMessage";
+import ChatMessage from './components/chat-message/chatMessage';
+import Archives from './components/menu/archives/archives';
 
 customElements.define('my-router', Router);
 customElements.define('countries-popup-item', CountriesPopupItem);
@@ -36,6 +37,7 @@ customElements.define('login-code', LoginCode);
 customElements.define('login-password', LoginPassword);
 customElements.define('chat-page', ChatPage);
 customElements.define('chat-message', ChatMessage);
+customElements.define('my-archives', Archives);
 
 const rt = document.getElementById('router');
 export const router = (route, attrs = {}) => {

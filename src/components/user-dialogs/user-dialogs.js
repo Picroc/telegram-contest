@@ -4,9 +4,55 @@ import chatMain from '../../pages/chat-main/index';
 import './user-dialogs.scss';
 import { telegramApi } from '../../App';
 import { outSvg } from './dialog/dialog.html';
+
+export const renderDialog = (component, archived = false) => dialog => {
+	const { id, pinned } = dialog;
+	const { id: userId } = getUser();
+	if (id == userId) {
+		dialog.savedMessages = true;
+		dialog.title = 'Saved Messages';
+	}
+
+	const elem = htmlToElement(
+		`<my-dialog anim="ripple" class="dialog" id="dialog_${id}" archived="${archived}"></my-dialog>`
+	);
+	elem.addEventListener('click', () => loadDialog(component, elem, dialog));
+
+	if (pinned) {
+		component.pinned.appendChild(elem);
+    this.pinned.classList.add('pinned_exist');
+	} else {
+		component.normal.appendChild(elem);
+	}
+};
+
+export const loadDialog = (component, elem, dialog) => {
+	const { id, dialog_peer: peer } = dialog;
+	if (component.prevActive) {
+		if (component.prevId === id) {
+			return;
+		} else {
+			component.prevActive.classList.toggle('dialog_active');
+		}
+	}
+	component.prevActive = elem;
+	component.prevId = id;
+
+	elem.classList.toggle('dialog_active');
+	const right = document.getElementById('right');
+	startLoading(right);
+	chatMain(right, peer).then(() => {
+		stopLoading(right);
+		const topBar = document.createElement('top-bar');
+		topBar.setAttribute('user_id', id);
+		right.prepend(topBar);
+	});
+};
+
 export default class UserDialogs extends HTMLElement {
 	render() {
 		this.id = 'user-dialogs';
+		this.renderDialog = renderDialog(this);
 		this.addEventListener(SET_DIALOGS, this.setListener, { capture: true });
 		this.addEventListener(APPEND_DIALOGS, this.updateListener, { capture: true });
 		this.pinned = createDiv('pinned');
@@ -43,55 +89,12 @@ export default class UserDialogs extends HTMLElement {
 		});
 	}
 
-	renderDialog = dialog => {
-		const { id, pinned } = dialog;
-		const { id: userId } = getUser();
-		if (id == userId) {
-			dialog.savedMessages = true;
-			dialog.title = 'Saved Messages';
-		}
-
-		const elem = htmlToElement(`<my-dialog anim="ripple" class="dialog" id="dialog_${id}"></my-dialog>`);
-		elem.addEventListener('click', () => this.loadDialog(elem, dialog));
-
-		if (pinned) {
-			this.pinned.appendChild(elem);
-			this.pinned.classList.add('pinned_exist');
-		} else {
-			this.normal.appendChild(elem);
-		}
-	};
-
-	loadDialog = (elem, dialog) => {
-		const { id, dialog_peer: peer } = dialog;
-		if (this.prevActive) {
-			if (this.prevId === id) {
-				return;
-			} else {
-				this.prevActive.classList.toggle('dialog_active');
-			}
-		}
-		this.prevActive = elem;
-		this.prevId = id;
-
-		elem.classList.toggle('dialog_active');
-		const right = document.getElementById('right');
-		startLoading(right);
-		chatMain(right, peer).then(() => {
-			stopLoading(right);
-			const topBar = document.createElement('top-bar');
-			topBar.setAttribute('user_id', id);
-			right.prepend(topBar);
-		});
-	};
-
 	setListener = event => {
 		getDialogs().forEach(this.renderDialog);
 	};
 
 	updateListener = event => {
 		const dialogs = getDialogs(event.detail.length);
-		console.log('dialogs', dialogs);
 		dialogs.forEach(this.renderDialog);
 	};
 
