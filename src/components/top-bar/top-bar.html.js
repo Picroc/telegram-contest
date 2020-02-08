@@ -26,7 +26,7 @@ export default ({
 	}
 	const icon = savedMessages ? saved : `<img src="${avatar}" alt="avatar" class="dialog__avatar">`;
 
-	const onlineInfoCls = clsx('top-bar__online-info', cc('top-bar__online-info_online', isOnline));
+	const onlineInfoCls = clsx('top-bar__online-info', isOnline && 'top-bar__online-info_online');
 	const avatarCls = clsx('top-bar__avatar', savedMessages && 'top-bar__saved');
 	return `
             <div class="${avatarCls}">${icon}</div>

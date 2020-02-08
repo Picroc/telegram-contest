@@ -8,7 +8,17 @@ export default class TopBar extends HTMLElement {
 		this.className = 'top-bar';
 		const id = this.getAttribute('user_id');
 		const dialog = this.getInfo(id);
+		const {
+			dialog_peer: { _: type },
+		} = dialog;
+
 		this.innerHTML = template(dialog);
+		this.online = this.querySelector('.top-bar__online-info');
+		telegramApi.getPeerByID(id, type).then(({ sortStatus: lastSeen }) => {
+			if (lastSeen) {
+				this.online.innerHTML = `last seen at ${telegramApi._convertDate(lastSeen)}`;
+			}
+		});
 		this.searchIcon = this.querySelector('.top-bar__search');
 		this.avatar = this.querySelector('.top-bar__avatar img');
 		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updatePhotoListener);

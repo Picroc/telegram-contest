@@ -561,9 +561,9 @@ export default class TelegramApi {
 	};
 
 	getPeerByID = (id, type) => {
-		type = type || 'user';
+		type = type || 'peerUser';
 
-		if ((type == 'chat' || type == 'channel') && id > 0) {
+		if ((type == 'peerChat' || type == 'peerChannel') && id > 0) {
 			id = -id;
 		}
 
