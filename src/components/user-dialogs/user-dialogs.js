@@ -1,9 +1,10 @@
 import { getDialogs, SET_DIALOGS, APPEND_DIALOGS, updateDialog, getUser, getDialog } from '../../store/store';
 import { htmlToElement, startLoading, stopLoading, createDiv } from '../../helpers/index';
-import chatMain from '../../templates/chat-page/chat-main/index';
 import './user-dialogs.scss';
 import { telegramApi } from '../../App';
 import { outSvg } from './dialog/dialog.html';
+import { loadMessages } from '../../pages/chat-main/index';
+
 export default class UserDialogs extends HTMLElement {
 	render() {
 		this.id = 'user-dialogs';
@@ -56,6 +57,7 @@ export default class UserDialogs extends HTMLElement {
 
 		if (pinned) {
 			this.pinned.appendChild(elem);
+			this.pinned.classList.add('pinned_exist');
 		} else {
 			this.normal.appendChild(elem);
 		}
@@ -76,7 +78,7 @@ export default class UserDialogs extends HTMLElement {
 		elem.classList.toggle('dialog_active');
 		const right = document.getElementById('right');
 		startLoading(right);
-		chatMain(right, peer).then(() => {
+		loadMessages(right, peer).then(() => {
 			stopLoading(right);
 			const topBar = document.createElement('top-bar');
 			topBar.setAttribute('user_id', id);

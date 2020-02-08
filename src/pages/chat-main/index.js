@@ -3,8 +3,8 @@ import InputMessage from './message-input';
 import { createDiv } from '../../helpers';
 import './messages.scss';
 import './chatMain.scss';
-import { telegramApi } from '../../../App';
-import Message from '../../../components/chat-message/chatMessage';
+import { telegramApi } from '../../App';
+import Message from '../../components/chat-message/chatMessage';
 const store = window.store;
 store.messages = []; // stores {peer: [...messageIds]}
 
@@ -22,7 +22,7 @@ async function* fetchMessages(peer, limit = 30, offsetId = 0) {
 	}
 }
 
-const loadMessages = async (elem, messageGenerator) => {
+export const loadMessages = async (elem, peer, messageGenerator) => {
 	const { id } = await telegramApi.getUserInfo();
 	const limit = 30;
 	const messages = [];
@@ -35,7 +35,7 @@ const loadMessages = async (elem, messageGenerator) => {
 		let previousSentDate;
 		let previousId = 0;
 		const { id, peer } = resp.value;
-		elem.insertAdjacentHTML("beforeend", `<chat-message id="${id}" peer="${peer}"/>`);
+		elem.insertAdjacentHTML('beforeend', `<chat-message id="${id}" peer="${peer}"/>`);
 	}
 };
 
