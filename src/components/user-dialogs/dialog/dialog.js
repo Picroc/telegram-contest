@@ -1,13 +1,15 @@
 import './dialog.scss';
 import template from './dialog.html.js';
-import { mapId, getDialogs, UPDATE_DIALOG_PHOTO, updateDialogPhoto, getUser } from '../../../store/store';
+import { mapId, getDialogs, UPDATE_DIALOG_PHOTO, updateDialogPhoto, getUser, getArchives } from '../../../store/store';
 import ChatMain from '../../../pages/chat-main/index';
 import { telegramApi } from '../../../App';
 
 export default class Dialog extends HTMLElement {
 	render() {
 		const id = this.getAttribute('id').replace('dialog_', '');
-		const dialogs = getDialogs();
+		const archived = JSON.parse(this.getAttribute('archived'));
+		const dialogs = archived ? getArchives() : getDialogs();
+
 		const dialog = dialogs[mapId(id)];
 		if (dialog.photo instanceof Promise) {
 			dialog.photo.then(photo => {

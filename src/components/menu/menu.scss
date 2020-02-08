@@ -85,6 +85,23 @@
         padding-right: 25px;
       }
     }
+
+    &__archived {
+      display: grid;
+      grid-template-columns: 24px 1fr 48px;
+
+      .dialog_right_bottom {
+        grid-row: 1;
+        align-self: center;
+        max-width: 48px;
+      }
+
+      &__text {
+      transform: translateX(24px);
+    }
+    }
+
+
   }
 
   &__icon {
