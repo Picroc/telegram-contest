@@ -57,3 +57,45 @@ const getSentDate = time => {
 		return `${day} ${sentMonth} ${year}`;
 	}
 };
+
+export default async (elem, peer) => {
+	const chatMain = createDiv('chat-main');
+	const statusInfo = createDiv('status-info');
+	const chatMessage = createDiv('chat-messages');
+	let messageInput = InputMessage();
+	chatMain.append(...[statusInfo, chatMessage, messageInput]);
+	const limit = 30;
+	const messageGenerator = fetchMessages(peer, limit);
+	await loadMessages(chatMessage, messageGenerator);
+	chatMessage.addEventListener('scroll', () => {
+		if (chatMessage.scrollTop <= 100) {
+			loadMessages(chatMessage, messageGenerator).then();
+		}
+	});
+
+	elem.innerHTML = chatMain.outerHTML;
+	const textarea = elem.querySelector('.text-input__input');
+	textarea.addEventListener('input', () => {
+		const sendButton = document.getElementById('send-button');
+		if (textarea.value.trim().length > 0) {
+			sendButton.classList.remove('microphone');
+			sendButton.classList.add('send-arrow');
+		} else {
+			sendButton.classList.remove('send-arrow');
+			sendButton.classList.add('microphone');
+		}
+		setTimeout(() => {
+			textarea.style.cssText = 'height:auto; padding:0';
+			textarea.style.cssText = 'height:' + textarea.scrollHeight + 'px;max-height: 300px;';
+		}, 0);
+	});
+
+	elem.querySelectorAll('svg').forEach(svg => {
+		svg.addEventListener('click', () => {
+			Array.from(elem.querySelectorAll('svg'))
+				.filter(anotherSvg => anotherSvg !== svg)
+				.forEach(svg => svg.classList.remove('active'));
+			svg.classList.toggle('active');
+		});
+	});
+};
