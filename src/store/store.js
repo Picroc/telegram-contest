@@ -95,3 +95,13 @@ export const getDialog = id => window.store.dialogs[mapId(id)];
 export const getMessages = peer => messageId => window.store.messages[peer][messageId];
 
 export const mapId = id => window.store.mapId[id];
+
+export const SET_ACTIVE_PEER = 'SET_ACTIVE_PEER';
+export const setActivePeer = peer => {
+	window.store.activePeer = peer;
+	document.getElementById('right-sidebar').dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER, { peer }));
+};
+
+export const getActivePeer = () => {
+	return window.store.activePeer;
+};
