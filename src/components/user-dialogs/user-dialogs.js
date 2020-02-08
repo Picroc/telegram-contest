@@ -56,6 +56,7 @@ export default class UserDialogs extends HTMLElement {
 
 		if (pinned) {
 			this.pinned.appendChild(elem);
+			this.pinned.classList.add('pinned_exist');
 		} else {
 			this.normal.appendChild(elem);
 		}
