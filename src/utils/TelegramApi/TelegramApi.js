@@ -15,6 +15,11 @@ import $timeout from './js/Etc/angular/$timeout';
 import { Config } from './js/lib/config';
 import AppUpdatesManagerModule from './js/App/AppUpdatesManager';
 
+import { inflate } from 'pako/lib/inflate';
+import pako from 'pako';
+
+import lottie from 'lottie-web';
+
 export default class TelegramApi {
 	options = { dcID: 2, createNetworker: true };
 
@@ -1166,6 +1171,23 @@ export default class TelegramApi {
 		}).then(photo_file => {
 			// console.log('Got file!');
 			return 'data:image/png;base64,' + btoa(String.fromCharCode(...new Uint8Array(photo_file.bytes)));
+		});
+	};
+
+	_getStickerData = async sticker => {
+		const decoded_text = new TextDecoder('utf-8').decode(await pako.inflate(sticker[0]));
+		return JSON.parse(decoded_text);
+	};
+
+	setStickerToContainer = (sticker, container) => {
+		this._getStickerData(sticker.bytes).then(st => {
+			lottie.loadAnimation({
+				container: container,
+				renderer: 'svg',
+				loop: true,
+				autoplay: true,
+				animationData: st,
+			});
 		});
 	};
 }
