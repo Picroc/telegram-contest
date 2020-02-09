@@ -11,11 +11,10 @@ export default ({
 	pinnedMessage,
 	voice,
 	channel,
-	onlineInfo,
 	savedMessages,
 	photo,
+	onlineStatus,
 }) => {
-	const online = onlineInfo ? onlineInfo : isOnline ? 'online' : 'last seen recently';
 	let muteIcon = channel && `<img src=${mute} class="top-bar__mute"></img>`;
 	let info = channel ? '' : voice ? voice : pinnedMessage;
 
@@ -29,9 +28,9 @@ export default ({
 		: `<img src="${avatar}" alt="avatar" class="dialog__avatar avatar avatar_small">`;
 
 	const onlineInfoCls = clsx('top-bar__online-info', isOnline && 'top-bar__online-info_online');
-	const avatarCls = clsx('top-bar__avatar', savedMessages && 'top-bar__saved');
+	const avatarCls = clsx('top-bar__avatar', savedMessages && 'top-bar__saved', 'dialog__avatar avatar avatar_small');
 	const titleCls = clsx('top-bar__title', savedMessages && 'top-bar__title_full');
-	const onl = !savedMessages ? `<div class="${onlineInfoCls}">${online}</div>` : '';
+	const onl = !savedMessages ? `<div class="${onlineInfoCls}">${onlineStatus ? onlineStatus : ''}</div>` : '';
 	return `
 			<div class="${avatarCls}">${icon}</div>
             <div class="${titleCls}">${title}</div>
