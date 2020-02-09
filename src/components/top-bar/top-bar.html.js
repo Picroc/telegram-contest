@@ -28,7 +28,7 @@ export default ({
 		: `<img src="${avatar}" alt="avatar" class="dialog__avatar avatar avatar_small">`;
 
 	const onlineInfoCls = clsx('top-bar__online-info', isOnline && 'top-bar__online-info_online');
-	const avatarCls = clsx('top-bar__avatar', savedMessages && 'top-bar__saved');
+	const avatarCls = clsx('top-bar__avatar', savedMessages && 'top-bar__saved', 'dialog__avatar avatar avatar_small');
 	const titleCls = clsx('top-bar__title', savedMessages && 'top-bar__title_full');
 	const onl = !savedMessages ? `<div class="${onlineInfoCls}">${onlineStatus ? onlineStatus : ''}</div>` : '';
 	return `

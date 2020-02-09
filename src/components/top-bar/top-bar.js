@@ -16,9 +16,13 @@ export default class TopBar extends HTMLElement {
 		this.className = 'top-bar';
 		const id = this.getAttribute('user_id');
 		const dialog = getDialog(id);
+		const {
+			dialog_peer: { _: type },
+		} = dialog;
 		this.innerHTML = template(dialog);
-		this.online = this.querySelector('.top-bar__online-info');
 		this.loadStatus(id);
+
+		this.online = this.querySelector('.top-bar__online-info');
 		telegramApi.getFullPeer(id).then(data => console.log('data', data));
 		this.searchIcon = this.querySelector('.top-bar__search');
 		this.avatar = this.querySelector('.top-bar__avatar img');
@@ -90,7 +94,11 @@ export default class TopBar extends HTMLElement {
 					this.onlineStatus = `${this.transformNumber(count)} ${sub}`;
 				}
 			})
-			.then(() => updateDialogStatus(id, this.onlineStatus));
+			.then(() => {
+				if (this.onlineStatus) {
+					updateDialogStatus(id, this.onlineStatus);
+				}
+			});
 	};
 
 	statusTransform = ({ was_online: lastSeen, _: type }) => {
