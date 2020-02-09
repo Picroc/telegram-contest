@@ -59,7 +59,8 @@ export default ({
             <div class="${clsx(
 		'dialog__avatar-wrapper',
 		isOnline && 'dialog__avatar_online',
-		savedMessages && 'dialog__saved'
+		savedMessages && 'dialog__saved',
+		'avatar_medium'
 	)}">
                 ${icon}
             </div>
