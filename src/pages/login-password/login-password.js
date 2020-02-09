@@ -3,6 +3,7 @@ import './login-password.scss';
 
 import { router, telegramApi } from '../../App';
 import { setInnerHTML } from '../../helpers/index';
+import { setUser, addToUser } from '../../store/store';
 
 export default class LoginPassword extends HTMLElement {
 	constructor() {

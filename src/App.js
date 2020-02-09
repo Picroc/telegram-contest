@@ -19,6 +19,7 @@ import Settings from './components/menu/settings/settings';
 import UserDialogs from './components/user-dialogs/user-dialogs';
 import Dialog from './components/user-dialogs/dialog/dialog';
 import ChatMessage from './components/chat-message/chatMessage';
+import RegisterPage from './pages/register-page/register-page';
 import Archives from './components/menu/archives/archives';
 import RightSidebar from './components/right-sidebar/right-sidebar';
 
@@ -36,6 +37,7 @@ customElements.define('my-dialog', Dialog);
 customElements.define('login-form', LoginForm);
 customElements.define('login-code', LoginCode);
 customElements.define('login-password', LoginPassword);
+customElements.define('register-page', RegisterPage);
 customElements.define('chat-page', ChatPage);
 customElements.define('chat-message', ChatMessage);
 customElements.define('my-archives', Archives);
@@ -79,7 +81,7 @@ telegramApi
 	.catch(err => console.log('err', err));
 
 const changeState = transform => {
-	return function (...args) {
+	return function(...args) {
 		const [oldState, newState] = [state, transform(...args)];
 
 		state = {

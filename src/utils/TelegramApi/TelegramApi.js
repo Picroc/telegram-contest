@@ -10,7 +10,7 @@ import MtpPasswordManagerModule from './js/Mtp/MtpPasswordManager';
 import AppsChatsManagerModule from './js/App/AppChatsManager';
 import FileSaverModule from './js/Etc/FileSaver';
 import { nextRandomInt } from './js/lib/bin_utils';
-import { isArray, isFunction, forEach, map, min } from './js/Etc/Helper';
+import { isArray, isFunction, forEach, map, min, noop } from './js/Etc/Helper';
 import $timeout from './js/Etc/angular/$timeout';
 import { Config } from './js/lib/config';
 import AppUpdatesManagerModule from './js/App/AppUpdatesManager';
@@ -43,6 +43,9 @@ export default class TelegramApi {
 					break;
 			}
 		});
+
+		window.apiManager = this.MtpApiManager;
+		this.MtpApiFileManager = new MtpApiFileManagerModule();
 
 		this.setConfig({
 			app: {
@@ -130,6 +133,11 @@ export default class TelegramApi {
 			},
 			this.options
 		).then(result => {
+			console.log(this.options);
+			if (result._ === 'auth.authorizationSignUpRequired') {
+				throw 'PHONE_NUMBER_UNOCCUPIED';
+			}
+
 			this.MtpApiManager.setUserAuth(this.options.dcID, {
 				id: result.user.id,
 			});
@@ -170,10 +178,10 @@ export default class TelegramApi {
 			},
 			this.options
 		).then(result => {
+			this.user = result.user;
 			this.MtpApiManager.setUserAuth(this.options.dcID, {
 				id: result.user.id,
 			});
-			this.user = result.user;
 		});
 
 	sendMessage = (id, message) =>
@@ -390,6 +398,7 @@ export default class TelegramApi {
 			_: 'inputDocumentFileLocation',
 			id: doc.id,
 			access_hash: doc.access_hash,
+			file_reference: doc.file_reference,
 		};
 		let fileName = 'FILE';
 		let size = 15728640;
@@ -490,10 +499,11 @@ export default class TelegramApi {
 	downloadPhoto = (photo, progress, autosave) => {
 		const photoSize = photo.sizes[photo.sizes.length - 1];
 		const location = {
-			_: 'inputFileLocation',
-			local_id: photoSize.location.local_id,
-			secret: photoSize.location.secret,
-			volume_id: photoSize.location.volume_id,
+			_: 'inputPhotoFileLocation',
+			id: photo.id,
+			access_hash: photo.access_hash,
+			file_reference: photo.file_reference,
+			thumb_size: 'c',
 		};
 
 		if (!isFunction(progress)) {
@@ -626,6 +636,14 @@ export default class TelegramApi {
 			location: location,
 			offset: 0,
 			limit: limit,
+		});
+	};
+
+	editUserPhoto = photo => {
+		return this.MtpApiFileManager.uploadFile(photo).then(inputFile => {
+			return this.invokeApi('photos.uploadProfilePhoto', {
+				file: inputFile,
+			});
 		});
 	};
 
@@ -762,7 +780,7 @@ export default class TelegramApi {
 		if (peer._ === 'peerChat') {
 			const chat = chats[chats.findIndex(el => el.id === peer.chat_id)];
 			title = chat.title;
-			if (chat.photo._ !== 'chatPhotoEmpty') {
+			if (chat.photo && chat.photo._ !== 'chatPhotoEmpty') {
 				photo = chat.photo;
 			}
 		} else if (peer._ === 'peerChannel') {
@@ -772,7 +790,7 @@ export default class TelegramApi {
 			is_supergroup = this._checkFlag(channel.flags, 8);
 
 			title = channel.title;
-			if (channel.photo._ !== 'chatPhotoEmpty') {
+			if (channel.photo && channel.photo._ !== 'chatPhotoEmpty') {
 				photo = channel.photo;
 			}
 			peer = {
@@ -789,9 +807,9 @@ export default class TelegramApi {
 			}
 			peer = user.access_hash
 				? {
-					...peer,
-					access_hash: user.access_hash,
-				}
+						...peer,
+						access_hash: user.access_hash,
+				  }
 				: peer;
 		}
 		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
@@ -1069,9 +1087,9 @@ export default class TelegramApi {
 				photo = user.photo && user.photo._ !== 'userPhotoEmpty' && user.photo;
 				peer = user.access_hash
 					? {
-						...result,
-						access_hash: user.access_hash,
-					}
+							...result,
+							access_hash: user.access_hash,
+					  }
 					: result;
 			}
 
