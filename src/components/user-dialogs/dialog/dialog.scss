@@ -1,5 +1,5 @@
 .dialog {
-  padding: 8px;
+  padding: 4px 8px;
   max-height: 10vh;
   min-height: 60px;
   display: grid;
@@ -7,7 +7,7 @@
   column-gap: 8px;
   grid-template-rows: 1fr 1fr;
   align-items: center;
-  margin: 0 8px;
+  margin: 4px 8px;
   border-radius: 8px;
   user-select: none;
   --ripple-background: var(--black);
@@ -24,8 +24,6 @@
   }
 
   &__saved {
-    width: 60px;
-    height: 60px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -50,13 +48,13 @@
       &::before {
         position: absolute;
         content: "";
-        height: 8px;
-        width: 8px;
+        height: 10px;
+        width: 10px;
         border-radius: 50%;
         background: var(--green);
-        border: 1px solid var(--white);
+        border: 2px solid var(--white);
         right: 2px;
-        bottom: 0;
+        bottom: 4px;
       }
     }
   }
