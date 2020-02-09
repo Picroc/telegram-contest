@@ -34,7 +34,8 @@
     &__info {
         grid-area: info;
         align-self: center;
-        justify-self: center;
+        display: grid;
+        justify-items: center;
 
     }
     &__attributes {
@@ -83,9 +84,15 @@
         align-items: center;
         justify-items: center;
 
+        .tab {
+            &_active {
+                color: var(--primary);
+            }
+        }
+
         .gray-line {
             grid-column: 1/5;
-            border-bottom: 1px solid var(--gray);
+            border-top: 1px solid var(--gray);
             width: 100%;
         }
 
