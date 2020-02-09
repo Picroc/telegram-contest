@@ -24,6 +24,11 @@ export default class TopBar extends HTMLElement {
 		this.addEventListener('click', this.showRightSideBar);
 	}
 
+	showRightSideBar = e => {
+		const rightSidebar = document.getElementById('right-sidebar');
+		rightSidebar.classList.toggle('right-sidebar_hidden');
+	};
+
 	unitCheck = unit => {
 		if (unit > 1) {
 			return 's';
