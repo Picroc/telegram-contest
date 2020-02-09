@@ -29,10 +29,10 @@ export default class RightSidebar extends HTMLElement {
 
 	loadPeerInfo = () => {
 		const setHTML = setInnerHTML.bind(this);
-		const { first_name, last_name, username } = getActivePeer();
+		const { first_name, last_name, username, avatar } = getActivePeer();
 		setHTML('.right-sidebar__name')(getName(first_name, last_name));
 		setHTML('.text__username')(username);
-		// document.querySelector('.right-sidebar__avatar_img').src = avatar;
+		document.querySelector('.right-sidebar__avatar_img').src = avatar;
 	};
 
 	connectedCallback() {

@@ -3,10 +3,12 @@
     background: var(--white);
     z-index: 2;
     width: 35vw;
+    transition: 0.4s;
+    overflow: auto;
+
     &_hidden {
         width: 0vw;
     }
-    transition: 0.4s;
 
     display: grid;
     grid-template-columns: 60px 1fr 60px;
@@ -16,23 +18,26 @@
         "info info info"
         "attributes attributes attributes"
         "tabs tabs tabs"
-        "general-materials general-materials general-materials"
-    ;
-    overflow: auto;
+        "general-materials general-materials general-materials";
 
     &__back {
         grid-area: back;
     }
+
     &__title {
         grid-area: title;
+
         align-self: center;
         font-weight: 600;
     }
+
     &__more {
         grid-area: more;
     }
+
     &__info {
         grid-area: info;
+
         align-self: center;
         display: grid;
         justify-items: center;
@@ -41,41 +46,58 @@
     &__attributes {
         grid-area: attributes;
 
-
         display: grid;
         grid-template-rows: repeat(5,1fr);
+    }
 
-        .attributes {
-
+    .attributes {
             &__item {
-
                 display: grid;
                 grid-template-columns: 60px 1fr;
-
-                .item {
-                    &__icon {
-                        align-self: center;
-                        justify-self: center;
-                    }
-                    &__text {
-                        display: grid;
-                        grid-template-rows: 1fr 1fr;
-
-                        .text {
-
-                            &__value {
-                                font-size: 12px;
-                            }
-                            &__label {
-                                font-size: 10px;
-                                color: var(--gray);//didn't checked
-                            }
-                        }
-                    }
-                }
             }
+
+            & input {
+                width: 24px;
+                height: 24px;
+                -webkit-appearance: none;
+                background-color: var(--white);
+                background: url("./svg/checkboxempty.svg");
+
+                &:active,
+                &:checked:active,
+                &:focus {
+                  outline: none;
+                }
+
+                &:checked {
+                  background: url("./svg/checkboxon.svg");
+                }
+              }
+        }
+
+    .item {
+        &__icon {
+            align-self: center;
+            justify-self: center;
+        }
+
+        &__text {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
         }
     }
+
+    .text {
+        &__value {
+            font-size: 12px;
+        }
+
+        &__label {
+            font-size: 10px;
+            color: var(--gray);//didn't checked
+        }
+    }
+
     &__tabs {
         grid-area: tabs;
 
@@ -83,6 +105,8 @@
         grid-template-columns: repeat(4,1fr);
         align-items: center;
         justify-items: center;
+        position: relative;
+    }
 
         .tab {
             &_active {
@@ -90,13 +114,27 @@
             }
         }
 
-        .gray-line {
-            grid-column: 1/5;
-            border-top: 1px solid var(--gray);
-            width: 100%;
-        }
-
+    .underline {
+        display: block;
+        position: absolute;
+        bottom: 10px;
+        width: 15%;
+        transition: transform .2s ease-in-out;
+        background: var(--primary);
+        border-radius: 20px;
+        height: 0.5vh;
+        z-index: 1;
+        transition: 0.4s;
     }
+
+    .gray-line {
+        position: absolute;
+        bottom: 10px;
+        grid-column: 1/5;
+        border-bottom: 1px solid var(--gray);
+        width: 100%;
+    }
+
     &__general-materials {
         grid-area: general-materials;
     }

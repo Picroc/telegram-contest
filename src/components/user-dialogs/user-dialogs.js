@@ -59,8 +59,19 @@ export const loadDialog = (component, elem, dialog) => {
 			document.getElementById('right-sidebar') || htmlToElement('<right-sidebar></right-sidebar>');
 		chatPage.append(rightSidebar);
 		telegramApi.getPeerByID(id).then(dialogPeer => {
-			setActivePeer(dialogPeer);
 			console.log('dialogPeer', dialogPeer);
+			telegramApi
+				.getChatPhoto(
+					{ _: 'peerUser', user_id: dialogPeer.id, access_hash: dialogPeer.access_hash },
+					dialogPeer.photo
+				)
+				.then(dialogPhoto => {
+					console.log('dialogPhoto', dialogPhoto);
+					setActivePeer({ ...dialogPeer, avatar: dialogPhoto });
+				});
+			// .then(avatar => setActivePeer({...dialogPeer, avatar}))}
+			// setActivePeer(dialogPeer);
+			// console.log('dialogPeer', dialogPeer);
 		});
 		//TODO: заставить хуйню снизу работать
 		// .then(dialogPeer => {telegramApi.getChatPhoto(dialogPeer, dialogPeer.photo)
