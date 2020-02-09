@@ -6,6 +6,11 @@
   flex-direction: column;
   z-index: 10;
 
+  &_hidden {
+    opacity: 0;
+    z-index: -1;
+  }
+
   background: var(--white);
   // padding: 0;
   margin-top: 10px;

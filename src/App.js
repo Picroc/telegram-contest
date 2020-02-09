@@ -79,7 +79,7 @@ telegramApi
 	.catch(err => console.log('err', err));
 
 const changeState = transform => {
-	return function(...args) {
+	return function (...args) {
 		const [oldState, newState] = [state, transform(...args)];
 
 		state = {
@@ -101,3 +101,14 @@ window.updateRipple = () => {
 		});
 	});
 };
+
+document.addEventListener('click', event => {
+	let target = event.target;
+	if (target.tagName === 'IMG' || target.tagName === 'SVG') {
+		target = target.parentNode;
+	}
+	const popup = document.querySelector('.popup');
+	if (popup && !target.contains(popup)) {
+		popup.classList.add('popup_hidden');
+	}
+});
