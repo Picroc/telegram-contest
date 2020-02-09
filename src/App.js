@@ -107,7 +107,6 @@ document.addEventListener('click', event => {
 	if (target.tagName === 'IMG' || target.tagName === 'SVG') {
 		target = target.parentNode;
 	}
-	console.log(target);
 	const popup = document.querySelector('.popup');
 	if (popup && !target.contains(popup)) {
 		popup.classList.add('popup_hidden');
