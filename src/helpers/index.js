@@ -94,3 +94,31 @@ export const getName = (first, second) => {
 	}
 	return `${first} ${second}`;
 };
+
+export const getNotificationsModeBoolByPeer = peer => {
+	return (peer.notify_settings && (peer.notify_settings.flags == 0 || peer.notify_settings.mute_until == 0)) ||
+		(peer.full_chat &&
+			(peer.full_chat.notify_settings.flags == 0 || peer.full_chat.notify_settings.mute_until == 0))
+		? true
+		: false;
+};
+
+export const getRightSidebarFieldsFromPeer = peer => {
+	const generalizedPeer = {};
+	if (peer._ === 'userFull') {
+		generalizedPeer.type = 'user';
+		generalizedPeer.name = getName(peer.user.first_name, peer.user.last_name);
+		generalizedPeer.status = 'waitForAntoha'; //TODO:
+		generalizedPeer.bio = peer.about;
+		generalizedPeer.username = peer.user.username;
+		generalizedPeer.phone = peer.user.phone;
+		generalizedPeer.notifications = getNotificationsModeBoolByPeer(peer);
+	} else if (peer._ === 'messages.chatFull') {
+		generalizedPeer.type = 'groupChat';
+		generalizedPeer.name = peer.chats[0].title;
+		generalizedPeer.status = 'waitForAntoha'; //TODO:
+		generalizedPeer.about = peer.full_chat.about;
+		generalizedPeer.link = 't.me/' + peer.full_chat.username;
+		generalizedPeer.notifications = getNotificationsModeBoolByPeer(peer);
+	}
+};

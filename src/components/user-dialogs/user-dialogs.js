@@ -7,7 +7,13 @@ import {
 	getDialog,
 	setActivePeer,
 } from '../../store/store';
-import { htmlToElement, startLoading, stopLoading, createDiv } from '../../helpers/index';
+import {
+	htmlToElement,
+	startLoading,
+	stopLoading,
+	createDiv,
+	getNotificationsModeBoolByPeer,
+} from '../../helpers/index';
 import chatMain from '../../pages/chat-main/index';
 import './user-dialogs.scss';
 import { telegramApi } from '../../App';
@@ -58,11 +64,9 @@ export const loadDialog = (component, elem, dialog) => {
 		const rightSidebar =
 			document.getElementById('right-sidebar') || htmlToElement('<right-sidebar></right-sidebar>');
 		chatPage.append(rightSidebar);
-		telegramApi.getPeerByID(id).then(dialogPeer => {
-			console.log('dialogPeer', dialogPeer);
-			telegramApi.getChatPhoto(dialogPeer, dialogPeer.photo).then(dialogPhoto => {
-				setActivePeer({ ...dialogPeer, avatar: dialogPhoto });
-			});
+		telegramApi.getFullPeer(id).then(fullPeer => {
+			console.log('fullPeer', fullPeer);
+			telegramApi.getPeerPhoto(id).then(dialogPhoto => setActivePeer({ ...fullPeer, avatar: dialogPhoto }));
 		});
 	});
 };
