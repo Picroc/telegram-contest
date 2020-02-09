@@ -15,14 +15,14 @@ export default class Dialog extends HTMLElement {
 		this.innerHTML = template(dialog);
 		this.rightBottom = this.querySelector('.dialog_right_bottom');
 		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updateDialogPhotoListener);
-		this.addEventListener(UPDATE_DIALOG_UNREAD, this.upateDialogUnreadListener);
+		this.addEventListener(UPDATE_DIALOG_UNREAD, this.updateDialogUnreadListener);
 	}
 
 	updateDialogListener = event => {
 		this.render();
 	};
 
-	upateDialogUnreadListener = event => {
+	updateDialogUnreadListener = event => {
 		event.preventDefault();
 		const { id } = event.detail;
 		const dialog = getDialog(id);
