@@ -7,10 +7,11 @@ const mapAndIdx = (dialog, idx) => {
 	//TODO: отхендлить естественное изменение порядка диалогов
 	const {
 		dialog_peer: { user_id, channel_id, chat_id },
+		archived,
 	} = dialog;
 	const id = user_id || channel_id || chat_id;
 	dialog.id = id;
-	window.store.mapId[id] = idx;
+	window.store.mapId[id] = { idx, archived };
 
 	return dialog;
 };
@@ -33,10 +34,8 @@ const appendChats = (storeString, element, event) => chats => {
 	chats = chats.filter(chat => {
 		const {
 			dialog_peer: { user_id, channel_id, chat_id },
-			savedMessages,
 		} = chat;
 		const id = user_id || channel_id || chat_id;
-		console.log('savedMessages', savedMessages);
 		return !(mapId(id) || document.getElementById(`dialog_${id}`));
 	});
 	window.store[storeString] = [...window.store[storeString], ...chats];
@@ -80,7 +79,8 @@ export const updateDialog = dialog => {
 
 export const UPDATE_DIALOG_PHOTO = `UPDATE_DIALOG_PHOTO`;
 export const updateDialogPhoto = (id, photo) => {
-	window.store.dialogs[mapId(id)].photo = photo;
+	const dialog = getDialog(id);
+	dialog.photo = photo;
 	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_PHOTO, { id }));
 	const topBar = document.querySelector('top-bar');
 	if (topBar && topBar.getAttribute('user_id') == id) {
@@ -91,7 +91,17 @@ export const updateDialogPhoto = (id, photo) => {
 export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);
 export const getArchives = (offset = 0) => window.store.archives.slice(offset);
 
-export const getDialog = id => window.store.dialogs[mapId(id)];
-export const getMessages = peer => messageId => window.store.messages[peer][messageId];
+export const getDialog = id => {
+	const { idx, archived } = mapId(id);
+	if (archived) {
+		return window.store.archives[idx];
+	} else {
+		return window.store.dialogs[idx];
+	}
+};
+export const getMessages = peer => messageId => {
+	return;
+	return window.store.messages[peer][messageId];
+};
 
 export const mapId = id => window.store.mapId[id];

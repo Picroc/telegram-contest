@@ -1,6 +1,6 @@
 import template from './top-bar.html.js';
 import './top-bar.scss';
-import { getDialogs, mapId, UPDATE_DIALOG_PHOTO } from '../../store/store.js';
+import { getDialogs, mapId, UPDATE_DIALOG_PHOTO, getDialog } from '../../store/store.js';
 import { telegramApi } from '../../App.js';
 
 export default class TopBar extends HTMLElement {
@@ -14,10 +14,8 @@ export default class TopBar extends HTMLElement {
 
 		this.innerHTML = template(dialog);
 		this.online = this.querySelector('.top-bar__online-info');
-		telegramApi.getPeerByID(id, type).then(({ sortStatus: lastSeen }) => {
-			if (lastSeen) {
-				this.online.innerHTML = `last seen at ${telegramApi._convertDate(lastSeen)}`;
-			}
+		telegramApi.getPeerByID(id, type).then(({ status }) => {
+			this.online.innerHTML = this.statusTransform(status);
 		});
 		this.searchIcon = this.querySelector('.top-bar__search');
 		this.avatar = this.querySelector('.top-bar__avatar img');
@@ -25,16 +23,68 @@ export default class TopBar extends HTMLElement {
 		this.searchIcon.addEventListener('click', this.searchClick);
 	}
 
-	getInfo = id => getDialogs()[mapId(id)];
+	unitCheck = unit => {
+		if (unit > 1) {
+			return 's';
+		}
+
+		return '';
+	};
+
+	statusTransform = ({ was_online: lastSeen, _: type }) => {
+		switch (type) {
+			case 'userStatusRecently':
+				return `last seen recently`;
+
+			case 'userStatusOffline':
+				return this.lastSeenTransform(lastSeen);
+
+			case 'userStatusOnline':
+				return 'online';
+		}
+	};
+
+	lastSeenTransform = lastSeen => {
+		const unixShift = 1000;
+		const now = new Date().getTime() / unixShift;
+		const diff = Math.abs(now - lastSeen);
+		const step = 60;
+		let time;
+		let unit;
+		if (diff < step) {
+			this.online.innerHTML = `last seen just now`;
+			return;
+		} else if (diff < step ** 2) {
+			unit = new Date(diff * unixShift).getMinutes();
+			time = 'minute';
+		} else if (diff < step ** 2 * 24) {
+			unit = new Date(lastSeen * unixShift).getHours();
+			time = 'hour';
+		} else if (diff < step ** 2 * 24 * 7) {
+			unit = new Date(lastSeen * unixShift).getDay();
+			time = 'day';
+		} else if (diff < step ** 2 * 24 * 7 * 4) {
+			unit = new Date(lastSeen * unixShift).getHours();
+			time = 'week';
+		} else if (diff < step ** 2 * 24 * 7 * 4 * 12) {
+			unit = new Date(lastSeen * unixShift).getHours();
+			time = 'month';
+		} else {
+			time = `long time`;
+		}
+		time = unit + ' ' + time + this.unitCheck(unit);
+		return `last seen ${time} ago`;
+	};
+
+	getInfo = id => getDialog(id);
 
 	updatePhotoListener = event => {
-		console.log('top-bar', event);
 		const id = this.getAttribute('user_id');
 		const {
 			detail: { id: eventId },
 		} = event;
 		if (id === eventId) {
-			const { photo } = getDialogs()[mapId(id)];
+			const { photo } = getDialog(id);
 			this.avatar.src = photo;
 		}
 	};

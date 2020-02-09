@@ -28,10 +28,12 @@ export default ({
 
 	const onlineInfoCls = clsx('top-bar__online-info', isOnline && 'top-bar__online-info_online');
 	const avatarCls = clsx('top-bar__avatar', savedMessages && 'top-bar__saved');
+	const titleCls = clsx('top-bar__title', savedMessages && 'top-bar__title_full');
+	const onl = !savedMessages ? `<div class="${onlineInfoCls}">${online}</div>` : '';
 	return `
-            <div class="${avatarCls}">${icon}</div>
-            <div class="top-bar__title">${title}</div>
-            <div class="${onlineInfoCls}">${online}</div>
+			<div class="${avatarCls}">${icon}</div>
+            <div class="${titleCls}">${title}</div>
+            ${onl}
             <div class="top-bar__info">${info}</div>
             ${muteIcon}
             <div class="top-bar__search icon">
