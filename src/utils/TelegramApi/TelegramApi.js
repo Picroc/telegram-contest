@@ -44,6 +44,9 @@ export default class TelegramApi {
 			}
 		});
 
+		window.apiManager = this.MtpApiManager;
+		this.MtpApiFileManager = new MtpApiFileManagerModule();
+
 		this.setConfig({
 			app: {
 				id: 1166576 /* App ID */,
@@ -130,6 +133,11 @@ export default class TelegramApi {
 			},
 			this.options
 		).then(result => {
+			console.log(this.options);
+			if (result._ === 'auth.authorizationSignUpRequired') {
+				throw 'PHONE_NUMBER_UNOCCUPIED';
+			}
+
 			this.MtpApiManager.setUserAuth(this.options.dcID, {
 				id: result.user.id,
 			});
@@ -170,10 +178,10 @@ export default class TelegramApi {
 			},
 			this.options
 		).then(result => {
+			this.user = result.user;
 			this.MtpApiManager.setUserAuth(this.options.dcID, {
 				id: result.user.id,
 			});
-			this.user = result.user;
 		});
 
 	sendMessage = (id, message) =>

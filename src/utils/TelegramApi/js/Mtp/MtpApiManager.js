@@ -232,8 +232,9 @@ export default function MtpApiManagerModule() {
 								}, rejectPromise);
 							}, rejectPromise);
 						} else if (error.code == 303) {
-							const fileMigrateDC = Number(error.type.match(/^(|FILE_MIGRATE_)(\d+)/)[2]);
+							let fileMigrateDC = error.type.match(/^(|FILE_MIGRATE_)(\d+)/);
 							if (fileMigrateDC) {
+								fileMigrateDC = Number(fileMigrateDC[2]);
 								if (fileMigrateDC !== dcID) {
 									// const newOptions = {
 									// 	dcID: fileMigrateDC,

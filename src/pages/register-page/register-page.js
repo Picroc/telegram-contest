@@ -66,30 +66,10 @@ export default class RegisterPage extends HTMLElement {
 	handleFile(file) {
 		console.log(file);
 
-		const fr = new FileReader();
-		const fileReadArray = [];
-
-		const self = this;
-
-		fr.onloadend = function(e) {
-			if (e.target.readyState == FileReader.DONE) {
-				const arrayBuffer = e.target.result,
-					array = new Uint8Array(arrayBuffer);
-
-				for (let i = 0; i < array.length; i++) {
-					fileReadArray.push(array[i]);
-				}
-
-				self.updatePhoto(e.target.result, file);
-
-				if (e.target.result) {
-					self.uploadPhoto(file).then(res => {
-						console.log('SERVER RESP', res);
-					});
-				}
-			}
-		};
-		fr.readAsArrayBuffer(file);
+		if (file) {
+			this.file = file;
+			this.updatePhoto(file);
+		}
 	}
 
 	showInvalid = () => {
@@ -109,8 +89,7 @@ export default class RegisterPage extends HTMLElement {
 		return await telegramApi.editUserPhoto(bytes);
 	};
 
-	updatePhoto = (photoBytes, justFile) => {
-		console.log(photoBytes);
+	updatePhoto = justFile => {
 		const image = document.createElement('img');
 
 		image.style = 'width: 160px; height: 160px;';
@@ -123,26 +102,47 @@ export default class RegisterPage extends HTMLElement {
 			prev.remove();
 		}
 		this.icon_button.appendChild(image);
+
+		// this.uploadPhoto(this.file);
 	};
 
 	signUp = () => {
-		const phone = this.getAttribute('phone'),
+		const phone = JSON.parse(this.getAttribute('phone')),
 			code = this.getAttribute('code');
+
+		console.log('PHONE', phone);
 
 		telegramApi
 			.signUp(phone, window.phone_code_hash, code, this.name.value, this.surname.value)
 			.then(res => {
-				telegramApi.getUserInfo().then(user => {
+				return telegramApi.getUserInfo().then(user => {
 					console.log('HERE WE GO', user);
 					setUser(user);
 				});
-				telegramApi
-					.getUserPhoto(1)
-					.then(res => {
-						addToUser('avatar', res);
-					})
-					.catch(err => console.log('err', err));
-				router('chat-page');
+			})
+			.then(() => {
+				if (this.file) {
+					setTimeout(() => {
+						this.uploadPhoto(this.file)
+							.then(() => {
+								router('chat-page');
+								telegramApi
+									.getUserPhoto(1)
+									.then(res => {
+										addToUser('avatar', res);
+									})
+									.catch(err => console.log('err', err));
+							})
+							.catch(err => {
+								console.log(err);
+								alert("Sorry, we couldn't process your photo. Try again another time.");
+
+								router('chat-page');
+							});
+					}, 100);
+				} else {
+					router('chat-page');
+				}
 			})
 			.catch(err => {
 				console.log('ERR OCCURED', err);

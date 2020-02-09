@@ -2,6 +2,7 @@ import MtpApiManagerModule from './MtpApiManager';
 import { Config } from '../lib/config';
 import { nextRandomInt } from '../lib/bin_utils';
 import { dT } from '../lib/utils';
+import { noop } from '../Etc/Helper';
 
 export default function MtpApiFileManagerModule() {
 	let cachedFs = false;
@@ -13,7 +14,7 @@ export default function MtpApiFileManagerModule() {
 	let downloadPulls = {};
 	let downloadActives = {};
 
-	let MtpApiManager = new MtpApiManagerModule();
+	let MtpApiManager = window.apiManager || new MtpApiManagerModule();
 
 	const downloadRequest = (dcID, cb, activeDelta) => {
 		if (downloadPulls[dcID] === undefined) {

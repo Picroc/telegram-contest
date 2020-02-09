@@ -39,12 +39,13 @@ export default class LoginCode extends HTMLElement {
 				})
 				.catch(err => {
 					// console.log('Got error');
-					if (err.type === 'PHONE_NUMBER_UNOCCUPIED') {
+					if (err === 'PHONE_NUMBER_UNOCCUPIED') {
 						router('register-page', { phone, code });
 					} else if (err.type === 'SESSION_PASSWORD_NEEDED') {
 						router('login-password');
 					} else {
-						showInvalid();
+						console.log(err);
+						this.showInvalid();
 					}
 				});
 		}
@@ -54,7 +55,7 @@ export default class LoginCode extends HTMLElement {
 
 	showInvalid = () => {
 		this.code.classList.add('input-field_invalid');
-		this.setLabel('Invalid Code');
+		// this.setLabel('Invalid Code');
 	};
 
 	checkIsInvalid = () => {
