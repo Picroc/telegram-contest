@@ -1,8 +1,8 @@
 import './menu.scss';
 import template from './menu.html';
 import { subscribe } from '../../helpers';
-import { getDialogs } from '../../store/store';
-import { hide, show } from '../../helpers/index';
+import { getDialogs, getArchives } from '../../store/store';
+import { hide, show, htmlToElement } from '../../helpers/index';
 
 export const onType = event => {
 	//TODO: добавить поиск по алиасу ( и мб что-то ещё кроме названия чата)
@@ -62,25 +62,18 @@ const onTypeContacts = (value, searchCallback = () => { }) => {
 export default class Menu extends HTMLElement {
 	render() {
 		this.innerHTML = template;
-		const menuList = this.querySelector('.menu-list');
-		const menuClick = e => {
-			menuList.classList.toggle('menu-list_hidden');
-		};
-		const settingsClick = e => {
-			const left = document.querySelector('#left');
-			let settings = document.querySelector('#settings');
-			if (!settings) {
-				settings = document.createElement('my-settings');
-				left.appendChild(settings);
-			}
-			setTimeout(() => settings.classList.toggle('sidebar_hidden'), 0);
-		};
-		subscribe('.menu__checkbox')('click', menuClick);
-		subscribe('.menu-list__settings')('click', settingsClick);
+		this.menuList = this.querySelector('.menu-list');
+		subscribe('.menu__checkbox')('click', this.menuClick);
+		subscribe('.menu-list__settings')('click', this.settingsClick);
+		subscribe('.menu-list__archived')('click', this.archivesClick);
 		subscribe('.menu__search')('input', event => {
 			onType(event);
 			// onTypeContacts(event.target.value, () => {});
 		});
+		// `<div class="dialog_right_bottom dialog__unread-count dialog_muted"><div class="count archived__count"></div></div>`
+		// this.archivedCount = this.querySelector('.archived__count');
+		// this.archivedCount.innerHTML = this.countArchives();
+		this.countArchives();
 	}
 
 	connectedCallback() {
@@ -90,6 +83,44 @@ export default class Menu extends HTMLElement {
 			this.rendered = true;
 		}
 	}
+
+	countArchives = () => {
+		setTimeout(() => {
+			let archives = getArchives();
+			let counter = 0;
+			for (const { unreadCount } of archives) {
+				counter += +unreadCount;
+			}
+			if (counter > 0) {
+				counter = counter > 100000 ? '99999+' : counter;
+				this.archivedCount = htmlToElement(
+					`<div class="dialog_right_bottom dialog__unread-count dialog_muted"><div class="count">${counter}</div></div>`
+				);
+				const menuArchived = this.querySelector('.menu-list__archived');
+				menuArchived.appendChild(this.archivedCount);
+			}
+		}, 0);
+	};
+
+	archivesClick = e => {
+		const archives = document.getElementById('archives');
+		console.log(archives);
+		archives.classList.toggle('sidebar_hidden');
+	};
+
+	settingsClick = e => {
+		const left = document.querySelector('#left');
+		let settings = document.querySelector('#settings');
+		if (!settings) {
+			settings = document.createElement('my-settings');
+			left.appendChild(settings);
+		}
+		setTimeout(() => settings.classList.toggle('sidebar_hidden'), 0);
+	};
+
+	menuClick = e => {
+		this.menuList.classList.toggle('popup_hidden');
+	};
 
 	static get observedAttributes() {
 		// (3)

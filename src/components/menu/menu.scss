@@ -7,6 +7,8 @@
   align-items: center;
   transition: 0.4s;
 
+  user-select: none;
+
   &__search-wrapper {
     height: 90%;
     width: 95%;
@@ -70,12 +72,6 @@
     left: 10px;
     max-width: 200px;
 
-
-    &_hidden {
-      opacity: 0;
-      z-index: -1;
-    }
-
     & li {
       justify-content: flex-start;
       width: 200px;
@@ -83,6 +79,21 @@
         width: 24px;
         height: 24px;
         padding-right: 25px;
+      }
+    }
+
+    &__archived {
+      display: grid;
+      grid-template-columns: 24px 1fr 48px;
+
+      .dialog_right_bottom {
+        grid-row: 1;
+        align-self: center;
+        max-width: 48px;
+      }
+
+      &__text {
+        transform: translateX(24px);
       }
     }
   }

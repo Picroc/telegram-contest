@@ -42,7 +42,15 @@ export default class AppPeersManagerModule {
 		return isUser ? peerParams[0] : -peerParams[0] || 0;
 	};
 
-	getPeer = peerID => (peerID > 0 ? this.AppUsersManager.getUser(peerID) : this.AppChatsManager.getChat(-peerID));
+	getPeer = peerID => {
+		const user_peer = this.AppUsersManager.getUser(peerID);
+
+		if (user_peer && (!user_peer.id || !user_peer.deleted)) {
+			return user_peer;
+		}
+
+		return this.AppChatsManager.getChat(peerID);
+	};
 
 	isChannel = peerID => peerID < 0 && this.AppChatsManager.isChannel(-peerID);
 }

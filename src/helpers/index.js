@@ -87,3 +87,10 @@ export const createInput = (type, className, placeholder) => {
 	elem.placeholder = placeholder;
 	return elem;
 };
+
+export const getName = (first, second) => {
+	if (!second) {
+		return first;
+	}
+	return `${first} ${second}`;
+};

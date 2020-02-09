@@ -1,3 +1,5 @@
+@import 'avatars.scss';
+
 :root {
   --primary: rgb(79, 164, 246);
   --secondary: #777b7f;
@@ -103,5 +105,33 @@ body {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+.sidebar {
+  position: absolute;
+  height: 100%;
+  background: var(--white);
+  z-index: 2;
+  width: 25vw;
+
+  min-width: 260px;
+  display: grid;
+  row-gap: 5px;
+
+  &_left {
+    left: 0;
+  }
+  &_hidden {
+    left: -100%;
+  }
+  left: 0;
+  transition: 0.4s;
+
+  &__left {
+    width: 25vw;
+    min-width: 260px;
+    display: grid;
+    row-gap: 5px;
   }
 }

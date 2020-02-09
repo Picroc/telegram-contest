@@ -14,10 +14,6 @@
 }
 
 .settings {
-  width: 25vw;
-  min-width: 260px;
-  display: grid;
-  row-gap: 5px;
   grid-template-columns: 60px 1fr 60px;
   grid-template-rows: 60px 150px 2fr;
 
@@ -59,15 +55,8 @@
   }
 
   &__avatar {
-    width: 80px;
-    height: 80px;
     margin-bottom: 20px;
-    img {
-      width: 80px;
-      height: 80px;
-    }
     overflow: hidden;
-    border-radius: 40px;
   }
 
   &__name {
@@ -84,10 +73,6 @@
   .settings-list {
     grid-row: 3;
     grid-column: 1/4;
-
-    &__logout {
-      // color: var(--red);
-    }
 
     &__item {
       max-height: 10vh;

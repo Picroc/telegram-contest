@@ -66,7 +66,7 @@ export default class TelegramApi {
 			},
 			mode: {
 				test: false,
-				debug: true,
+				debug: false,
 			},
 		});
 
@@ -560,13 +560,7 @@ export default class TelegramApi {
 		this.AppUpdatesManager.subscribe(type, handler);
 	};
 
-	getPeerByID = (id, type) => {
-		type = type || 'user';
-
-		if ((type == 'chat' || type == 'channel') && id > 0) {
-			id = -id;
-		}
-
+	getPeerByID = id => {
 		const peer = this.AppPeersManager.getPeer(id);
 
 		return new Promise((resolve, reject) => {
@@ -805,7 +799,7 @@ export default class TelegramApi {
 		const unread_count = dialog.unread_count;
 
 		if (photo) {
-			photo = this.getChatPhoto(peer, photo);
+			photo = this.getPeerPhoto(peer.user_id || peer.chat_id || peer.channel_id);
 		}
 
 		return {
@@ -846,29 +840,180 @@ export default class TelegramApi {
 		return { dialog_items, archived_items };
 	};
 
+	getFullPeer = async peer_id => {
+		const peer = await this.getPeerByID(peer_id);
+		const mapped_peer = this.mapPeerToInputPeer(peer);
+
+		let saved_peer;
+		console.log(mapped_peer);
+
+		switch (mapped_peer._) {
+			case 'inputUser':
+				if (mapped_peer.user_id === (await this.MtpApiManager.getUserID())) {
+					return await this.getFullUserInfo();
+				}
+				saved_peer = this.AppUsersManager.getFullUser(mapped_peer.user_id);
+				if (saved_peer && (!saved_peer.id || !saved_peer.deleted)) {
+					return saved_peer;
+				}
+				return await this.invokeApi('users.getFullUser', {
+					id: mapped_peer,
+				}).then(fullUser => {
+					this.AppUsersManager.saveFullUser(fullUser);
+					return fullUser;
+				});
+			case 'inputChat':
+				saved_peer = this.AppChatsManager.getFullChat(mapped_peer.chat_id);
+				if (saved_peer && (!saved_peer.id || !saved_peer.deleted)) {
+					return saved_peer;
+				}
+				return await this.invokeApi('messages.getFullChat', {
+					chat_id: mapped_peer.chat_id,
+				}).then(fullChat => {
+					this.AppChatsManager.saveFullChat(fullChat);
+					return fullChat;
+				});
+			case 'inputChannel':
+				saved_peer = this.AppChatsManager.getFullChat(mapped_peer.id);
+				if (saved_peer && (!saved_peer.id || !saved_peer.deleted)) {
+					return saved_peer;
+				}
+				return await this.invokeApi('channels.getFullChannel', {
+					channel: mapped_peer,
+				}).then(fullChannel => {
+					this.AppChatsManager.saveFullChat(fullChannel);
+					return fullChannel;
+				});
+		}
+	};
+
+	getChatParticipants = async chat_id => {
+		const chat = await this.getFullPeer(chat_id, 'chat');
+
+		if (chat && chat.full_chat && chat.full_chat._ === 'chatFull') {
+			const onlineUsers = [],
+				offlineUsers = [];
+
+			chat.users.forEach(user => {
+				if (user.status && user._ !== 'userEmpty') {
+					user.status._ === 'userStatusOnline' ? onlineUsers.push(user) : offlineUsers.push(user);
+				}
+			});
+
+			return { onlineUsers, offlineUsers };
+		} else if (chat.full_chat._ === 'channelFull') {
+			const channel_peer = await this.getPeerByID(chat_id, 'chat');
+
+			if (!this._checkFlag(channel_peer.flags, 8)) {
+				return { onlineUsers: [], offlineUsers: [] };
+			}
+
+			const channel_users = await this.invokeApi('channels.getParticipants', {
+				channel: this.mapPeerToInputPeer(channel_peer),
+				filter: {
+					_: 'channelParticipantsRecent',
+				},
+				offset: 0,
+				limit: 200,
+				hash: Math.round(Math.random() * 100),
+			});
+
+			const onlineUsers = [],
+				offlineUsers = [];
+
+			channel_users.users.forEach(user => {
+				if (user.status && user._ !== 'userEmpty') {
+					user.status._ === 'userStatusOnline' ? onlineUsers.push(user) : offlineUsers.push(user);
+				}
+			});
+
+			return { onlineUsers, offlineUsers };
+		}
+
+		return { onlineUsers: [], offlineUsers: [] };
+	};
+
+	mapPeerToInputPeer = peer => {
+		const type = peer._;
+
+		switch (type) {
+			case 'inputPeerUser':
+			case 'user':
+				return {
+					...peer,
+					_: 'inputUser',
+					user_id: peer.user_id ? peer.user_id.toString() : peer.id.toString(),
+				};
+
+			case 'inputPeerChat':
+			case 'chat':
+				return {
+					...peer,
+					_: 'inputChat',
+					chat_id: peer.chat_id ? peer.chat_id.toString() : peer.id.toString(),
+				};
+
+			case 'inputPeerChannel':
+			case 'channel':
+				return {
+					...peer,
+					_: 'inputChannel',
+					channel_id: peer.channel_id ? peer.channel_id.toString() : peer.id.toString(),
+				};
+
+			default:
+				return peer;
+		}
+	};
+
+	mapPeerTypeToType = type => {
+		switch (type) {
+			case 'inputPeerUser':
+			case 'inputUser':
+			case 'peerUser':
+				return 'user';
+
+			case 'inputPeerChat':
+			case 'inputChat':
+			case 'peerChat':
+				return 'chat';
+
+			case 'inputPeerChannel':
+			case 'inputChannel':
+			case 'peerChannel':
+				return 'channel';
+
+			default:
+				return type;
+		}
+	};
+
 	mapPeerToTruePeer = peer => {
 		const type = peer._;
 
 		switch (type) {
 			case 'peerUser':
+			case 'user':
 				return {
 					...peer,
 					_: 'inputPeerUser',
-					user_id: peer.user_id.toString(),
+					user_id: peer.user_id ? peer.user_id.toString() : peer.id,
 				};
 
 			case 'peerChat':
+			case 'chat':
 				return {
 					...peer,
 					_: 'inputPeerChat',
-					chat_id: peer.chat_id.toString(),
+					chat_id: peer.chat_id ? peer.chat_id.toString() : peer.id,
 				};
 
 			case 'peerChannel':
+			case 'channel':
 				return {
 					...peer,
 					_: 'inputPeerChannel',
-					channel_id: peer.channel_id.toString(),
+					channel_id: peer.channel_id ? peer.channel_id.toString() : peer.id,
 				};
 
 			default:
@@ -931,7 +1076,7 @@ export default class TelegramApi {
 			}
 
 			if (photo) {
-				photo = this.getChatPhoto(peer, photo);
+				photo = this.getPeerPhoto(peer.user_id || peer.chat_id || peer.channel_id);
 			}
 
 			search_items.push({
@@ -985,8 +1130,10 @@ export default class TelegramApi {
 			});
 	};
 
-	getChatPhoto = async (peer, photo) => {
-		photo = photo.photo_small;
+	getPeerPhoto = async peer_id => {
+		const peer = await this.getPeerByID(peer_id);
+
+		const photo = peer.photo.photo_small;
 		// console.log('PEER', peer);
 		// console.log('PHOTO', photo);
 		return this.invokeApi('upload.getFile', {

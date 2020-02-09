@@ -1,14 +1,18 @@
 import './dialog.scss';
 import template from './dialog.html.js';
-import { mapId, getDialogs, UPDATE_DIALOG_PHOTO, updateDialogPhoto, getUser } from '../../../store/store';
-import ChatMain from '../../../pages/chat-main/index';
-import { telegramApi } from '../../../App';
+import {
+	mapId,
+	getDialogs,
+	UPDATE_DIALOG_PHOTO,
+	updateDialogPhoto,
+	getArchives,
+	getDialog,
+} from '../../../store/store';
 
 export default class Dialog extends HTMLElement {
 	render() {
 		const id = this.getAttribute('id').replace('dialog_', '');
-		const dialogs = getDialogs();
-		const dialog = dialogs[mapId(id)];
+		const dialog = getDialog(id);
 		if (dialog.photo instanceof Promise) {
 			dialog.photo.then(photo => {
 				updateDialogPhoto(id, photo);
@@ -29,7 +33,7 @@ export default class Dialog extends HTMLElement {
 		const { id } = event.detail;
 		const elem = this.querySelector('.dialog__avatar-wrapper img');
 		if (elem) {
-			elem.src = getDialogs()[mapId(id)].photo;
+			elem.src = getDialog(id).photo;
 		}
 	};
 
