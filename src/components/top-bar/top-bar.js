@@ -21,6 +21,7 @@ export default class TopBar extends HTMLElement {
 		this.avatar = this.querySelector('.top-bar__avatar img');
 		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updatePhotoListener);
 		this.searchIcon.addEventListener('click', this.searchClick);
+		this.addEventListener('click', this.showRightSideBar);
 	}
 
 	unitCheck = unit => {

@@ -1,4 +1,12 @@
-import { getDialogs, SET_DIALOGS, APPEND_DIALOGS, updateDialog, getUser, getDialog } from '../../store/store';
+import {
+	getDialogs,
+	SET_DIALOGS,
+	APPEND_DIALOGS,
+	updateDialog,
+	getUser,
+	getDialog,
+	setActivePeer,
+} from '../../store/store';
 import { htmlToElement, startLoading, stopLoading, createDiv } from '../../helpers/index';
 import chatMain from '../../pages/chat-main/index';
 import './user-dialogs.scss';
@@ -40,12 +48,34 @@ export const loadDialog = (component, elem, dialog) => {
 
 	elem.classList.toggle('dialog_active');
 	const right = document.getElementById('right');
+	const chatPage = document.querySelector('.chat-page');
 	startLoading(right);
 	chatMain(right, peer).then(() => {
 		stopLoading(right);
 		const topBar = document.createElement('top-bar');
 		topBar.setAttribute('user_id', id);
 		right.prepend(topBar);
+		const rightSidebar =
+			document.getElementById('right-sidebar') || htmlToElement('<right-sidebar></right-sidebar>');
+		chatPage.append(rightSidebar);
+		telegramApi.getPeerByID(id).then(dialogPeer => {
+			console.log('dialogPeer', dialogPeer);
+			telegramApi
+				.getChatPhoto(
+					{ _: 'peerUser', user_id: dialogPeer.id, access_hash: dialogPeer.access_hash },
+					dialogPeer.photo
+				)
+				.then(dialogPhoto => {
+					console.log('dialogPhoto', dialogPhoto);
+					setActivePeer({ ...dialogPeer, avatar: dialogPhoto });
+				});
+			// .then(avatar => setActivePeer({...dialogPeer, avatar}))}
+			// setActivePeer(dialogPeer);
+			// console.log('dialogPeer', dialogPeer);
+		});
+		//TODO: заставить хуйню снизу работать
+		// .then(dialogPeer => {telegramApi.getChatPhoto(dialogPeer, dialogPeer.photo)
+		// .then(avatar => setActivePeer({...dialogPeer, avatar}))}
 	});
 };
 
