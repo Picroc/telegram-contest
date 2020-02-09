@@ -2,10 +2,10 @@ import {
 	getDialogs,
 	SET_DIALOGS,
 	APPEND_DIALOGS,
-	updateDialog,
 	getUser,
 	getDialog,
 	setActivePeer,
+	updateDialog,
 } from '../../store/store';
 import { htmlToElement, startLoading, stopLoading, createDiv } from '../../helpers/index';
 import chatMain from '../../pages/chat-main/index';
@@ -48,23 +48,9 @@ export const loadDialog = (component, elem, dialog) => {
 
 	elem.classList.toggle('dialog_active');
 	const right = document.getElementById('right');
-	const chatPage = document.querySelector('.chat-page');
+	setActivePeer(peer);
 	startLoading(right);
-	chatMain(right, peer).then(() => {
-		stopLoading(right);
-		const topBar = document.createElement('top-bar');
-		topBar.setAttribute('user_id', id);
-		right.prepend(topBar);
-		const rightSidebar =
-			document.getElementById('right-sidebar') || htmlToElement('<right-sidebar></right-sidebar>');
-		chatPage.append(rightSidebar);
-		telegramApi.getPeerByID(id).then(dialogPeer => {
-			console.log('dialogPeer', dialogPeer);
-			telegramApi.getChatPhoto(dialogPeer, dialogPeer.photo).then(dialogPhoto => {
-				setActivePeer({ ...dialogPeer, avatar: dialogPhoto });
-			});
-		});
-	});
+	right.innerHTML = `<chat-main peer-id="${id}"></chat-main>`;
 };
 
 export default class UserDialogs extends HTMLElement {

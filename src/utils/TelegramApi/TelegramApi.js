@@ -1114,10 +1114,11 @@ export default class TelegramApi {
 		return search_items;
 	};
 
-	getMessagesFromPeer = async (peer, limit = 200, offsetId = 0) => {
+	getMessagesFromPeer = async (peer, limit = 200, offsetId = 0, offsetDate = 0) => {
 		return await this.invokeApi('messages.getHistory', {
 			peer: this.mapPeerToTruePeer(peer),
 			limit,
+			offset_date: offsetDate,
 			offset_id: offsetId,
 		});
 	};

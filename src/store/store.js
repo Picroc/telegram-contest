@@ -1,4 +1,6 @@
-window.store = {};
+import { peerToId } from "../helpers";
+
+window.store = { messages: {} };
 window.store.mapId = {};
 export const updateStoreEvent = (type, options) =>
 	new CustomEvent(type, { bubbles: false, cancelable: true, detail: options });
@@ -118,9 +120,21 @@ export const getDialog = id => {
 	}
 };
 export const getMessages = peer => messageId => {
-	return;
 	return window.store.messages[peer][messageId];
 };
+
+export const getMessagesByPeerId = peerId => window.store.messages[peerId];
+export const getMessage = (peerId, messageId) => getMessagesByPeerId(peerId)[messageId];
+export const putMessage = (peerId, messageId, messageContent) => getMessagesByPeerId(peerId)[messageId] = messageContent;
+
+export const getCurrentPeer = () => window.store.currentPeer;
+export const setCurrentPeer = peer => {
+	window.store.currentPeer = peer;
+	const peerId = peerToId(peer);
+	window.store.messages[peerId] = {}
+};
+
+export const getCurrentPeerId = () => peerToId(getCurrentPeer());
 
 export const mapId = id => window.store.mapId[id];
 

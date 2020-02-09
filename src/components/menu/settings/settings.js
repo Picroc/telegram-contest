@@ -14,6 +14,7 @@ export default class Settings extends HTMLElement {
 		const setHTML = setInnerHTML.bind(this);
 		const user = getUser();
 		this.avatar = user.avatar;
+		console.log('user avatar', this.avatar);
 		document.querySelector('.settings__avatar_img').src = user.avatar;
 		this.name = user.first_name + (user.last_name ? ` ${user.last_name}` : '');
 		setHTML('.settings__name')(this.name);
