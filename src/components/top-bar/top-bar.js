@@ -7,7 +7,7 @@ export default class TopBar extends HTMLElement {
 	render() {
 		this.className = 'top-bar';
 		const id = this.getAttribute('user_id');
-		const dialog = this.getInfo(id);
+		const dialog = getDialog(id);
 		const {
 			dialog_peer: { _: type },
 		} = dialog;
@@ -75,8 +75,6 @@ export default class TopBar extends HTMLElement {
 		time = unit + ' ' + time + this.unitCheck(unit);
 		return `last seen ${time} ago`;
 	};
-
-	getInfo = id => getDialog(id);
 
 	updatePhotoListener = event => {
 		const id = this.getAttribute('user_id');

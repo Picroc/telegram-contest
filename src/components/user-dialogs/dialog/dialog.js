@@ -32,7 +32,9 @@ export default class Dialog extends HTMLElement {
 		event.preventDefault();
 		const { id } = event.detail;
 		const elem = this.querySelector('.dialog__avatar-wrapper img');
-		elem.src = getDialog(id).photo;
+		if (elem) {
+			elem.src = getDialog(id).photo;
+		}
 	};
 
 	connectedCallback() {
