@@ -24,7 +24,9 @@ export default ({
 	if (!(photo instanceof Promise) && photo) {
 		avatar = photo;
 	}
-	const icon = savedMessages ? saved : `<img src="${avatar}" alt="avatar" class="dialog__avatar">`;
+	const icon = savedMessages
+		? saved
+		: `<img src="${avatar}" alt="avatar" class="dialog__avatar avatar avatar_small">`;
 
 	const onlineInfoCls = clsx('top-bar__online-info', cc('top-bar__online-info_online', isOnline));
 	const avatarCls = clsx('top-bar__avatar', savedMessages && 'top-bar__saved');

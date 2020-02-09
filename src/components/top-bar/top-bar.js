@@ -13,7 +13,13 @@ export default class TopBar extends HTMLElement {
 		this.avatar = this.querySelector('.top-bar__avatar img');
 		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updatePhotoListener);
 		this.searchIcon.addEventListener('click', this.searchClick);
+		this.addEventListener('click', this.showRightSideBar);
 	}
+
+	showRightSideBar = e => {
+		const rightSidebar = document.getElementById('right-sidebar');
+		rightSidebar.classList.toggle('right-sidebar_hidden');
+	};
 
 	getInfo = id => getDialogs()[mapId(id)];
 

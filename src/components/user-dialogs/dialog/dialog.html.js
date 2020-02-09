@@ -39,26 +39,28 @@ export default ({
 	if (!(photo instanceof Promise) && photo) {
 		avatar = photo;
 	}
-	const icon = savedMessages ? saved : `<img src="${avatar}" alt="avatar" class="dialog__avatar">`;
+	const icon = savedMessages
+		? saved
+		: `<img src="${avatar}" alt="avatar" class="dialog__avatar avatar avatar_medium">`;
 
 	const { out } = message_info;
 
 	const rightBottom =
 		unreadCount > 0
 			? `<div class="${clsx(
-				'dialog_right_bottom',
-				'dialog__unread-count',
-				muted && 'dialog_muted'
-			)}"><div class="count">${unreadCount}</div></div>`
+					'dialog_right_bottom',
+					'dialog__unread-count',
+					muted && 'dialog_muted'
+			  )}"><div class="count">${unreadCount}</div></div>`
 			: pinned
-				? `<div class="${clsx('dialog_right_bottom', 'dialog__pinned')}">${pinnedSvg}</div>`
-				: '';
+			? `<div class="${clsx('dialog_right_bottom', 'dialog__pinned')}">${pinnedSvg}</div>`
+			: '';
 	return `
             <div class="${clsx(
-		'dialog__avatar-wrapper',
-		isOnline && 'dialog__avatar_online',
-		savedMessages && 'dialog__saved'
-	)}">
+				'dialog__avatar-wrapper',
+				isOnline && 'dialog__avatar_online',
+				savedMessages && 'dialog__saved'
+			)}">
                 ${icon}
             </div>
             <div class="dialog__name">${title}</div>
@@ -68,6 +70,6 @@ export default ({
             	<div class="${clsx('dialog__time', !out && 'full')}">${time}</div>
 			</div>
             ${rightBottom}
-	
+
     `;
 };
