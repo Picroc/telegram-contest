@@ -789,9 +789,9 @@ export default class TelegramApi {
 			}
 			peer = user.access_hash
 				? {
-						...peer,
-						access_hash: user.access_hash,
-				  }
+					...peer,
+					access_hash: user.access_hash,
+				}
 				: peer;
 		}
 		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
@@ -799,7 +799,7 @@ export default class TelegramApi {
 		const unread_count = dialog.unread_count;
 
 		if (photo) {
-			photo = this.getChatPhoto(peer, photo);
+			photo = this.getPeerPhoto(peer.user_id || peer.chat_id || peer.channel_id);
 		}
 
 		return {
@@ -1069,14 +1069,14 @@ export default class TelegramApi {
 				photo = user.photo && user.photo._ !== 'userPhotoEmpty' && user.photo;
 				peer = user.access_hash
 					? {
-							...result,
-							access_hash: user.access_hash,
-					  }
+						...result,
+						access_hash: user.access_hash,
+					}
 					: result;
 			}
 
 			if (photo) {
-				photo = this.getChatPhoto(peer, photo);
+				photo = this.getPeerPhoto(peer.user_id || peer.chat_id || peer.channel_id);
 			}
 
 			search_items.push({
@@ -1130,8 +1130,10 @@ export default class TelegramApi {
 			});
 	};
 
-	getChatPhoto = async (peer, photo) => {
-		photo = photo.photo_small;
+	getPeerPhoto = async peer_id => {
+		const peer = await this.getPeerByID(peer_id);
+
+		const photo = peer.photo.photo_small;
 		// console.log('PEER', peer);
 		// console.log('PHOTO', photo);
 		return this.invokeApi('upload.getFile', {

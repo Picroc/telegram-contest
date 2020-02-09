@@ -24,6 +24,7 @@ export default class ChatPage extends HTMLElement {
 				const left = document.getElementById('left');
 				stopLoading(left);
 				left.innerHTML = `<my-archives></my-archives><my-menu></my-menu><user-dialogs></user-dialogs>`;
+				console.log('dialogs', data);
 				setDialogs(data);
 				setArchives(archived_items);
 				first = false;
