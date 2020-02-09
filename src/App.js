@@ -122,9 +122,12 @@ document.addEventListener('click', event => {
 document.addEventListener('click', event => {
 	const search = document.getElementById('search');
 	const icon = document.querySelector('.menu .menu__icon');
+	const searchOverlay = document.querySelector('.menu__search_overlay');
 	if (event.target !== search) {
-		document.querySelector('.menu__search_overlay').classList.toggle('hide');
+		searchOverlay.classList.add('hide');
 		icon.classList.add('burger');
 		icon.classList.remove('arrow');
+	} else {
+		searchOverlay.classList.remove('hide');
 	}
 });
