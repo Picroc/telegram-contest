@@ -34,7 +34,6 @@ export default ({
                     post_author: postAuthor = '',
                 }) => {
     const isOutgoing = out && fromId === userId;
-    const hasReply = !!replyToMessageId;
     const hasMedia = !!media;
 
     const chatMessageClass = clsx('chat-message',
