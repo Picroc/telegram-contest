@@ -22,7 +22,7 @@ export default class Dialog extends HTMLElement {
 		this.render();
 	};
 
-	upateDialogUnreadListener = event => {
+	updateDialogUnreadListener = event => {
 		event.preventDefault();
 		const { id } = event.detail;
 		const dialog = getDialog(id);
