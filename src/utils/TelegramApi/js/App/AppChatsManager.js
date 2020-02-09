@@ -5,6 +5,7 @@ export default class AppsChatsManagerModule {
 	constructor() {
 		window.chatsManagerStorage = window.chatsManagerStorage || {};
 		window.channelAccess = window.channelAccess || {};
+		window.fullChats = window.fullChats || {};
 	}
 
 	saveApiChats = apiChats => {
@@ -29,7 +30,28 @@ export default class AppsChatsManagerModule {
 		}
 	};
 
+	saveFullChat = apiChatFull => {
+		if (!isObject(apiChatFull)) {
+			return;
+		}
+
+		const { full_chat: apiChat } = apiChatFull;
+
+		apiChat.num = (Math.abs(apiChat.id >> 1) % 8) + 1;
+
+		if (apiChat.pFlags === undefined) {
+			apiChat.pFlags = {};
+		}
+
+		if (fullChats[apiChat.id] === undefined) {
+			fullChats[apiChat.id] = apiChatFull;
+		} else {
+			safeReplaceObject(fullChats[apiChat.id], apiChatFull);
+		}
+	};
+
 	getChat = id => chatsManagerStorage[id] || { id: id, deleted: true, access_hash: channelAccess[id] };
+	getFullChat = id => fullChats[id] || { id: id, deleted: true, access_hash: channelAccess[id] };
 
 	isChannel = id => {
 		const chat = chatsManagerStorage[id];

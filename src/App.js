@@ -20,6 +20,7 @@ import UserDialogs from './components/user-dialogs/user-dialogs';
 import Dialog from './components/user-dialogs/dialog/dialog';
 import ChatMessage from './components/chat-message/chatMessage';
 import Archives from './components/menu/archives/archives';
+import RightSidebar from './components/right-sidebar/right-sidebar';
 
 customElements.define('my-router', Router);
 customElements.define('countries-popup-item', CountriesPopupItem);
@@ -38,6 +39,7 @@ customElements.define('login-password', LoginPassword);
 customElements.define('chat-page', ChatPage);
 customElements.define('chat-message', ChatMessage);
 customElements.define('my-archives', Archives);
+customElements.define('right-sidebar', RightSidebar);
 
 const rt = document.getElementById('router');
 export const router = (route, attrs = {}) => {
