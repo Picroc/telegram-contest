@@ -55,7 +55,6 @@ export default class LoginCode extends HTMLElement {
 
 	showInvalid = () => {
 		this.code.classList.add('input-field_invalid');
-		// this.setLabel('Invalid Code');
 	};
 
 	checkIsInvalid = () => {

@@ -64,8 +64,6 @@ export default class RegisterPage extends HTMLElement {
 	}
 
 	handleFile(file) {
-		console.log(file);
-
 		if (file) {
 			this.file = file;
 			this.updatePhoto(file);
