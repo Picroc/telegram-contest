@@ -44,6 +44,9 @@ export default class TelegramApi {
 			}
 		});
 
+		window.apiManager = this.MtpApiManager;
+		this.MtpApiFileManager = new MtpApiFileManagerModule();
+
 		this.setConfig({
 			app: {
 				id: 1166576 /* App ID */,
@@ -130,6 +133,11 @@ export default class TelegramApi {
 			},
 			this.options
 		).then(result => {
+			console.log(this.options);
+			if (result._ === 'auth.authorizationSignUpRequired') {
+				throw 'PHONE_NUMBER_UNOCCUPIED';
+			}
+
 			this.MtpApiManager.setUserAuth(this.options.dcID, {
 				id: result.user.id,
 			});
@@ -170,10 +178,10 @@ export default class TelegramApi {
 			},
 			this.options
 		).then(result => {
+			this.user = result.user;
 			this.MtpApiManager.setUserAuth(this.options.dcID, {
 				id: result.user.id,
 			});
-			this.user = result.user;
 		});
 
 	sendMessage = (id, message) =>
@@ -629,6 +637,14 @@ export default class TelegramApi {
 		});
 	};
 
+	editUserPhoto = photo => {
+		return this.MtpApiFileManager.uploadFile(photo).then(inputFile => {
+			return this.invokeApi('photos.uploadProfilePhoto', {
+				file: inputFile,
+			});
+		});
+	};
+
 	editChatPhoto = (chat_id, photo) => {
 		return this.MtpApiFileManager.uploadFile(photo).then(inputFile => {
 			return this.MtpApiManager.invokeApi('messages.editChatPhoto', {
@@ -789,9 +805,9 @@ export default class TelegramApi {
 			}
 			peer = user.access_hash
 				? {
-					...peer,
-					access_hash: user.access_hash,
-				}
+						...peer,
+						access_hash: user.access_hash,
+				  }
 				: peer;
 		}
 		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
@@ -1069,9 +1085,9 @@ export default class TelegramApi {
 				photo = user.photo && user.photo._ !== 'userPhotoEmpty' && user.photo;
 				peer = user.access_hash
 					? {
-						...result,
-						access_hash: user.access_hash,
-					}
+							...result,
+							access_hash: user.access_hash,
+					  }
 					: result;
 			}
 
