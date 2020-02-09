@@ -95,6 +95,17 @@ export const updateDialogUnread = (id, count) => {
 	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_UNREAD, { id }));
 };
 
+export const UPDATE_DIALOG_STATUS = `UPDATE_DIALOG_STATUS`;
+export const updateDialogStatus = (id, status) => {
+	const dialog = getDialog(id);
+	dialog.onlineStatus = status;
+	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, { id }));
+	const topBar = document.querySelector('top-bar');
+	if (topBar && topBar.getAttribute('user_id') == id) {
+		topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, { id }));
+	}
+};
+
 export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);
 export const getArchives = (offset = 0) => window.store.archives.slice(offset);
 
