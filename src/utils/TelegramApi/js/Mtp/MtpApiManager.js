@@ -157,8 +157,8 @@ export default function MtpApiManagerModule() {
 					setTimeout(function() {
 						if (!error.handled) {
 							if (error.code == 401 && error.type !== 'SESSION_PASSWORD_NEEDED') {
-								// mtpLogOut();
-								console.error('THERE SHOULD BE LOG OUT!!!!!!!!!');
+								mtpLogOut();
+								// console.error('THERE SHOULD BE LOG OUT!!!!!!!!!');
 							}
 							error.handled = true;
 						}
