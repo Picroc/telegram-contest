@@ -14,7 +14,7 @@ export default class TopBar extends HTMLElement {
 
 		this.innerHTML = template(dialog);
 		this.online = this.querySelector('.top-bar__online-info');
-		telegramApi.getPeerByID(id, type).then(({ status }) => {
+		telegramApi.getPeerByID(id).then(({ status }) => {
 			this.online.innerHTML = this.statusTransform(status);
 		});
 		this.searchIcon = this.querySelector('.top-bar__search');
