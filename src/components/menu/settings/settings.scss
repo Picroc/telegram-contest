@@ -14,7 +14,7 @@
 }
 
 .settings {
-  grid-template-columns: 60px 1fr 60px;
+  grid-template-columns: 60px auto 60px;
   grid-template-rows: 60px 150px 2fr;
 
   &__icon {
@@ -96,11 +96,10 @@
         background-color: var(--light-gray);
         cursor: pointer;
       }
-
     }
-        &__text {
-          font-size: 14px;
-        }
+    &__text {
+      font-size: 14px;
+    }
   }
 
   .more-list {
