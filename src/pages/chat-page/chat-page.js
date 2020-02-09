@@ -1,5 +1,5 @@
 import { router, telegramApi } from '../../App';
-import { setDialogs, appendDialogs, setArchives, appendArchives } from '../../store/store';
+import { setDialogs, appendDialogs, setArchives, appendArchives, updateDialogUnread } from '../../store/store';
 import template from './chat-page.html';
 import { stopLoading } from '../../helpers/index';
 import './chat-page.scss';
@@ -36,6 +36,21 @@ export default class ChatPage extends HTMLElement {
 		};
 
 		await telegramApi.getDialogsParsed(15).then(load);
-		await telegramApi.getDialogsParsed(100).then(load);
+		telegramApi.invokeApi('messages.getPinnedDialogs', { folder_id: 0 }).then(({ dialogs }) => {
+			console.log('dialogs', dialogs);
+			dialogs.forEach(dialog => {
+				const {
+					peer: { channel_id, chat_id, user_id },
+					unread_count: count,
+					_: type,
+				} = dialog;
+				const id = channel_id || chat_id || user_id;
+				if (type !== 'dialogFolder') {
+					console.log('id', id);
+					updateDialogUnread(id, count);
+				}
+			});
+		});
+		telegramApi.getDialogsParsed(100).then(load);
 	};
 }
