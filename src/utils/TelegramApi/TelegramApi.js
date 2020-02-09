@@ -628,14 +628,25 @@ export default class TelegramApi {
 	};
 
 	getDocumentPreview = doc => {
-		const location = doc.thumb.location;
+		const location = { ...doc };
 		let limit = 524288;
 
-		location._ = 'inputFileLocation';
+		location._ = 'inputDocumentFileLocation';
+		location.thumb_size = 'x';
 
-		if (doc.thumb.size > limit) {
-			throw new Error('Size of document exceed limit');
-		}
+		return this.MtpApiManager.invokeApi('upload.getFile', {
+			location: location,
+			offset: 0,
+			limit: limit,
+		});
+	};
+
+	getPhotoPreview = photo => {
+		const location = { ...photo };
+		let limit = 524288;
+
+		location._ = 'inputPhotoFileLocation';
+		location.thumb_size = 'x';
 
 		return this.MtpApiManager.invokeApi('upload.getFile', {
 			location: location,
@@ -1188,6 +1199,60 @@ export default class TelegramApi {
 				autoplay: true,
 				animationData: st,
 			});
+		});
+	};
+
+	_fillPhotosPromises = async (photos = []) => {
+		const photo_promises = [];
+		photos.forEach(photo => {
+			if (photo) {
+				photo_promises.push(
+					this.getPhotoPreview(photo).then(
+						res => 'data:image/png;base64,' + btoa(String.fromCharCode(...new Uint8Array(res.bytes)))
+					)
+				);
+			}
+		});
+		return photo_promises;
+	};
+
+	_fillDocumentsPromises = async (docs = []) => {
+		const doc_results = [];
+		docs.forEach(doc => {
+			const new_doc = { ...doc };
+
+			docs.push(new_doc);
+		});
+	};
+
+	searchPeerMessages = async (peer_id, text, filter = {}, limit = 100) => {
+		const peer = this.mapPeerToTruePeer(await this.getPeerByID(peer_id));
+
+		return this.invokeApi('messages.search', {
+			peer,
+			q: text,
+			filter,
+			limit,
+			hash: Math.floor(Math.random() * 1000),
+		});
+	};
+
+	getPeerPhotos = async (peer_id, offset = 0, limit = 100) => {
+		return this.searchPeerMessages(peer_id, '', { _: 'inputMessagesFilterPhotos' }, limit).then(messages => {
+			const msg_photos = [];
+			console.log('MSGS', messages);
+
+			messages.messages.forEach(msg => {
+				msg_photos.push(msg.media.photo);
+			});
+
+			return this._fillPhotosPromises(msg_photos);
+		});
+	};
+
+	getPeerDocuments = async (peer_id, offset = 0, limit = 100) => {
+		return this.searchPeerMessages(peer_id, '', { _: 'inputMessagesFilterDocument' }, limit).then(messages => {
+			console.log('MSGS', messages);
 		});
 	};
 }
