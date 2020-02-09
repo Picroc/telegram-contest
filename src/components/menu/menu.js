@@ -21,7 +21,7 @@ export const onType = event => {
 let currentSeacrhTimeout;
 const tApi = window.telegramApi;
 
-const onTypeContacts = (value, searchCallback = () => {}) => {
+const onTypeContacts = (value, searchCallback = () => { }) => {
 	if (value.length == 0) {
 		clearTimeout(currentSeacrhTimeout);
 		return;
@@ -119,7 +119,7 @@ export default class Menu extends HTMLElement {
 	};
 
 	menuClick = e => {
-		this.menuList.classList.toggle('menu-list_hidden');
+		this.menuList.classList.toggle('popup_hidden');
 	};
 
 	static get observedAttributes() {
