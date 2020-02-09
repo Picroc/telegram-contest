@@ -66,7 +66,7 @@ export const loadDialog = (component, elem, dialog) => {
 		chatPage.append(rightSidebar);
 		telegramApi.getFullPeer(id).then(fullPeer => {
 			console.log('fullPeer', fullPeer);
-			telegramApi.getPeerPhoto(id).then(dialogPhoto => setActivePeer({ ...fullPeer, avatar: dialogPhoto }));
+			telegramApi.getPeerPhoto(id).then(dialogPhoto => setActivePeer({ ...fullPeer, avatar: dialogPhoto, id }));
 		});
 	});
 };

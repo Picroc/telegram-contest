@@ -104,6 +104,11 @@ export const updateDialogStatus = (id, status) => {
 	if (topBar && topBar.getAttribute('user_id') == id) {
 		topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, { id }));
 	}
+	const rightSidebar = document.getElementById('right-sidebar');
+	console.log('rightSidebar', rightSidebar);
+	if (rightSidebar) {
+		rightSidebar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, status));
+	}
 };
 
 export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);

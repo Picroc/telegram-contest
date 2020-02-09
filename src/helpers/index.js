@@ -1,3 +1,5 @@
+import { getDialog } from '../store/store';
+
 export const cc = (cls, condition = true) => ({ class: cls, condition });
 export const tc = (cls1, cls2, conditional) => cc(conditional ? cls1 : cls2);
 
@@ -21,7 +23,7 @@ export const clsx = (...clss) =>
 
 export const subscribe = element => {
 	const el = typeof element === 'string' ? document.querySelector(element) : element;
-	return function (...args) {
+	return function(...args) {
 		el.addEventListener(...args);
 	};
 };
@@ -33,7 +35,7 @@ export const htmlToElement = html => {
 	return template.content.firstChild;
 };
 
-export const setInnerHTML = function (selector) {
+export const setInnerHTML = function(selector) {
 	return value => {
 		this.querySelector(selector).innerHTML = value;
 	};
@@ -54,7 +56,7 @@ const toggleActive = force => elem => {
 
 export const hide = toggleHide(true);
 export const show = toggleHide(false);
-export const setAttribute = function (selector) {
+export const setAttribute = function(selector) {
 	return attribute => value => {
 		this.querySelector(selector).setAttribute(attribute, value);
 	};
@@ -114,17 +116,19 @@ export const getRightSidebarFieldsFromPeer = peer => {
 	if (peer._ === 'userFull') {
 		generalizedPeer.type = 'user';
 		generalizedPeer.name = getName(peer.user.first_name, peer.user.last_name);
-		generalizedPeer.status = 'waitForAntoha'; //TODO:
 		generalizedPeer.bio = peer.about;
 		generalizedPeer.username = peer.user.username;
 		generalizedPeer.phone = peer.user.phone;
-		generalizedPeer.notifications = getNotificationsModeBoolByPeer(peer);
 	} else if (peer._ === 'messages.chatFull') {
 		generalizedPeer.type = 'groupChat';
 		generalizedPeer.name = peer.chats[0].title;
-		generalizedPeer.status = 'waitForAntoha'; //TODO:
 		generalizedPeer.about = peer.full_chat.about;
 		generalizedPeer.link = 't.me/' + peer.full_chat.username;
-		generalizedPeer.notifications = getNotificationsModeBoolByPeer(peer);
 	}
+	generalizedPeer.notifications = getNotificationsModeBoolByPeer(peer);
+	generalizedPeer.avatar = peer.avatar;
+
+	return generalizedPeer;
 };
+
+export const capitalise = string => string.charAt(0).toUpperCase() + string.slice(1);
