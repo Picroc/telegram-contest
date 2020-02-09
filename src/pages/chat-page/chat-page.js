@@ -37,7 +37,6 @@ export default class ChatPage extends HTMLElement {
 
 		await telegramApi.getDialogsParsed(15).then(load);
 		telegramApi.invokeApi('messages.getPinnedDialogs', { folder_id: 0 }).then(({ dialogs }) => {
-			console.log('dialogs', dialogs);
 			dialogs.forEach(dialog => {
 				const {
 					peer: { channel_id, chat_id, user_id },
