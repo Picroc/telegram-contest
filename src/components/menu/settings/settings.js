@@ -42,7 +42,7 @@ export default class Settings extends HTMLElement {
 	};
 
 	moreButtonListener = e => {
-		this.moreButton.children[1].classList.toggle('hide');
+		this.moreButton.children[1].classList.toggle('popup_hidden');
 	};
 
 	connectedCallback() {

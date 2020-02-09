@@ -7,6 +7,8 @@
   align-items: center;
   transition: 0.4s;
 
+  user-select: none;
+
   &__search-wrapper {
     height: 90%;
     width: 95%;
@@ -70,12 +72,6 @@
     left: 10px;
     max-width: 200px;
 
-
-    &_hidden {
-      opacity: 0;
-      z-index: -1;
-    }
-
     & li {
       justify-content: flex-start;
       width: 200px;
@@ -97,11 +93,9 @@
       }
 
       &__text {
-      transform: translateX(24px);
+        transform: translateX(24px);
+      }
     }
-    }
-
-
   }
 
   &__icon {
