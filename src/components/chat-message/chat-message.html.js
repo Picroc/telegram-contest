@@ -34,7 +34,6 @@ export default ({
                     post_author: postAuthor = '',
                 }) => {
     const isOutgoing = out && fromId === userId;
-    const wasForward = !!forwardFrom;
     const hasReply = !!replyToMessageId;
     const hasMedia = !!media;
 
