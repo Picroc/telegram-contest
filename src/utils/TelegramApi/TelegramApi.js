@@ -10,7 +10,7 @@ import MtpPasswordManagerModule from './js/Mtp/MtpPasswordManager';
 import AppsChatsManagerModule from './js/App/AppChatsManager';
 import FileSaverModule from './js/Etc/FileSaver';
 import { nextRandomInt } from './js/lib/bin_utils';
-import { isArray, isFunction, forEach, map, min } from './js/Etc/Helper';
+import { isArray, isFunction, forEach, map, min, noop } from './js/Etc/Helper';
 import $timeout from './js/Etc/angular/$timeout';
 import { Config } from './js/lib/config';
 import AppUpdatesManagerModule from './js/App/AppUpdatesManager';
@@ -398,6 +398,7 @@ export default class TelegramApi {
 			_: 'inputDocumentFileLocation',
 			id: doc.id,
 			access_hash: doc.access_hash,
+			file_reference: doc.file_reference,
 		};
 		let fileName = 'FILE';
 		let size = 15728640;
@@ -498,10 +499,11 @@ export default class TelegramApi {
 	downloadPhoto = (photo, progress, autosave) => {
 		const photoSize = photo.sizes[photo.sizes.length - 1];
 		const location = {
-			_: 'inputFileLocation',
-			local_id: photoSize.location.local_id,
-			secret: photoSize.location.secret,
-			volume_id: photoSize.location.volume_id,
+			_: 'inputPhotoFileLocation',
+			id: photo.id,
+			access_hash: photo.access_hash,
+			file_reference: photo.file_reference,
+			thumb_size: 'c',
 		};
 
 		if (!isFunction(progress)) {
@@ -778,7 +780,7 @@ export default class TelegramApi {
 		if (peer._ === 'peerChat') {
 			const chat = chats[chats.findIndex(el => el.id === peer.chat_id)];
 			title = chat.title;
-			if (chat.photo._ !== 'chatPhotoEmpty') {
+			if (chat.photo && chat.photo._ !== 'chatPhotoEmpty') {
 				photo = chat.photo;
 			}
 		} else if (peer._ === 'peerChannel') {
@@ -788,7 +790,7 @@ export default class TelegramApi {
 			is_supergroup = this._checkFlag(channel.flags, 8);
 
 			title = channel.title;
-			if (channel.photo._ !== 'chatPhotoEmpty') {
+			if (channel.photo && channel.photo._ !== 'chatPhotoEmpty') {
 				photo = channel.photo;
 			}
 			peer = {
