@@ -1,5 +1,8 @@
 import template from './register-page.html';
 import './register-page.scss';
+import { convertToByteArray } from '../../utils/TelegramApi/js/lib/bin_utils';
+import { telegramApi, router } from '../../App';
+import { addToUser, setUser } from '../../store/store';
 
 export default class RegisterPage extends HTMLElement {
 	constructor() {
@@ -23,10 +26,12 @@ export default class RegisterPage extends HTMLElement {
 			'click',
 			e => {
 				e.preventDefault();
-				console.log(this.name);
+				// console.log(this.name);
 				if (!this.name.value) {
 					this.showInvalid();
+					return;
 				}
+				this.signUp();
 			},
 			false
 		);
@@ -66,7 +71,6 @@ export default class RegisterPage extends HTMLElement {
 
 		const self = this;
 
-		fr.readAsArrayBuffer(file);
 		fr.onloadend = function(e) {
 			if (e.target.readyState == FileReader.DONE) {
 				const arrayBuffer = e.target.result,
@@ -76,9 +80,16 @@ export default class RegisterPage extends HTMLElement {
 					fileReadArray.push(array[i]);
 				}
 
-				self.uploadPhoto(e.target.result, file);
+				self.updatePhoto(e.target.result, file);
+
+				if (e.target.result) {
+					self.uploadPhoto(file).then(res => {
+						console.log('SERVER RESP', res);
+					});
+				}
 			}
 		};
+		fr.readAsArrayBuffer(file);
 	}
 
 	showInvalid = () => {
@@ -94,7 +105,11 @@ export default class RegisterPage extends HTMLElement {
 		}, 3000);
 	};
 
-	uploadPhoto = (photoBytes, justFile) => {
+	uploadPhoto = async bytes => {
+		return await telegramApi.editUserPhoto(bytes);
+	};
+
+	updatePhoto = (photoBytes, justFile) => {
 		console.log(photoBytes);
 		const image = document.createElement('img');
 
@@ -110,11 +125,40 @@ export default class RegisterPage extends HTMLElement {
 		this.icon_button.appendChild(image);
 	};
 
+	signUp = () => {
+		const phone = this.getAttribute('phone'),
+			code = this.getAttribute('code');
+
+		telegramApi
+			.signUp(phone, window.phone_code_hash, code, this.name.value, this.surname.value)
+			.then(res => {
+				telegramApi.getUserInfo().then(user => {
+					console.log('HERE WE GO', user);
+					setUser(user);
+				});
+				telegramApi
+					.getUserPhoto(1)
+					.then(res => {
+						addToUser('avatar', res);
+					})
+					.catch(err => console.log('err', err));
+				router('chat-page');
+			})
+			.catch(err => {
+				console.log('ERR OCCURED', err);
+			});
+	};
+
 	connectedCallback() {
 		if (!this.rendered) {
 			this.render();
 			this.rendered = true;
 		}
+	}
+
+	static get observedAttributes() {
+		// (3)
+		return ['phone', 'code'];
 	}
 
 	attributeChangedCallback() {

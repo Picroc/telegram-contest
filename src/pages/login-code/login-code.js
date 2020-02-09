@@ -2,7 +2,7 @@ import template from './login-code.html';
 import './login-code.scss';
 
 import { router, telegramApi } from '../../App';
-import { getUser, addToUser } from '../../store/store';
+import { getUser, addToUser, setUser } from '../../store/store';
 
 export default class LoginCode extends HTMLElement {
 	constructor() {
@@ -25,9 +25,6 @@ export default class LoginCode extends HTMLElement {
 			telegramApi
 				.signIn(phone, window.phone_code_hash, newText)
 				.then(res => {
-					if (res.type === 'SESSION_PASSWORD_NEEDED') {
-						router('login-password');
-					}
 					telegramApi.getUserInfo().then(user => {
 						console.log('HERE WE GO', user);
 						setUser(user);
@@ -38,9 +35,10 @@ export default class LoginCode extends HTMLElement {
 							addToUser('avatar', res);
 						})
 						.catch(err => console.log('err', err));
+					router('chat-page');
 				})
 				.catch(err => {
-					console.log('Got error');
+					// console.log('Got error');
 					if (err.type === 'PHONE_NUMBER_UNOCCUPIED') {
 						router('register-page', { phone, code });
 					} else if (err.type === 'SESSION_PASSWORD_NEEDED') {

@@ -66,7 +66,7 @@ telegramApi
 	})
 	.then(res => {
 		if (res) {
-			router('register-page');
+			router('login-form');
 		}
 	})
 	.catch(err => {

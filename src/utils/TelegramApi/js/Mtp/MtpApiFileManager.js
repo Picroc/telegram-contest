@@ -1,5 +1,7 @@
 import MtpApiManagerModule from './MtpApiManager';
 import { Config } from '../lib/config';
+import { nextRandomInt } from '../lib/bin_utils';
+import { dT } from '../lib/utils';
 
 export default function MtpApiFileManagerModule() {
 	let cachedFs = false;
@@ -41,7 +43,7 @@ export default function MtpApiFileManagerModule() {
 
 		downloadActives[dcID] += activeDelta;
 
-		const a = index++;
+		// const a = index++;
 		data.cb().then(
 			result => {
 				downloadActives[dcID] -= activeDelta;
@@ -144,7 +146,7 @@ export default function MtpApiFileManagerModule() {
 										} else {
 											Config.Modes.debug &&
 												console.log(dT(), 'Progress', (doneParts * partSize) / fileSize);
-											resolve({ done: doneParts * partSize, total: fileSize });
+											// resolve({ done: doneParts * partSize, total: fileSize });
 										}
 									}, errorHandler);
 								};
@@ -157,7 +159,7 @@ export default function MtpApiFileManagerModule() {
 				})(offset, part++);
 			}
 
-			cancel = () => {
+			const cancel = () => {
 				Config.Modes.debug && console.log('cancel upload', canceled, resolved);
 				if (!canceled && !resolved) {
 					canceled = true;

@@ -629,6 +629,14 @@ export default class TelegramApi {
 		});
 	};
 
+	editUserPhoto = photo => {
+		return this.MtpApiFileManager.uploadFile(photo).then(inputFile => {
+			return this.invokeApi('photos.uploadProfilePhoto', {
+				file: inputFile,
+			});
+		});
+	};
+
 	editChatPhoto = (chat_id, photo) => {
 		return this.MtpApiFileManager.uploadFile(photo).then(inputFile => {
 			return this.MtpApiManager.invokeApi('messages.editChatPhoto', {
@@ -789,9 +797,9 @@ export default class TelegramApi {
 			}
 			peer = user.access_hash
 				? {
-					...peer,
-					access_hash: user.access_hash,
-				}
+						...peer,
+						access_hash: user.access_hash,
+				  }
 				: peer;
 		}
 		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
@@ -1069,9 +1077,9 @@ export default class TelegramApi {
 				photo = user.photo && user.photo._ !== 'userPhotoEmpty' && user.photo;
 				peer = user.access_hash
 					? {
-						...result,
-						access_hash: user.access_hash,
-					}
+							...result,
+							access_hash: user.access_hash,
+					  }
 					: result;
 			}
 
