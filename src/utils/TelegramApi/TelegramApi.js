@@ -780,7 +780,7 @@ export default class TelegramApi {
 		if (peer._ === 'peerChat') {
 			const chat = chats[chats.findIndex(el => el.id === peer.chat_id)];
 			title = chat.title;
-			if (chat.photo._ !== 'chatPhotoEmpty') {
+			if (chat.photo && chat.photo._ !== 'chatPhotoEmpty') {
 				photo = chat.photo;
 			}
 		} else if (peer._ === 'peerChannel') {
@@ -790,7 +790,7 @@ export default class TelegramApi {
 			is_supergroup = this._checkFlag(channel.flags, 8);
 
 			title = channel.title;
-			if (channel.photo._ !== 'chatPhotoEmpty') {
+			if (channel.photo && channel.photo._ !== 'chatPhotoEmpty') {
 				photo = channel.photo;
 			}
 			peer = {
