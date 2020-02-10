@@ -1,5 +1,7 @@
 window.store = {};
 window.store.mapId = {};
+window.defaultAvatar = 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg';
+
 export const updateStoreEvent = (type, options) =>
 	new CustomEvent(type, { bubbles: false, cancelable: true, detail: options });
 
@@ -137,4 +139,14 @@ export const setActivePeer = peer => {
 
 export const getActivePeer = () => {
 	return window.store.activePeer;
+};
+
+export const SET_ACTIVE_PEER_MEDIA = 'SET_ACTIVE_PEER_MEDIA';
+export const setActivePeerMedia = media => {
+	window.store.activePeerMedia = media;
+	document.getElementById('right-sidebar').dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER_MEDIA, media));
+};
+
+export const getActivePeerMedia = () => {
+	return window.store.activePeerMedia;
 };

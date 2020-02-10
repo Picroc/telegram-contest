@@ -823,6 +823,8 @@ export default class TelegramApi {
 	getChatParticipants = async chat_id => {
 		const chat = await this.getFullPeer(chat_id, 'chat');
 
+		this.AppUsersManager.saveApiUsers(chat.users);
+
 		if (chat && chat.full_chat && chat.full_chat._ === 'chatFull') {
 			const onlineUsers = [],
 				offlineUsers = [];
@@ -850,6 +852,8 @@ export default class TelegramApi {
 				limit: 200,
 				hash: Math.round(Math.random() * 100),
 			});
+
+			this.AppUsersManager.saveApiUsers(channel_users.users);
 
 			const onlineUsers = [],
 				offlineUsers = [];

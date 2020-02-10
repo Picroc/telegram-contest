@@ -6,6 +6,7 @@ import {
 	getUser,
 	getDialog,
 	setActivePeer,
+	setActivePeerMedia,
 } from '../../store/store';
 import {
 	htmlToElement,
@@ -66,7 +67,14 @@ export const loadDialog = (component, elem, dialog) => {
 		chatPage.append(rightSidebar);
 		telegramApi.getFullPeer(id).then(fullPeer => {
 			console.log('fullPeer', fullPeer);
-			telegramApi.getPeerPhoto(id).then(dialogPhoto => setActivePeer({ ...fullPeer, avatar: dialogPhoto, id }));
+			telegramApi.getPeerPhoto(id).then(dialogPhoto => {
+				setActivePeer({ ...fullPeer, avatar: dialogPhoto, id });
+				telegramApi.getPeerPhotos(id, 0, 20).then(media => {
+					console.log('media', media);
+					setActivePeerMedia(media);
+					rightSidebar.loadPeerSidebar(id);
+				});
+			});
 		});
 	});
 };

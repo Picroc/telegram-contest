@@ -1,11 +1,12 @@
 import template from './right-sidebar.html';
 import './right-sidebar.scss';
 import { setInnerHTML, setAttribute } from '../../helpers';
-import { SET_ACTIVE_PEER, UPDATE_DIALOG_STATUS, getActivePeer } from '../../store/store';
-import { getRightSidebarFieldsFromPeer, htmlToElement, capitalise } from '../../helpers/index';
+import { UPDATE_DIALOG_STATUS, getActivePeer, getActivePeerMedia } from '../../store/store';
+import { getRightSidebarFieldsFromPeer, htmlToElement, capitalise, getName } from '../../helpers/index';
 import infoSvg from './svg/info.js';
 import phoneSvg from './svg/phone.js';
 import usernameSvg from './svg/username.js';
+import { telegramApi } from '../../App';
 // import livelocation from './svg/livelocation.js';
 // import edit from './svg/edit.js';
 
@@ -19,14 +20,17 @@ export default class RightSidebar extends HTMLElement {
 
 		this.tabsElem = this.querySelector('.right-sidebar__tabs');
 
+		this.materialsElem = this.querySelector('.right-sidebar__general-materials');
+
 		this.moreButton = this.querySelector('.right-sidebar__more');
 		this.moreButton.addEventListener('click', this.moreButtonListener);
 
 		this.backButton = this.querySelector('.right-sidebar__back');
 		this.backButton.addEventListener('click', this.backButtonListener);
 
-		this.addEventListener(SET_ACTIVE_PEER, this.loadPeerSidebar); //{ capture: true }
-		this.addEventListener(UPDATE_DIALOG_STATUS, this.updateStatus); //{ capture: true }
+		this.addEventListener(UPDATE_DIALOG_STATUS, this.updateStatus);
+		// this.addEventListener(SET_ACTIVE_PEER, this.loadPeerSidebar);
+		// this.addEventListener(SET_ACTIVE_PEER_MEDIA, this.setMedia);
 	}
 
 	backButtonListener = e => {
@@ -43,21 +47,25 @@ export default class RightSidebar extends HTMLElement {
 		setHTML('.right-sidebar__status')(status);
 	};
 
-	loadPeerSidebar = () => {
+	loadPeerSidebar = id => {
 		const setHTML = setInnerHTML.bind(this);
 		this.attributesElem.innerHTML = '';
+		this.materialsElem.innerHTML = '';
 		const generalizedPeer = getRightSidebarFieldsFromPeer(getActivePeer());
+		this.generalizedPeer = generalizedPeer;
 		const { notifications, avatar, name } = generalizedPeer;
-		document.querySelector('.right-sidebar__avatar_img').src = avatar;
+		document.querySelector('.right-sidebar__avatar_img').src = avatar || window.defaultAvatar;
 		setHTML('.right-sidebar__name')(name);
 		switch (generalizedPeer.type) {
 			case 'user':
 				this.loadUserAttributes(generalizedPeer);
 				this.loadTabs(['media', 'docs', 'links', 'audio']);
+				this.setMedia();
 				break;
 			case 'groupChat':
 				this.loadGroupChatAttributes(generalizedPeer);
 				this.loadTabs(['members', 'media', 'docs', 'links']);
+				this.setChatParticipants(id);
 				break;
 		}
 		const label = notifications ? 'Enabled' : 'Disabled';
@@ -100,18 +108,21 @@ export default class RightSidebar extends HTMLElement {
 			tabElem.addEventListener('click', this.chooseTab);
 			this.tabsElem.append(tabElem);
 		});
-		this.tabsElem.firstChild.classList.add('tab_active');
-		const members = tabs[0] == 'members';
+		this.tabsElem.firstChild.classList.add('tab_active'); //TODO: добавить прогрузку контента первого таба
+		const membersBool = tabs[0] == 'members';
 		this.underline = htmlToElement(
-			`<div class="tabs__underline underline ${members ? 'underline_big' : ''}"></div>`
+			`<div class="tabs__underline underline ${membersBool ? 'underline_big' : ''}"></div>`
 		);
 		this.tabsElem.append(this.underline);
 		this.tabsElem.append(htmlToElement(`<div class="tabs__gray-line gray-line"></div>`));
+
+		media && media.addEventListener('click', this.setMedia);
+		members && members.addEventListener('click', this.setChatParticipants);
 	};
 
 	createTabElem = tab => {
 		return htmlToElement(`
-        <div class="tabs__tab tab tab__${tab}">${capitalise(tab)}</div>`);
+        <div class="tabs__tab tab tab__${tab}" id="${tab}">${capitalise(tab)}</div>`);
 	};
 
 	chooseTab = e => {
@@ -128,6 +139,57 @@ export default class RightSidebar extends HTMLElement {
 				element.classList.remove('tab_active');
 			}
 		});
+	};
+
+	clearMaterialsClasses = () => {
+		this.materialsElem.classList = 'right-sidebar__general-materials';
+	};
+
+	setMedia = e => {
+		this.materialsElem.innerHTML = '';
+		this.clearMaterialsClasses();
+		this.materialsElem.classList.add('right-sidebar__general-materials__media');
+		const media = getActivePeerMedia();
+		media.forEach(({ photo }) => {
+			const placeholder = htmlToElement(`<div class="right-sidebar__general-materials_placeholder"></div>`);
+			this.materialsElem.appendChild(placeholder);
+			photo.then(image => placeholder.appendChild(this.createMediaElem(image, 'media')));
+		});
+	};
+
+	createMediaElem = (media, name) => {
+		return htmlToElement(`<img src="${media}" class="right-sidebar__general-materials__${name}-element"/>`);
+	};
+
+	setChatParticipants = async id => {
+		this.materialsElem.innerHTML = '';
+		this.clearMaterialsClasses();
+		this.materialsElem.classList.add('right-sidebar__general-materials__participants');
+		const { onlineUsers, offlineUsers } = await telegramApi.getChatParticipants(id);
+		for (const { first_name, last_name, id } of onlineUsers) {
+			const name = getName(first_name, last_name);
+			const avatar = (await telegramApi.getPeerPhoto(id)) || window.defaultAvatar;
+			const elem = this.createParticipantElem(avatar, name, 'online');
+			this.materialsElem.appendChild(elem);
+		}
+		for (const { first_name, last_name, id } of offlineUsers) {
+			const name = getName(first_name, last_name);
+			const avatar = (await telegramApi.getPeerPhoto(id)) || window.defaultAvatar;
+			const elem = this.createParticipantElem(avatar, name, 'offline');
+			this.materialsElem.appendChild(elem);
+		}
+	};
+
+	createParticipantElem = (avatar, name, status) => {
+		return htmlToElement(`<div class="right-sidebar__general-materials__participants__participant">
+        <div class="participants__avatar-wrapper">
+            <img src="${avatar}" alt="avatar" class="participants__avatar avatar avatar_small">
+        </div>
+        <div class="participants__name-and-status">
+            <div class="participants__name-and-status__name">${name}</div>
+            <div class="participants__name-and-status__status ${status}">${status}</div>
+        </div>
+    </div>`);
 	};
 
 	connectedCallback() {
