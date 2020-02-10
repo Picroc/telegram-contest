@@ -10,7 +10,10 @@ export default class ChatPage extends HTMLElement {
 
 	render() {
 		this.innerHTML = template;
+		this.className = 'chat-page';
 		this.loadData();
+		const rightSidebar = document.createElement('right-sidebar');
+		this.appendChild(rightSidebar);
 	}
 
 	connectedCallback() {
@@ -23,7 +26,7 @@ export default class ChatPage extends HTMLElement {
 			if (first) {
 				const left = document.getElementById('left');
 				stopLoading(left);
-				left.innerHTML = `<my-archives></my-archives><my-menu></my-menu><user-dialogs></user-dialogs>`;
+				left.innerHTML = `<my-archives></my-archives><my-menu></my-menu><user-dialogs></user-dialogs><search-list></search-list>`;
 				console.log('dialogs', data);
 				setDialogs(data);
 				setArchives(archived_items);

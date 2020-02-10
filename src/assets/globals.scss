@@ -1,4 +1,4 @@
-@import 'avatars.scss';
+@import "avatars.scss";
 
 :root {
   --primary: rgb(79, 164, 246);
@@ -9,6 +9,7 @@
   --dark-gray: rgb(106, 108, 111);
   --gray-300: #e0e0e0;
   --pinned: #c4c9cc;
+  --special-gray: #c5cacc;
 
   --green: #4dcd5e;
   --shadow: rgba(0, 0, 0, 0.75);
@@ -112,7 +113,7 @@ body {
   position: absolute;
   height: 100%;
   background: var(--white);
-  z-index: 2;
+  z-index: 10;
   width: 25vw;
 
   min-width: 260px;

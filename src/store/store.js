@@ -1,13 +1,14 @@
-import { peerToId } from "../helpers";
+import { peerToId } from '../helpers';
 
 window.store = new Store();
 
 function Store() {
 	this.mapId = {};
+	this.dialogs = [];
 }
 
 const addPeerStore = peerId => {
-	return window.store[peerId] = {
+	return (window.store[peerId] = {
 		messages: {},
 		links: {},
 		photo: {},
@@ -18,7 +19,7 @@ const addPeerStore = peerId => {
 		poll: {},
 		webpage: {},
 		unsupported: {},
-	};
+	});
 };
 
 export const updateStoreEvent = (type, options) =>
@@ -44,7 +45,10 @@ const setChats = (storeString, elem, event) => chats => {
 };
 
 export const SET_DIALOGS = 'SET_DIALOGS';
-export const setDialogs = dialogs => setChats('dialogs', document.getElementById('user-dialogs'), SET_DIALOGS)(dialogs);
+export const setDialogs = dialogs => {
+	setChats('dialogs', document.getElementById('user-dialogs'), SET_DIALOGS)(dialogs);
+	document.getElementById('search-list').dispatchEvent(updateStoreEvent(SET_DIALOGS));
+};
 
 export const SET_ARCHIVES = 'SET_ARCHIVES';
 export const setArchives = archives =>
@@ -65,8 +69,10 @@ const appendChats = (storeString, element, event) => chats => {
 };
 
 export const APPEND_DIALOGS = 'APPEND_DIALOGS';
-export const appendDialogs = dialogs =>
+export const appendDialogs = dialogs => {
 	appendChats('dialogs', document.getElementById('user-dialogs'), APPEND_DIALOGS)(dialogs);
+	document.getElementById('search-list').dispatchEvent(updateStoreEvent(APPEND_DIALOGS));
+};
 
 export const APPEND_ARCHIVES = 'APPEND_ARCHIVES';
 export const appendArchives = archives =>
@@ -103,6 +109,10 @@ export const updateDialogPhoto = (id, photo) => {
 	const dialog = getDialog(id);
 	dialog.photo = photo;
 	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_PHOTO, { id }));
+	const searchPerson = document.getElementById(`search-list__person_${id}`);
+	if (searchPerson) {
+		searchPerson.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_PHOTO, { id }));
+	}
 	const topBar = document.querySelector('top-bar');
 	if (topBar && topBar.getAttribute('user_id') == id) {
 		topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_PHOTO, { id }));
@@ -238,8 +248,9 @@ export const SET_ACTIVE_PEER = 'SET_ACTIVE_PEER';
 export const setActivePeer = peer => {
 	window.store.activePeer = peer;
 	const rightSidebar = document.getElementById('right-sidebar');
-	if (rightSidebar)
+	if (rightSidebar) {
 		rightSidebar.dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER, { peer }));
+	}
 };
 
 export const getActivePeer = () => {

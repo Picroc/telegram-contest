@@ -1,6 +1,10 @@
-.chat-main {
+chat-main {
   align-self: center;
   align-items: center;
+  .all-messages {
+    height: 80vh;
+    overflow: auto;
+  }
 }
 
 .date-bubble {
