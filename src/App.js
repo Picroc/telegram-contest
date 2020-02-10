@@ -7,6 +7,7 @@ import LoginForm from './pages/login-form/login-form';
 import LoginCode from './pages/login-code/login-code';
 import LoginPassword from './pages/login-password/login-password';
 import ChatPage from './pages/chat-page/chat-page';
+import ChatMain from './pages/chat-main/index';
 
 import CountriesPopupItem from './components/countries-popup-item/countries-popup-item';
 import BubbleMessage from './components/bubbles/bubbleMessage';
@@ -18,10 +19,17 @@ import Menu from './components/menu/menu';
 import Settings from './components/menu/settings/settings';
 import UserDialogs from './components/user-dialogs/user-dialogs';
 import Dialog from './components/user-dialogs/dialog/dialog';
-import ChatMessage from './components/chat-message/chatMessage';
 import RegisterPage from './pages/register-page/register-page';
 import Archives from './components/menu/archives/archives';
 import RightSidebar from './components/right-sidebar/right-sidebar';
+import ChatMessage from "./components/chat-message/chatMessage";
+import DocumentMessage from "./components/chat-message/message-types/documentMessage";
+import ContactMessage from "./components/chat-message/message-types/contactMessage";
+import GameMessage from "./components/chat-message/message-types/gameMessage";
+import GeoMessage from "./components/chat-message/message-types/geoMessage";
+import GeoLiveMessage from "./components/chat-message/message-types/geoLiveMessage";
+import InvoiceMessage from "./components/chat-message/message-types/invoiceMessage";
+import PollMessage from "./components/chat-message/message-types/pollMessage";
 
 customElements.define('my-router', Router);
 customElements.define('countries-popup-item', CountriesPopupItem);
@@ -34,11 +42,21 @@ customElements.define('my-settings', Settings);
 customElements.define('user-dialogs', UserDialogs);
 customElements.define('my-dialog', Dialog);
 
+customElements.define('contact-message', ContactMessage);
+customElements.define('document-message', DocumentMessage);
+customElements.define('game-message', GameMessage);
+customElements.define('geo-message', GeoMessage);
+customElements.define('geo-live-message', GeoLiveMessage);
+customElements.define('invoice-message', InvoiceMessage);
+customElements.define('poll-message', PollMessage);
+
+
 customElements.define('login-form', LoginForm);
 customElements.define('login-code', LoginCode);
 customElements.define('login-password', LoginPassword);
 customElements.define('register-page', RegisterPage);
 customElements.define('chat-page', ChatPage);
+customElements.define('chat-main', ChatMain);
 customElements.define('chat-message', ChatMessage);
 customElements.define('my-archives', Archives);
 customElements.define('right-sidebar', RightSidebar);

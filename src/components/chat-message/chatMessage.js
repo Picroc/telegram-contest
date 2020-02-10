@@ -1,12 +1,12 @@
 import makeTemplate from './chat-message.html';
-import { getMessages } from "../../store/store";
+import { getMessage, getActivePeerId } from "../../store/store";
 import './chatMessage.scss'
 
 export default class ChatMessage extends HTMLElement{
     render() {
-        const peer = this.getAttribute('peer');
+        const peerId = getActivePeerId();
         const messageId = this.getAttribute('id');
-        const message = getMessages(peer)(messageId);
+        const message = getMessage(peerId)(messageId);
         this.innerHTML = `${makeTemplate(message)}`;
     }
 
