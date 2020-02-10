@@ -1,7 +1,7 @@
 import { peerToId, stopLoading } from "../../helpers";
 import './messages.scss';
 import './chatMain.scss';
-import { getCurrentPeer, getMessagesByPeerId, putMessage } from "../../store/store";
+import { getActivePeer, getAllMessages, putMessage } from "../../store/store";
 import { telegramApi } from '../../App';
 
 export default class ChatMain extends HTMLElement {
@@ -11,7 +11,7 @@ export default class ChatMain extends HTMLElement {
         const startMessageId = this.getAttribute('start-message');
         const peerId = this.getAttribute('peer-id');
         this.getMessages(peerId, startMessageId).then(messagesComponent => {
-            stopLoading(right)
+            stopLoading(right);
             this.innerHTML = `
 						<top-bar user_id="${ peerId }"></top-bar>
 						${ messagesComponent }
@@ -35,19 +35,19 @@ export default class ChatMain extends HTMLElement {
     getMessages = async (peerId, startMessageId) => {
         await this.fetchMessages({offsetId: startMessageId});
         let div = '';
-        for (const messageId of Object.keys(getMessagesByPeerId(peerId))){
+        for (const messageId of Object.keys(getAllMessages(peerId))){
             div += `<p><chat-message id="${messageId}"></chat-message></p>`
         }
         return `<div class="all-messages">${div}</div>`;
     }
 
     fetchMessages = async ({limit = 30, offsetId = 0, offsetDate = 0}) => {
-    	const peer = getCurrentPeer();
+    	const peer = getActivePeer();
     	const peerId = peerToId(peer);
     	const { messages } = await telegramApi.getMessagesFromPeer(peer, limit, offsetId, offsetDate);
     	for (const message of messages) {
             const { id } = message;
-            putMessage(peerId, id, message);
+            putMessage(peerId)(id)(message);
         }
 	}
 }

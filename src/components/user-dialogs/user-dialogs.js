@@ -2,9 +2,9 @@ import {
 	getDialogs,
 	SET_DIALOGS,
 	APPEND_DIALOGS,
+  setActivePeer,
 	getUser,
 	getDialog,
-	setActivePeer,
 	updateDialog,
 } from '../../store/store';
 import { htmlToElement, startLoading, stopLoading, createDiv } from '../../helpers/index';

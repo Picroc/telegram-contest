@@ -1,7 +1,24 @@
 import { peerToId } from "../helpers";
 
-window.store = { messages: {} };
-window.store.mapId = {};
+window.store = new Store();
+
+function Store() {
+	this.mapId = {};
+}
+
+const addPeerStore = peerId => {
+	return window.store[peerId] = {
+		messages: {},
+		links: {},
+		photo: {},
+		document: {},
+		geo: {},
+		contact: {},
+		invoice: {},
+		poll: {}
+	};
+};
+
 export const updateStoreEvent = (type, options) =>
 	new CustomEvent(type, { bubbles: false, cancelable: true, detail: options });
 
@@ -109,6 +126,7 @@ export const updateDialogStatus = (id, status) => {
 };
 
 export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);
+
 export const getArchives = (offset = 0) => window.store.archives.slice(offset);
 
 export const getDialog = id => {
@@ -119,29 +137,104 @@ export const getDialog = id => {
 		return window.store.dialogs[idx];
 	}
 };
-export const getMessages = peer => messageId => {
-	return window.store.messages[peer][messageId];
+
+export const getByPeerId = peerId => ({
+	getMessage: getMessage(peerId),
+	getContent: getContent(peerId),
+	getPhoto: getPhoto(peerId),
+	getDocument: getDocument(peerId),
+	getContact: getContact(peerId),
+});
+
+export const getAllContent = peerId => type => {
+	return window.store[peerId][type];
 };
 
-export const getMessagesByPeerId = peerId => window.store.messages[peerId];
-export const getMessage = (peerId, messageId) => getMessagesByPeerId(peerId)[messageId];
-export const putMessage = (peerId, messageId, messageContent) => getMessagesByPeerId(peerId)[messageId] = messageContent;
-
-export const getCurrentPeer = () => window.store.currentPeer;
-export const setCurrentPeer = peer => {
-	window.store.currentPeer = peer;
-	const peerId = peerToId(peer);
-	window.store.messages[peerId] = {}
+export const getContent = peerId => type => id => {
+	return getAllContent(peerId)(type)[id] || {};
 };
 
-export const getCurrentPeerId = () => peerToId(getCurrentPeer());
+export const getAllMessages = peerId => {
+	return getAllContent(peerId)('messages');
+};
+
+export const getMessage = peerId => messageId => {
+	return getContent(peerId)('messages')(messageId);
+};
+
+export const getPhoto = peerId => photoId => {
+	return getContent(peerId)('photo')(photoId);
+};
+
+export const getDocument = peerId => documentId => {
+	return getContent(peerId)('document')(documentId);
+};
+
+export const getContact = peerId => contactId => {
+	return getContent(peerId)('contact')(contactId);
+};
+
+export const putMessage = peerId => messageId => messageContent => {
+	const peerStore = window.store[peerId] || addPeerStore(peerId);
+	peerStore.messages[messageId] = messageContent;
+	if (messageContent.media) {
+		const mediaType = mapDocumentType(messageContent.media._);
+		putDocument(peerId)(mediaType)(messageContent.media);
+	}
+};
+
+export const putDocumentByPeerId = peerId => {
+	return putDocument(peerId);
+};
+
+export const putDocument = peerId => type => content => {
+	const peerStore = window.store[peerId] || addPeerStore(peerId);
+	const storeType = mapDocumentType(type);
+	const { id: documentId } = content;
+	peerStore[storeType][documentId] = content;
+};
+
+const mapDocumentType = type => {
+	switch (type) {
+		case 'messageMediaPhoto':
+		case 'photo':
+			return `photo`;
+		case 'messageMediaDocument':
+		case 'document':
+			return `document`;
+		case 'messageMediaGeo':
+		case 'geo':
+			return `geo`;
+		case 'messageMediaGeoLive':
+		case 'geoLive':
+			return `geoLive`;
+		case 'messageMediaContact':
+		case 'contact':
+			return `contact`;
+		case 'messageMediaGame':
+		case 'game':
+			return `game`;
+		case 'messageMediaInvoice':
+		case 'invoice':
+			return `invoice`;
+		case 'messageMediaPoll':
+		case 'poll':
+			return `poll`;
+		default:
+			return `unsupported`;
+	}
+};
+
+export const getActivePeerId = () => peerToId(getActivePeer());
 
 export const mapId = id => window.store.mapId[id];
 
 export const SET_ACTIVE_PEER = 'SET_ACTIVE_PEER';
 export const setActivePeer = peer => {
 	window.store.activePeer = peer;
-	document.getElementById('right-sidebar').dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER, { peer }));
+	const rightSidebar = document.getElementById('right-sidebar');
+	if (rightSidebar)
+		rightSidebar.dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER, { peer }));
 };
 
 export const getActivePeer = () => {
