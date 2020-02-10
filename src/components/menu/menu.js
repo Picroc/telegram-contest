@@ -63,7 +63,13 @@ export default class Menu extends HTMLElement {
 	render() {
 		this.innerHTML = template;
 		this.menuList = this.querySelector('.menu-list');
+		this.menuIcon = this.querySelector('.menu__icon');
 		subscribe('.menu__checkbox')('click', this.menuClick);
+		subscribe('.menu__search')('click', event => {
+			this.querySelector('.menu__search_overlay').classList.toggle('hide');
+			this.menuIcon.classList.toggle('arrow');
+			this.menuIcon.classList.toggle('burger');
+		});
 		subscribe('.menu-list__settings')('click', this.settingsClick);
 		subscribe('.menu-list__archived')('click', this.archivesClick);
 		subscribe('.menu__search')('input', event => {
