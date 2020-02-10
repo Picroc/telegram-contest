@@ -2,7 +2,7 @@ import {
 	getDialogs,
 	SET_DIALOGS,
 	APPEND_DIALOGS,
-  setActivePeer,
+	setActivePeer,
 	getUser,
 	getDialog,
 	updateDialog,
@@ -50,7 +50,7 @@ export const loadDialog = (component, elem, dialog) => {
 	const right = document.getElementById('right');
 	setActivePeer(peer);
 	startLoading(right);
-	right.innerHTML = `<chat-main peer-id="${id}"></chat-main>`;
+	right.innerHTML = `<top-bar user_id="${id}"></top-bar><chat-main peer-id="${id}"></chat-main>`;
 };
 
 export default class UserDialogs extends HTMLElement {

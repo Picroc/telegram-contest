@@ -10,7 +10,10 @@ export default class ChatPage extends HTMLElement {
 
 	render() {
 		this.innerHTML = template;
+		this.className = 'chat-page';
 		this.loadData();
+		const rightSidebar = document.createElement('right-sidebar');
+		this.appendChild(rightSidebar);
 	}
 
 	connectedCallback() {

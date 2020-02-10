@@ -1,4 +1,4 @@
-import { peerToId } from "../helpers";
+import { peerToId } from '../helpers';
 
 window.store = new Store();
 
@@ -8,7 +8,7 @@ function Store() {
 }
 
 const addPeerStore = peerId => {
-	return window.store[peerId] = {
+	return (window.store[peerId] = {
 		messages: {},
 		links: {},
 		photo: {},
@@ -19,13 +19,11 @@ const addPeerStore = peerId => {
 		poll: {},
 		webpage: {},
 		unsupported: {},
-	};
+	});
 };
 
 export const updateStoreEvent = (type, options) =>
 	new CustomEvent(type, { bubbles: false, cancelable: true, detail: options });
-
-export const mapId = id => window.store.mapId[id];
 
 const mapAndIdx = (dialog, idx) => {
 	//TODO: отхендлить естественное изменение порядка диалогов
@@ -250,8 +248,9 @@ export const SET_ACTIVE_PEER = 'SET_ACTIVE_PEER';
 export const setActivePeer = peer => {
 	window.store.activePeer = peer;
 	const rightSidebar = document.getElementById('right-sidebar');
-	if (rightSidebar)
+	if (rightSidebar) {
 		rightSidebar.dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER, { peer }));
+	}
 };
 
 export const getActivePeer = () => {
