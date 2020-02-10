@@ -99,7 +99,7 @@ telegramApi
 	.catch(err => console.log('err', err));
 
 const changeState = transform => {
-	return function(...args) {
+	return function (...args) {
 		const [oldState, newState] = [state, transform(...args)];
 
 		state = {
@@ -127,8 +127,25 @@ document.addEventListener('click', event => {
 	if (target.tagName === 'IMG' || target.tagName === 'SVG') {
 		target = target.parentNode;
 	}
+	if (target.classList.length === 0) {
+		target = target.parentNode.parentNode;
+	}
+	console.log('target', target);
 	const popup = document.querySelector('.popup');
 	if (popup && !target.contains(popup)) {
 		popup.classList.add('popup_hidden');
+	}
+});
+
+document.addEventListener('click', event => {
+	const search = document.getElementById('search');
+	const icon = document.querySelector('.menu .menu__icon');
+	const searchOverlay = document.querySelector('.menu__search_overlay');
+	if (event.target !== search) {
+		searchOverlay.classList.add('hide');
+		icon.classList.add('burger');
+		icon.classList.remove('arrow');
+	} else {
+		searchOverlay.classList.remove('hide');
 	}
 });
