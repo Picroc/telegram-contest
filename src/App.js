@@ -22,6 +22,9 @@ import ChatMessage from './components/chat-message/chatMessage';
 import RegisterPage from './pages/register-page/register-page';
 import Archives from './components/menu/archives/archives';
 import RightSidebar from './components/right-sidebar/right-sidebar';
+import SearchList from './components/search-list/search-list';
+
+import { show, hide } from './helpers/index';
 
 customElements.define('my-router', Router);
 customElements.define('countries-popup-item', CountriesPopupItem);
@@ -33,6 +36,7 @@ customElements.define('my-menu', Menu);
 customElements.define('my-settings', Settings);
 customElements.define('user-dialogs', UserDialogs);
 customElements.define('my-dialog', Dialog);
+customElements.define('search-list', SearchList);
 
 customElements.define('login-form', LoginForm);
 customElements.define('login-code', LoginCode);
@@ -106,16 +110,17 @@ window.updateRipple = () => {
 
 document.addEventListener('click', event => {
 	let target = event.target;
-	if (target.tagName === 'IMG' || target.tagName === 'SVG') {
-		target = target.parentNode;
-	}
-	if (target.classList.length === 0) {
+	if (target.attributes.length === 0) {
 		target = target.parentNode.parentNode;
 	}
-	console.log('target', target);
+	if (target.tagName === 'IMG' || target.tagName === 'SVG' || target.classList.contains('burger')) {
+		target = target.parentNode;
+	}
 	const popup = document.querySelector('.popup');
-	if (popup && !target.contains(popup)) {
+	const icon = document.querySelector('.menu__icon_active');
+	if (popup && !target.contains(popup) && icon) {
 		popup.classList.add('popup_hidden');
+		icon.classList.remove('menu__icon_active');
 	}
 });
 
@@ -123,11 +128,20 @@ document.addEventListener('click', event => {
 	const search = document.getElementById('search');
 	const icon = document.querySelector('.menu .menu__icon');
 	const searchOverlay = document.querySelector('.menu__search_overlay');
+	const userDialogs = document.getElementById('user-dialogs');
+	const searchList = document.getElementById('search-list');
+
 	if (event.target !== search) {
 		searchOverlay.classList.add('hide');
 		icon.classList.add('burger');
 		icon.classList.remove('arrow');
+		show(userDialogs);
+		hide(searchList);
+		searchList.classList.add('search-list_hidden');
 	} else {
 		searchOverlay.classList.remove('hide');
+		hide(userDialogs);
+		show(searchList);
+		setZeroTimeout(() => searchList.classList.remove('search-list_hidden'));
 	}
 });
