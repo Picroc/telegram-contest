@@ -79,7 +79,7 @@
     position: absolute;
     overflow: hidden;
 
-    transition: all 0.4s ease-in;
+    transition: all 0.1s ease-in;
     .menu__search_active {
       position: relative;
       box-shadow: 0 0 0 1.5pt var(--primary);
@@ -99,7 +99,7 @@
       background-color: var(--white);
       min-width: calc(25vw - 80px);
       height: 32px;
-      transition: 0.4s ease-in;
+      transition: 0.1s ease-in;
     }
   }
 
