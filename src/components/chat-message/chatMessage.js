@@ -4,9 +4,9 @@ import './chatMessage.scss'
 
 export default class ChatMessage extends HTMLElement{
     render() {
-        const peer = getActivePeerId();
+        const peerId = getActivePeerId();
         const messageId = this.getAttribute('id');
-        const message = getMessage(peer, messageId);
+        const message = getMessage(peerId)(messageId);
         this.innerHTML = `${makeTemplate(message)}`;
     }
 

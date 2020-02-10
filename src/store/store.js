@@ -15,7 +15,9 @@ const addPeerStore = peerId => {
 		geo: {},
 		contact: {},
 		invoice: {},
-		poll: {}
+		poll: {},
+		webpage: {},
+		unsupported: {},
 	};
 };
 
@@ -220,6 +222,9 @@ const mapDocumentType = type => {
 		case 'messageMediaPoll':
 		case 'poll':
 			return `poll`;
+		case 'messageMediaWebPage':
+		case 'webpage':
+			return 'webpage';
 		default:
 			return `unsupported`;
 	}

@@ -10,7 +10,7 @@ export default class DocumentMessage extends HTMLElement {
   }
 
   render() {
-    const { media: { document } } = getMessage(this.peerId, this.id);
+    const { media: { document } } = getMessage(this.peerId)(this.id);
     this.innerHTML = `<div class="document-message">${ this.getContentByMimeType(document) }</div>`;
   }
 
@@ -39,16 +39,17 @@ export default class DocumentMessage extends HTMLElement {
 
   getAnimatedSticker({ id, file_reference: fileReference, date, size, thumbs, attributes }) {
     const { type, w, h, bytes } = thumbs[0];
-    const [{ w: width, h: height }, { alt: altEmoji, stickerset: stickerSet }, { file_name: fileName }] = attributes;
+    const [{ w: width, h: height }, { alt: altEmoji, stickerset: stickerSet }] = attributes;
     const stickerPreviewUrl = `data:image/png;base64,${btoa(String.fromCharCode(...new Uint8Array(bytes)))}`;
-    return `<div class="chat-message_animated-sticker"><img src="${stickerPreviewUrl}" alt="Animated Sticker"></div>`;
+    return `<div class="chat-message_animated-sticker"><img src="${ stickerPreviewUrl }" alt=${altEmoji}></div>`;
   };
 
   getSticker({ id, file_reference: fileReference, date, size, thumbs, attributes }) {
     const { type, w, h, bytes } = thumbs[0];
     const [{ w: width, h: height }, { alt: altEmoji, stickerset: stickerSet }, { file_name: fileName }] = attributes;
-
-    return `<div>Sticker</div>`;
+    const stickerUrl = `data:image/png;base64,${btoa(String.fromCharCode(...new Uint8Array(bytes)))}`;
+    console.log('sticker', altEmoji, thumbs, btoa(String.fromCharCode(...new Uint8Array(bytes))));
+    return `<div class="chat-message_sticker"><img src="${ stickerUrl }" alt=${altEmoji}></div>`;
   }
 
   getAnimationItem = (data, options) => () =>

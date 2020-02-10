@@ -5,6 +5,7 @@ import checkSent from "./check-sent.svg";
 import sending from "./sending.svg";
 import sendingError from "./sending-error.svg";
 import { clsx, tc, cc } from "../../helpers";
+import { telegramApi } from "../../App";
 
 export default ({
                   id,
@@ -47,14 +48,12 @@ export default ({
   if (hasMedia) {
     const fullMessageMedia = getFullMessageMediaTemplate(media, id);
     if (fullMessageMedia.length !== 0) {
-      return `
-                <div class=${ chatMessageClass + "chat-message_full-media" }>
-                    ${ fullMessageMedia }
+      return `<div class=${ chatMessageClass + "chat-message_full-media" }>
+                ${ fullMessageMedia }
                 </div>`;
     }
     const { _: mediaType, photo = {}, photos = [], ttl_seconds: ttlSeconds = 0 } = media;
     if (mediaType === "messageMediaPhoto") {
-      console.log("PHOTO", media);
       const photoElemList = photos.reduce((accum, currentPhoto) => accum += getPhotoTemplate(currentPhoto), ``);
       const photoElem = getPhotoTemplate(photo);
       photoMedia = `<div class="chat-message__photo-media">${ (photoElemList || photoElem) }</div>`;
@@ -101,19 +100,27 @@ const getFullMessageMediaTemplate = ({ _: mediaType }, messageId) => {
   }
 };
 
-const getPhotoTemplate = ({
-                            id,
-                            date,
-                            sizes,
-                            dc_id: dcId,
-                            access_hash: accessHash,
-                            file_reference: fileReference,
-                            has_stickers: hasStickers = false
-                          }) => {
-  const strippedSize = sizes[0];
+const getPhotoTemplate = photo => {
+  const {
+    id,
+    date,
+    sizes,
+    dc_id: dcId,
+    access_hash: accessHash,
+    file_reference: fileReference,
+    has_stickers: hasStickers = false
+  } = photo;
+  const [strippedSize, normalSize, ...largeSizes] = sizes;
+  const { type, w: width, h: height } = normalSize;
   const imageUrl = `data:image/png;base64,` + btoa(String.fromCharCode(...new Uint8Array(strippedSize.bytes)));
-  console.log(imageUrl);
-  return `<img src=${ imageUrl } alt="Photo Media"/>`;
+  telegramApi.downloadPhoto(photo)
+    .then(photo => {
+      console.log('DOWNLOADED');
+      const img = document.getElementById(id);
+      const { bytes, type, fileName } = photo;
+      img.src = URL.createObjectURL(new Blob(...new Uint8Array(bytes), { type: type }));
+    });
+  return `<img id="${id}" src=${ imageUrl } alt="Photo Media" width="${width}" height="${height}"/>`;
   // TODO implement logic for all other sizes
 };
 
@@ -122,7 +129,7 @@ const getFormattedMessage = ({ message, entities }) => {
   if (!message)
     return "";
   if (isEmoji(message))
-    return `<p style="font-size:64px">${ message }</p>`;
+    return `<div class="chat-message_emoji">${ message }</div>`;
   return message && `<div class="message">${ message }</div>` || "";
 };
 
