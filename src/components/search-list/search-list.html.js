@@ -1,11 +1,22 @@
 import { clsx } from '../../helpers/index';
 
-export const person = ({ photo, isOnline, firstName, id }) => `
-	<div class="search-list__person" id="search-list__person_${id}">
-		<img src=${photo} class="${clsx('search-list__avatar', 'avatar', 'avatar_medium', isOnline && 'online')}"></img>
-		<div class="search-list__avatar-label">${firstName}</div>
-	</div>
+export const person = ({
+	avatar = 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg',
+	isOnline,
+	firstName,
+	id,
+	photo,
+}) => {
+	if (photo && !(photo instanceof Promise)) {
+		avatar = photo;
+	}
+	return `
+		<div class="search-list__person" id="search-list__person_${id}">
+			<img src=${avatar} class="${clsx('search-list__avatar', 'avatar', 'avatar_medium', isOnline && 'online')}"></img>
+			<div class="search-list__avatar-label">${firstName}</div>
+		</div>
 `;
+};
 
 export const searchContainer = title => `
 <div class="search-list__container">

@@ -155,6 +155,7 @@ document.addEventListener('click', event => {
 		show(userDialogs);
 		hide(searchList);
 		searchList.classList.add('search-list_hidden');
+		search.peerId = void 0;
 	} else {
 		searchOverlay.classList.remove('hide');
 		hide(userDialogs);
