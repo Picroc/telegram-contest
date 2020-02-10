@@ -464,11 +464,17 @@ export default class TelegramApi {
 	};
 
 	getPhotoPreview = photo => {
-		const location = { ...photo };
-		let limit = 524288;
+		let photo_size = photo.sizes;
+		photo_size = photo_size[2] || photo_size[1];
 
-		location._ = 'inputPhotoFileLocation';
-		location.thumb_size = 'x';
+		const location = {
+			_: 'inputPhotoFileLocation',
+			id: photo.id,
+			access_hash: photo.access_hash,
+			file_reference: photo.file_reference,
+			thumb_size: photo_size.type,
+		};
+		let limit = 524288;
 
 		return this.MtpApiManager.invokeApi('upload.getFile', {
 			location: location,
@@ -507,7 +513,7 @@ export default class TelegramApi {
 		)
 			.then(res => {
 				// console.log('Got file!');
-				return 'data:image/png;base64,' + btoa(String.fromCharCode(...new Uint8Array(res.bytes)));
+				return this._getImageData(res.bytes);
 			})
 			.catch(err => {
 				if (err.type === 'FILEREF_UPGRADE_NEEDED') {
@@ -533,7 +539,7 @@ export default class TelegramApi {
 			limit: 1048576,
 		}).then(photo_file => {
 			// console.log('Got file!');
-			return 'data:image/png;base64,' + btoa(String.fromCharCode(...new Uint8Array(photo_file.bytes)));
+			return this._getImageData(photo_file.bytes);
 		});
 	};
 
@@ -1121,8 +1127,75 @@ export default class TelegramApi {
 				: peer;
 		}
 		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
-		const { message: text, date, flags: msg_flags } = message;
+		let { message: text, date, flags: msg_flags } = message;
 		const unread_count = dialog.unread_count;
+
+		if (!text || (message.media && message.media._ !== 'messageMediaEmpty')) {
+			if (message._ === 'messageService') {
+				text = 'Service message';
+			} else {
+				const type = message.media && message.media._;
+				const getDocumentText = media => {
+					const doc = media.document;
+
+					let isSticker,
+						filename,
+						fin_text = '';
+
+					if (doc.attributes) {
+						doc.attributes.forEach(attr => {
+							if (attr._ === 'documentAttributeAnimated') {
+								fin_text = 'GIF';
+							}
+							if (attr._ === 'documentAttributeSticker') {
+								fin_text = attr.alt + ' Sticker';
+								isSticker = true;
+							}
+							if (attr._ === 'documentAttributeVideo') {
+								fin_text = 'Video';
+							}
+							if (attr._ === 'documentAttributeAudio') {
+								if (this._checkFlag(attr.flags, 10)) {
+									fin_text = 'Voice Message';
+								} else {
+									fin_text = '🎵' + attr.title + ' - ' + attr.performer;
+								}
+							}
+							if (attr._ === 'documentAttributeFilename') {
+								filename = attr.file_name;
+							}
+						});
+
+						if (isSticker) {
+							return fin_text;
+						}
+						if (filename && !fin_text) {
+							return filename;
+						}
+						return fin_text;
+					}
+				};
+
+				if (type) {
+					switch (type) {
+						case 'messageMediaPhoto':
+							text = text ? '🖼️ ' + text : 'Photo';
+							break;
+						case 'messageMediaGeo':
+							text = 'Location';
+							break;
+						case 'messageMediaContact':
+							text = 'Contact';
+							break;
+						case 'messageMediaDocument':
+							text = getDocumentText(message.media);
+							break;
+						default:
+							text = text || 'Unsupported message';
+					}
+				}
+			}
+		}
 
 		if (photo) {
 			photo = this.getPeerPhoto(peer.user_id || peer.chat_id || peer.channel_id);
@@ -1255,9 +1328,7 @@ export default class TelegramApi {
 		photos.forEach(photo => {
 			if (photo) {
 				photo_promises.push({
-					photo: this.getPhotoPreview(photo.photo).then(
-						res => 'data:image/png;base64,' + btoa(String.fromCharCode(...new Uint8Array(res.bytes)))
-					),
+					photo: this.getPhotoPreview(photo.photo).then(res => this._getImageData(res.bytes)),
 					caption: photo.caption,
 				});
 			}
@@ -1272,5 +1343,22 @@ export default class TelegramApi {
 
 			doc_results.push(new_doc);
 		});
+	};
+
+	_getImageData = async bytes => {
+		const chunk = 0x8000;
+
+		let index = 0;
+		let length = bytes.length;
+
+		let result = '';
+		let slice;
+
+		while (index < length) {
+			slice = bytes.slice(index, Math.min(index + chunk, length));
+			result += String.fromCharCode.apply(null, new Uint8Array(slice));
+			index += chunk;
+		}
+		return 'data:image/png;base64,' + btoa(result);
 	};
 }
