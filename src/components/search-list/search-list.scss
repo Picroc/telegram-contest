@@ -18,6 +18,10 @@
     font-weight: 600;
   }
 
+  .dialog_active {
+    background: var(--white);
+  }
+
   &__person {
     &:first-child {
       margin-left: 8px;
@@ -29,10 +33,10 @@
     align-items: center;
     width: 80px;
     height: 80px;
+    border-radius: 8px;
 
     &:hover {
       background: var(--light-gray);
-      border-radius: 8px;
       cursor: pointer;
     }
   }
