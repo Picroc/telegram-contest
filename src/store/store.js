@@ -4,10 +4,13 @@ window.store = new Store();
 
 function Store() {
 	this.mapId = {};
+	this.mapMediaId = {};
+	this.mapParticipantsId = {};
 	this.dialogs = [];
 	this.defaultAvatar = 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg';
 }
 
+export const getDefaultAvatar = () => window.store.defaultAvatar;
 const addPeerStore = peerId => {
 	return (window.store[peerId] = {
 		messages: {},
@@ -253,10 +256,7 @@ export const mapId = id => window.store.mapId[id];
 export const SET_ACTIVE_PEER = 'SET_ACTIVE_PEER';
 export const setActivePeer = peer => {
 	window.store.activePeer = peer;
-	const rightSidebar = document.getElementById('right-sidebar');
-	if (rightSidebar) {
-		rightSidebar.dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER, { peer }));
-	}
+	document.getElementById('right-sidebar').dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER, peer));
 };
 
 export const getActivePeer = () => {
@@ -264,11 +264,18 @@ export const getActivePeer = () => {
 };
 
 export const SET_ACTIVE_PEER_MEDIA = 'SET_ACTIVE_PEER_MEDIA';
-export const setActivePeerMedia = media => {
-	window.store.activePeerMedia = media;
-	document.getElementById('right-sidebar').dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER_MEDIA, media));
+export const setPeerMediaById = (id, media, update = false, dispatchEvent = true) => {
+	//TODO: по готовности эвентов обновлений прикрутить их проверку тут
+	if (update || !window.store.mapMediaId[id]) {
+		window.store.mapMediaId[id] = media;
+		console.log('setPeerMedia', window.store.mapMediaId[id]);
+		if (dispatchEvent) {
+			document.getElementById('right-sidebar').dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER_MEDIA, id));
+		}
+	}
 };
 
-export const getActivePeerMedia = () => {
-	return window.store.activePeerMedia;
+export const getPeerMediaById = id => {
+	console.log('getPeerMedia', window.store.mapMediaId[id]);
+	return window.store.mapMediaId[id];
 };

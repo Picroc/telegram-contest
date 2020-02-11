@@ -5,8 +5,9 @@ import {
 	setActivePeer,
 	getUser,
 	getDialog,
-	setActivePeerMedia,
+	setPeerMediaById,
 	updateDialog,
+	setActivePeerPhoto,
 } from '../../store/store';
 import {
 	htmlToElement,
@@ -52,21 +53,17 @@ export const loadDialog = component => elem => dialog => {
 	}
 	component.prevActive = elem;
 	component.prevId = id;
-
+	const avatar = elem.querySelector('.dialog__avatar').src; //TODO: getDialog(id).photo && title && id
 	elem.classList.toggle('dialog_active');
 	const right = document.getElementById('right');
 	setActivePeer(peer);
 	startLoading(right);
-	const rightSidebar = document.getElementById('right-sidebar');
 	telegramApi.getFullPeer(id).then(fullPeer => {
 		console.log('fullPeer', fullPeer);
-		telegramApi.getPeerPhoto(id).then(dialogPhoto => {
-			setActivePeer({ ...fullPeer, avatar: dialogPhoto, id });
-			telegramApi.getPeerPhotos(id, 0, 20).then(media => {
-				console.log('media', media);
-				setActivePeerMedia(media);
-				rightSidebar.loadPeerSidebar(id);
-			});
+		setActivePeer({ ...fullPeer, id, avatar });
+		telegramApi.getPeerPhotos(id, 0, 20).then(media => {
+			console.log('mediaLoaded', media);
+			setPeerMediaById(id, media);
 		});
 	});
 	right.innerHTML = `<top-bar user_id="${id}"></top-bar><chat-main peer-id="${id}"></chat-main>`;

@@ -1,7 +1,15 @@
 import template from './right-sidebar.html';
 import './right-sidebar.scss';
 import { setInnerHTML, setAttribute } from '../../helpers';
-import { UPDATE_DIALOG_STATUS, getActivePeer, getActivePeerMedia } from '../../store/store';
+import {
+	UPDATE_DIALOG_STATUS,
+	getActivePeer,
+	getPeerMediaById,
+	SET_ACTIVE_PEER,
+	SET_ACTIVE_PEER_MEDIA,
+	getDefaultAvatar,
+	setPeerMediaById,
+} from '../../store/store';
 import { getRightSidebarFieldsFromPeer, htmlToElement, capitalise, getName } from '../../helpers/index';
 import infoSvg from './svg/info.js';
 import phoneSvg from './svg/phone.js';
@@ -16,11 +24,20 @@ export default class RightSidebar extends HTMLElement {
 		this.className = 'right-sidebar right-sidebar_hidden';
 		this.innerHTML = template;
 
+		this.avatar = this.querySelector('.right-sidebar__avatar_img');
+		this.avatar.src = getDefaultAvatar();
+
 		this.attributesElem = this.querySelector('.right-sidebar__attributes');
 
 		this.tabsElem = this.querySelector('.right-sidebar__tabs');
 
 		this.materialsElem = this.querySelector('.right-sidebar__general-materials');
+		this.members = this.querySelector('.right-sidebar__general-materials__members');
+		this.media = this.querySelector('.right-sidebar__general-materials__media');
+		this.media.cashed = {};
+		this.docs = this.querySelector('.right-sidebar__general-materials__docs');
+		this.links = this.querySelector('.right-sidebar__general-materials__links');
+		this.audio = this.querySelector('.right-sidebar__general-materials__audio');
 
 		this.moreButton = this.querySelector('.right-sidebar__more');
 		this.moreButton.addEventListener('click', this.moreButtonListener);
@@ -29,8 +46,8 @@ export default class RightSidebar extends HTMLElement {
 		this.backButton.addEventListener('click', this.backButtonListener);
 
 		this.addEventListener(UPDATE_DIALOG_STATUS, this.updateStatus);
-		// this.addEventListener(SET_ACTIVE_PEER, this.loadPeerSidebar);
-		// this.addEventListener(SET_ACTIVE_PEER_MEDIA, this.setMedia);
+		this.addEventListener(SET_ACTIVE_PEER, this.loadPeerSidebar);
+		this.addEventListener(SET_ACTIVE_PEER_MEDIA, this.setMedia);
 	}
 
 	backButtonListener = e => {
@@ -47,25 +64,27 @@ export default class RightSidebar extends HTMLElement {
 		setHTML('.right-sidebar__status')(status);
 	};
 
-	loadPeerSidebar = id => {
+	loadPeerSidebar = e => {
+		const peer = e.detail;
 		const setHTML = setInnerHTML.bind(this);
 		this.attributesElem.innerHTML = '';
-		this.materialsElem.innerHTML = '';
-		const generalizedPeer = getRightSidebarFieldsFromPeer(getActivePeer());
+		// this.materialsElem.innerHTML = '';
+		const generalizedPeer = getRightSidebarFieldsFromPeer(peer);
 		this.generalizedPeer = generalizedPeer;
-		const { notifications, avatar, name } = generalizedPeer;
-		document.querySelector('.right-sidebar__avatar_img').src = avatar || window.defaultAvatar;
+		const { notifications, name, avatar, id } = generalizedPeer;
+		this.avatar.src = avatar;
+		this.peerId = id;
 		setHTML('.right-sidebar__name')(name);
 		switch (generalizedPeer.type) {
 			case 'user':
 				this.loadUserAttributes(generalizedPeer);
 				this.loadTabs(['media', 'docs', 'links', 'audio']);
-				this.setMedia();
+				// this.setMedia({ detail: id });
 				break;
 			case 'groupChat':
 				this.loadGroupChatAttributes(generalizedPeer);
 				this.loadTabs(['members', 'media', 'docs', 'links']);
-				this.setChatParticipants(id);
+				// this.setChatParticipants(id);
 				break;
 		}
 		const label = notifications ? 'Enabled' : 'Disabled';
@@ -115,14 +134,19 @@ export default class RightSidebar extends HTMLElement {
 		);
 		this.tabsElem.append(this.underline);
 		this.tabsElem.append(htmlToElement(`<div class="tabs__gray-line gray-line"></div>`));
-
-		media && media.addEventListener('click', this.setMedia);
-		members && members.addEventListener('click', this.setChatParticipants);
+		const tab_media = this.querySelector('#tab_media');
+		const tab_members = this.querySelector('#tab_members');
+		if (tab_media) {
+			tab_media.addEventListener('click', this.setMedia);
+		}
+		if (tab_members) {
+			tab_members.addEventListener('click', this.setChatParticipants);
+		}
 	};
 
 	createTabElem = tab => {
 		return htmlToElement(`
-        <div class="tabs__tab tab tab__${tab}" id="${tab}">${capitalise(tab)}</div>`);
+        <div class="tabs__tab tab tab__${tab}" id="tab_${tab}">${capitalise(tab)}</div>`);
 	};
 
 	chooseTab = e => {
@@ -141,29 +165,56 @@ export default class RightSidebar extends HTMLElement {
 		});
 	};
 
-	clearMaterialsClasses = () => {
-		this.materialsElem.classList = 'right-sidebar__general-materials';
+	hideMaterials = () => {
+		Array.from(this.materialsElem.children).forEach(elem => {
+			elem.classList.add('hide');
+		});
 	};
 
 	setMedia = e => {
-		this.materialsElem.innerHTML = '';
-		this.clearMaterialsClasses();
-		this.materialsElem.classList.add('right-sidebar__general-materials__media');
-		const media = getActivePeerMedia();
-		media.forEach(({ photo }) => {
-			const placeholder = htmlToElement(`<div class="right-sidebar__general-materials_placeholder"></div>`);
-			this.materialsElem.appendChild(placeholder);
-			photo.then(image => placeholder.appendChild(this.createMediaElem(image, 'media')));
-		});
+		const id = this.peerId || e.detail;
+		console.log('id', id);
+		if (this.media.cashed[id]) {
+			return;
+		}
+		this.media.cashed[id] = true;
+		this.media.innerHTML = '';
+		this.hideMaterials();
+		this.media.classList.toggle('hide'); //TODO: убрать
+		const media = getPeerMediaById(id);
+		console.log('media', media);
+		if (media) {
+			const isPromiseMedia = !!media[0].photo.then;
+			if (isPromiseMedia) {
+				console.log('upload media');
+				const unpromisedMedia = media.map(async ({ photo }) => {
+					const placeholder = htmlToElement(
+						`<div class="right-sidebar__general-materials_placeholder"></div>`
+					);
+					this.media.appendChild(placeholder);
+					const image = await photo;
+					placeholder.replaceWith(this.createMediaElem(image, 'media'));
+					return image;
+				});
+				Promise.all(unpromisedMedia).then(photoArr => setPeerMediaById(id, photoArr, true, false));
+			} else {
+				console.log('set media from store');
+				media.forEach(({ photo }) => {
+					this.materialsElem.appendChild(this.createMediaElem(photo, 'media'));
+				});
+			}
+		}
 	};
+
+	setMediaFromStore = id => {};
 
 	createMediaElem = (media, name) => {
 		return htmlToElement(`<img src="${media}" class="right-sidebar__general-materials__${name}-element"/>`);
 	};
 
 	setChatParticipants = async id => {
-		this.materialsElem.innerHTML = '';
-		this.clearMaterialsClasses();
+		// this.materialsElem.innerHTML = '';
+		this.hideMaterials();
 		this.materialsElem.classList.add('right-sidebar__general-materials__participants');
 		const { onlineUsers, offlineUsers } = await telegramApi.getChatParticipants(id);
 		for (const { first_name, last_name, id } of onlineUsers) {

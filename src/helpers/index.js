@@ -116,17 +116,18 @@ export const getRightSidebarFieldsFromPeer = peer => {
 	if (peer._ === 'userFull') {
 		generalizedPeer.type = 'user';
 		generalizedPeer.name = getName(peer.user.first_name, peer.user.last_name);
-		generalizedPeer.bio = peer.about;
+		generalizedPeer.bio = peer.about || '';
 		generalizedPeer.username = peer.user.username;
-		generalizedPeer.phone = peer.user.phone;
+		generalizedPeer.phone = peer.user.phone || '';
 	} else if (peer._ === 'messages.chatFull') {
 		generalizedPeer.type = 'groupChat';
 		generalizedPeer.name = peer.chats[0].title;
 		generalizedPeer.about = peer.full_chat.about;
-		generalizedPeer.link = 't.me/' + peer.full_chat.username;
+		generalizedPeer.link = (peer.full_chat.username && 't.me/' + peer.full_chat.username) || '';
 	}
 	generalizedPeer.notifications = getNotificationsModeBoolByPeer(peer);
 	generalizedPeer.avatar = peer.avatar;
+	generalizedPeer.id = peer.id;
 
 	return generalizedPeer;
 };
