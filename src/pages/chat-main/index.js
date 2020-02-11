@@ -15,6 +15,7 @@ export default class ChatMain extends HTMLElement {
 			this.innerHTML = `
 						${messagesComponent}
 						<message-input></message-input>`;
+			this.querySelector('.all-messages').scrollTo({ top: 999999 });
 		});
 	}
 

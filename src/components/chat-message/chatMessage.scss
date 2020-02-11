@@ -35,6 +35,11 @@
 
 }
 
-.message {
+.chat-message_animated-sticker {
+  width: 200px;
+  height: 200px;
+}
 
+.message {
+  white-space: pre-wrap;
 }

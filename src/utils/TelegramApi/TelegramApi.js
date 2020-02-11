@@ -345,6 +345,7 @@ export default class TelegramApi {
 			id: doc.id,
 			access_hash: doc.access_hash,
 			file_reference: doc.file_reference,
+			thumb_size: 'x',
 		};
 		let fileName = 'FILE';
 		let size = 15728640;
@@ -1400,6 +1401,7 @@ export default class TelegramApi {
 	};
 
 	setStickerToContainer = (sticker, container) => {
+		console.log(sticker);
 		this._getStickerData(sticker.bytes).then(st => {
 			lottie.loadAnimation({
 				container: container,

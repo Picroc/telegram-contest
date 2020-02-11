@@ -4,6 +4,9 @@ chat-main {
   .all-messages {
     height: 80vh;
     overflow: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
