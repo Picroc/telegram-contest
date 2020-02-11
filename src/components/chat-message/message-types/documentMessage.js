@@ -35,9 +35,29 @@ export default class DocumentMessage extends HTMLElement {
 				return this.getAnimatedSticker(document);
 			case 'image/webp':
 				return this.getSticker(document);
+			case 'video/mp4':
+				return this.getVideoDocument(document);
 			default:
+				console.log('UNDEFINED', document);
 				'DOCUMENT';
 		}
+	}
+
+	getVideoDocument(doc) {
+		console.log(doc);
+		telegramApi.downloadDocument(doc).then(data => {
+			console.log(data);
+			telegramApi._getVideoData(data.bytes).then(video_data => {
+				const vid = document.createElement('video');
+				vid.src = video_data;
+				vid.width = 300;
+				vid.height = 300;
+				vid.controls = 'controls';
+				vid.autoplay = true;
+				this.querySelector('.document-message__video').appendChild(vid);
+			});
+		});
+		return `<div style='width: 300px; height: 300px;' class='document-message__video'></div>`;
 	}
 
 	getAnimatedSticker(doc) {

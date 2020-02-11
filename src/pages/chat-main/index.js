@@ -28,7 +28,7 @@ export default class ChatMain extends HTMLElement {
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		this.render();
+		// this.render();
 	}
 
 	getMessages = async (peerId, startMessageId) => {

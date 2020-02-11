@@ -53,7 +53,9 @@ export default ({
                 ${fullMessageMedia}
                 </div>`;
 		}
-		const { _: mediaType, photo = {}, photos = [], ttl_seconds: ttlSeconds = 0 } = media;
+		const { _: mediaType, photo = {}, photos = [] } = media;
+
+		console.log(photo, photos);
 		if (mediaType === 'messageMediaPhoto') {
 			const photoElemList = photos.reduce((accum, currentPhoto) => (accum += getPhotoTemplate(currentPhoto)), ``);
 			const photoElem = getPhotoTemplate(photo);
@@ -112,29 +114,48 @@ const getPhotoTemplate = photo => {
 		has_stickers: hasStickers = false,
 	} = photo;
 	const [strippedSize, normalSize, ...largeSizes] = sizes;
-	const { type, w: width, h: height } = normalSize;
-	const imageUrl = `data:image/png;base64,` + btoa(String.fromCharCode(...new Uint8Array(strippedSize.bytes)));
+	const { w: width, h: height } = normalSize;
+
 	telegramApi.getPhotoPreview(photo).then(photo => {
-		console.log('DOWNLOADED');
+		console.log('DOWNLOADED', photo);
 		telegramApi._getImageData(photo.bytes).then(data => {
-			const img = document.getElementById(id);
+			const container = document.getElementById(id);
+			const img = document.createElement('img');
+			img.style = 'width: 100%; height: 100%';
 			img.src = data;
+
+			container.appendChild(img);
 		});
 	});
-	return `<img id="${id}" src=${imageUrl} alt="Photo Media" width="${width}" height="${height}"/>`;
+	return `<div id="${id}" style="width: ${width}px;height: ${height}px;background: #fafafa"></div>`;
 	// TODO implement logic for all other sizes
 };
 
 // TODO implement formatted message
-const getFormattedMessage = ({ message, entities }) => {
-	console.log(message);
+const getFormattedMessage = ({ message, entities = [] }) => {
 	if (!message) {
 		return '';
 	}
 	if (isEmoji(message)) {
 		return `<div class="chat-message_emoji">${message}</div>`;
 	}
-	return (message && `<div class="message">${message}</div>`) || '';
+
+	let formatted = message;
+	console.log(entities);
+
+	entities &&
+		entities.reverse().forEach(entity => {
+			if (entity._ === 'messageEntityUrl') {
+				const pre = formatted.slice(0, entity.offset);
+				const msg_ent = formatted.slice(entity.offset, entity.offset + entity.length);
+				const pos = formatted.slice(entity.offset + entity.length);
+				formatted = `${pre}<a href='${msg_ent}'>${msg_ent}</a>${pos}`;
+			}
+		});
+
+	console.log(formatted);
+
+	return (message && `<div class="message"><p>${formatted}</p></div>`) || '';
 };
 
 const isEmoji = message => {

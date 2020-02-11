@@ -354,9 +354,9 @@ export default class TelegramApi {
 		return new Promise((resolve, request) => {
 			const bytes = [];
 
-			if (doc.size > size) {
-				throw new Error('Big file not supported');
-			}
+			// if (doc.size > size) {
+			// 	throw new Error('Big file not supported');
+			// }
 
 			size = doc.size;
 
@@ -1450,5 +1450,13 @@ export default class TelegramApi {
 			index += chunk;
 		}
 		return 'data:image/png;base64,' + btoa(result);
+	};
+
+	_getVideoData = async bytes => {
+		// const byteArray = ;
+		// console.log('BTARRAY', byteArray);
+		const blob = new Blob(bytes, { type: 'video/mp4' });
+		console.log('BLOB', blob);
+		return window.URL.createObjectURL(blob);
 	};
 }
