@@ -31,7 +31,7 @@ export const renderDialog = (component, archived = false) => dialog => {
 	const elem = htmlToElement(
 		`<my-dialog anim="ripple" class="dialog" id="dialog_${id}" archived="${archived}"></my-dialog>`
 	);
-	elem.addEventListener('click', () => loadDialog(component, elem, dialog));
+	elem.addEventListener('click', () => loadDialog(component)(elem)(dialog));
 
 	if (pinned) {
 		component.pinned.appendChild(elem);
@@ -41,7 +41,7 @@ export const renderDialog = (component, archived = false) => dialog => {
 	}
 };
 
-export const loadDialog = (component, elem, dialog) => {
+export const loadDialog = component => elem => dialog => {
 	const { id, dialog_peer: peer } = dialog;
 	if (component.prevActive) {
 		if (component.prevId === id) {

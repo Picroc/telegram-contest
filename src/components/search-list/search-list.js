@@ -11,6 +11,7 @@ import {
 	getActivePeer,
 } from '../../store/store.js';
 import { telegramApi } from '../../App.js';
+import { renderDialog, loadDialog } from '../user-dialogs/user-dialogs.js';
 
 export default class SearchList extends HTMLElement {
 	render() {
@@ -24,6 +25,7 @@ export default class SearchList extends HTMLElement {
 		this.addEventListener(SET_DIALOGS, this.peopleRender);
 		this.addEventListener(APPEND_DIALOGS, this.peopleRender);
 		this.search.addEventListener('input', this.searchUpdate);
+		this.loadDialog = loadDialog(this);
 	}
 
 	peopleRender = () => {
@@ -47,17 +49,19 @@ export default class SearchList extends HTMLElement {
 				if (type === 'peerUser' && id != user_id) {
 					const p = htmlToElement(person(dialog));
 					p.addEventListener(UPDATE_DIALOG_PHOTO, this.updatePhotoListener);
+					p.addEventListener('click', () => this.loadDialog(p)(dialog));
 					this.people.appendChild(p);
 				}
 			});
 		}
 	};
 
-	searchUpdate = event => {
-		console.log('object', this.search.value);
-		const active = getActivePeer();
-		console.log('active', active);
-		// telegramApi.searchPeerMessages()
+	searchUpdate = async event => {
+		const { value, peerId } = this.search;
+		if (peerId) {
+			const result = await telegramApi.searchPeerMessages(peerId, value);
+			console.log('result', result);
+		}
 	};
 
 	updatePhotoListener = event => {

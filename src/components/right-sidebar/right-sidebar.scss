@@ -1,13 +1,15 @@
 .right-sidebar {
     height: 100vh;
     background: var(--white);
-    z-index: 2;
-    width: 35vw;
-    transition: 0.4s;
+    z-index: 10;
+    width: 25vw;
+    min-width: 300px;
+    transition: 0.1s;
     overflow: auto;
 
     &_hidden {
-        width: 0vw;
+        width: 0;
+        min-width: 0;
     }
 
     display: grid;
