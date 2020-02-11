@@ -24,6 +24,12 @@ $hover-color: #f1f3f4;
 
 #right {
   position: relative;
+  min-width: 600px;
+  width: 75vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  transition: 0.4s;
   &::after {
     position: absolute;
     left: 0;
@@ -37,10 +43,4 @@ $hover-color: #f1f3f4;
     background-size: cover;
     background-image: url("./BG.jpg");
   }
-  width: 75vw;
-  min-width: 600px;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  transition: 0.4s;
 }

@@ -132,3 +132,6 @@ export const getRightSidebarFieldsFromPeer = peer => {
 };
 
 export const capitalise = string => string.charAt(0).toUpperCase() + string.slice(1);
+export const peerToId = peer => {
+	return peer.user_id || peer.channel_id || peer.chat_id;
+};

@@ -2,11 +2,11 @@ import {
 	getDialogs,
 	SET_DIALOGS,
 	APPEND_DIALOGS,
-	updateDialog,
+	setActivePeer,
 	getUser,
 	getDialog,
-	setActivePeer,
 	setActivePeerMedia,
+	updateDialog,
 } from '../../store/store';
 import {
 	htmlToElement,
@@ -55,28 +55,21 @@ export const loadDialog = (component, elem, dialog) => {
 
 	elem.classList.toggle('dialog_active');
 	const right = document.getElementById('right');
-	const chatPage = document.querySelector('.chat-page');
+	setActivePeer(peer);
 	startLoading(right);
-	chatMain(right, peer).then(() => {
-		stopLoading(right);
-		const topBar = document.createElement('top-bar');
-		topBar.setAttribute('user_id', id);
-		right.prepend(topBar);
-		const rightSidebar =
-			document.getElementById('right-sidebar') || htmlToElement('<right-sidebar></right-sidebar>');
-		chatPage.append(rightSidebar);
-		telegramApi.getFullPeer(id).then(fullPeer => {
-			console.log('fullPeer', fullPeer);
-			telegramApi.getPeerPhoto(id).then(dialogPhoto => {
-				setActivePeer({ ...fullPeer, avatar: dialogPhoto, id });
-				telegramApi.getPeerPhotos(id, 0, 20).then(media => {
-					console.log('media', media);
-					setActivePeerMedia(media);
-					rightSidebar.loadPeerSidebar(id);
-				});
+	const rightSidebar = document.getElementById('right-sidebar');
+	telegramApi.getFullPeer(id).then(fullPeer => {
+		console.log('fullPeer', fullPeer);
+		telegramApi.getPeerPhoto(id).then(dialogPhoto => {
+			setActivePeer({ ...fullPeer, avatar: dialogPhoto, id });
+			telegramApi.getPeerPhotos(id, 0, 20).then(media => {
+				console.log('media', media);
+				setActivePeerMedia(media);
+				rightSidebar.loadPeerSidebar(id);
 			});
 		});
 	});
+	right.innerHTML = `<top-bar user_id="${id}"></top-bar><chat-main peer-id="${id}"></chat-main>`;
 };
 
 export default class UserDialogs extends HTMLElement {

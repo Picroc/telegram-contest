@@ -1,6 +1,27 @@
-window.store = {};
-window.store.mapId = {};
-window.defaultAvatar = 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg';
+import { peerToId } from '../helpers';
+
+window.store = new Store();
+
+function Store() {
+	this.mapId = {};
+	this.dialogs = [];
+	this.defaultAvatar = 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg';
+}
+
+const addPeerStore = peerId => {
+	return (window.store[peerId] = {
+		messages: {},
+		links: {},
+		photo: {},
+		document: {},
+		geo: {},
+		contact: {},
+		invoice: {},
+		poll: {},
+		webpage: {},
+		unsupported: {},
+	});
+};
 
 export const updateStoreEvent = (type, options) =>
 	new CustomEvent(type, { bubbles: false, cancelable: true, detail: options });
@@ -25,7 +46,10 @@ const setChats = (storeString, elem, event) => chats => {
 };
 
 export const SET_DIALOGS = 'SET_DIALOGS';
-export const setDialogs = dialogs => setChats('dialogs', document.getElementById('user-dialogs'), SET_DIALOGS)(dialogs);
+export const setDialogs = dialogs => {
+	setChats('dialogs', document.getElementById('user-dialogs'), SET_DIALOGS)(dialogs);
+	document.getElementById('search-list').dispatchEvent(updateStoreEvent(SET_DIALOGS));
+};
 
 export const SET_ARCHIVES = 'SET_ARCHIVES';
 export const setArchives = archives =>
@@ -46,8 +70,10 @@ const appendChats = (storeString, element, event) => chats => {
 };
 
 export const APPEND_DIALOGS = 'APPEND_DIALOGS';
-export const appendDialogs = dialogs =>
+export const appendDialogs = dialogs => {
 	appendChats('dialogs', document.getElementById('user-dialogs'), APPEND_DIALOGS)(dialogs);
+	document.getElementById('search-list').dispatchEvent(updateStoreEvent(APPEND_DIALOGS));
+};
 
 export const APPEND_ARCHIVES = 'APPEND_ARCHIVES';
 export const appendArchives = archives =>
@@ -84,6 +110,10 @@ export const updateDialogPhoto = (id, photo) => {
 	const dialog = getDialog(id);
 	dialog.photo = photo;
 	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_PHOTO, { id }));
+	const searchPerson = document.getElementById(`search-list__person_${id}`);
+	if (searchPerson) {
+		searchPerson.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_PHOTO, { id }));
+	}
 	const topBar = document.querySelector('top-bar');
 	if (topBar && topBar.getAttribute('user_id') == id) {
 		topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_PHOTO, { id }));
@@ -114,6 +144,7 @@ export const updateDialogStatus = (id, status) => {
 };
 
 export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);
+
 export const getArchives = (offset = 0) => window.store.archives.slice(offset);
 
 export const getDialog = id => {
@@ -124,17 +155,108 @@ export const getDialog = id => {
 		return window.store.dialogs[idx];
 	}
 };
-export const getMessages = peer => messageId => {
-	return;
-	return window.store.messages[peer][messageId];
+
+export const getByPeerId = peerId => ({
+	getMessage: getMessage(peerId),
+	getContent: getContent(peerId),
+	getPhoto: getPhoto(peerId),
+	getDocument: getDocument(peerId),
+	getContact: getContact(peerId),
+});
+
+export const getAllContent = peerId => type => {
+	return window.store[peerId][type];
 };
+
+export const getContent = peerId => type => id => {
+	return getAllContent(peerId)(type)[id] || {};
+};
+
+export const getAllMessages = peerId => {
+	return getAllContent(peerId)('messages');
+};
+
+export const getMessage = peerId => messageId => {
+	return getContent(peerId)('messages')(messageId);
+};
+
+export const getPhoto = peerId => photoId => {
+	return getContent(peerId)('photo')(photoId);
+};
+
+export const getDocument = peerId => documentId => {
+	return getContent(peerId)('document')(documentId);
+};
+
+export const getContact = peerId => contactId => {
+	return getContent(peerId)('contact')(contactId);
+};
+
+export const putMessage = peerId => messageId => messageContent => {
+	const peerStore = window.store[peerId] || addPeerStore(peerId);
+	peerStore.messages[messageId] = messageContent;
+	if (messageContent.media) {
+		const mediaType = mapDocumentType(messageContent.media._);
+		putDocument(peerId)(mediaType)(messageContent.media);
+	}
+};
+
+export const putDocumentByPeerId = peerId => {
+	return putDocument(peerId);
+};
+
+export const putDocument = peerId => type => content => {
+	const peerStore = window.store[peerId] || addPeerStore(peerId);
+	const storeType = mapDocumentType(type);
+	const { id: documentId } = content;
+	peerStore[storeType][documentId] = content;
+};
+
+const mapDocumentType = type => {
+	switch (type) {
+		case 'messageMediaPhoto':
+		case 'photo':
+			return `photo`;
+		case 'messageMediaDocument':
+		case 'document':
+			return `document`;
+		case 'messageMediaGeo':
+		case 'geo':
+			return `geo`;
+		case 'messageMediaGeoLive':
+		case 'geoLive':
+			return `geoLive`;
+		case 'messageMediaContact':
+		case 'contact':
+			return `contact`;
+		case 'messageMediaGame':
+		case 'game':
+			return `game`;
+		case 'messageMediaInvoice':
+		case 'invoice':
+			return `invoice`;
+		case 'messageMediaPoll':
+		case 'poll':
+			return `poll`;
+		case 'messageMediaWebPage':
+		case 'webpage':
+			return 'webpage';
+		default:
+			return `unsupported`;
+	}
+};
+
+export const getActivePeerId = () => peerToId(getActivePeer());
 
 export const mapId = id => window.store.mapId[id];
 
 export const SET_ACTIVE_PEER = 'SET_ACTIVE_PEER';
 export const setActivePeer = peer => {
 	window.store.activePeer = peer;
-	document.getElementById('right-sidebar').dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER, { peer }));
+	const rightSidebar = document.getElementById('right-sidebar');
+	if (rightSidebar) {
+		rightSidebar.dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER, { peer }));
+	}
 };
 
 export const getActivePeer = () => {

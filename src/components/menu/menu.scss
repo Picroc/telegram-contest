@@ -5,7 +5,7 @@
   height: 100%;
   svg {
     position: absolute;
-    fill: #c5cacc;
+    fill: var(--special-gray);
     bottom: 6px;
     left: 6px;
   }
@@ -38,7 +38,7 @@
     height: 14px;
     width: 14px;
     position: absolute;
-    fill: #c5cacc;
+    fill: var(--special-gray);
     bottom: 15px;
     left: 6px;
   }
@@ -55,7 +55,7 @@
     border: none;
 
     &::placeholder {
-      color: #c5cacc;
+      color: var(--special-gray);
     }
     &:focus {
       outline: none;
@@ -79,7 +79,7 @@
     position: absolute;
     overflow: hidden;
 
-    transition: all 0.4s ease-in;
+    transition: all 0.1s ease-in;
     .menu__search_active {
       position: relative;
       box-shadow: 0 0 0 1.5pt var(--primary);
@@ -93,13 +93,13 @@
       }
       @media (max-width: 1300px) {
         & {
-          min-width: 190px;
+          min-width: 200px;
         }
       }
       background-color: var(--white);
       min-width: calc(25vw - 80px);
       height: 32px;
-      transition: 0.4s ease-in;
+      transition: 0.1s ease-in;
     }
   }
 
@@ -157,8 +157,11 @@
 
   .burger {
     div {
-      margin-bottom: 2px;
+      margin-bottom: 3px;
       background: #707579;
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 
@@ -183,18 +186,24 @@
   }
 
   &__icon {
-    margin-left: -2px;
-    margin-top: -2px;
-
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    width: 40px;
+    height: 40px;
     cursor: pointer;
+
     div {
       display: block;
       width: 18px;
       height: 3px;
+    }
+
+    &_active {
+      background: var(--light-gray);
+      border-radius: 50%;
+      cursor: pointer;
     }
   }
 }

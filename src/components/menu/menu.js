@@ -64,11 +64,15 @@ export default class Menu extends HTMLElement {
 		this.innerHTML = template;
 		this.menuList = this.querySelector('.menu-list');
 		this.menuIcon = this.querySelector('.menu__icon');
+		this.search = this.querySelector('.menu__search');
+		this.overlay = this.querySelector('.menu__search_overlay');
 		subscribe('.menu__checkbox')('click', this.menuClick);
-		subscribe('.menu__search')('click', event => {
-			this.querySelector('.menu__search_overlay').classList.toggle('hide');
-			this.menuIcon.classList.toggle('arrow');
-			this.menuIcon.classList.toggle('burger');
+		this.search.addEventListener('click', event => {
+			if (this.overlay.classList.contains('hide')) {
+				this.overlay.classList.toggle('hide');
+				this.menuIcon.classList.toggle('arrow');
+				this.menuIcon.classList.toggle('burger');
+			}
 		});
 		subscribe('.menu-list__settings')('click', this.settingsClick);
 		subscribe('.menu-list__archived')('click', this.archivesClick);
@@ -125,6 +129,7 @@ export default class Menu extends HTMLElement {
 	};
 
 	menuClick = e => {
+		this.menuIcon.classList.toggle('menu__icon_active');
 		this.menuList.classList.toggle('popup_hidden');
 	};
 
