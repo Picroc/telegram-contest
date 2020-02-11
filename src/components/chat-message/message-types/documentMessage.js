@@ -2,6 +2,7 @@ import lottie from 'lottie-web';
 import { getActivePeerId, getMessage } from '../../../store/store';
 import { createDiv, createElement } from '../../../helpers';
 import { telegramApi } from '../../../App';
+import { startLoading, stopLoading } from '../../../helpers/index';
 
 export default class DocumentMessage extends HTMLElement {
 	constructor() {
@@ -45,19 +46,23 @@ export default class DocumentMessage extends HTMLElement {
 
 	getVideoDocument(doc) {
 		console.log(doc);
-		telegramApi.downloadDocument(doc).then(data => {
-			console.log(data);
-			telegramApi._getVideoData(data.bytes).then(video_data => {
-				const vid = document.createElement('video');
-				vid.src = video_data;
-				vid.width = 300;
-				vid.height = 300;
-				vid.controls = 'controls';
-				vid.autoplay = true;
-				this.querySelector('.document-message__video').appendChild(vid);
+		this.addEventListener('click', () => {
+			startLoading(this.querySelector('.document-message__video'));
+			telegramApi.downloadDocument(doc).then(data => {
+				console.log(data);
+				telegramApi._getVideoData(data.bytes).then(video_data => {
+					const vid = document.createElement('video');
+					vid.src = video_data;
+					vid.width = 300;
+					vid.height = 300;
+					vid.controls = 'controls';
+					vid.autoplay = true;
+					stopLoading(this.querySelector('.document-message__video'));
+					this.querySelector('.document-message__video').appendChild(vid);
+				});
 			});
 		});
-		return `<div style='width: 300px; height: 300px;' class='document-message__video'></div>`;
+		return `<div style='width: 300px; height: 300px;background: url("https://riggswealth.com/wp-content/uploads/2016/06/Riggs-Video-Placeholder.jpg"); background-position: center center;' class='document-message__video'></div>`;
 	}
 
 	getAnimatedSticker(doc) {
@@ -72,16 +77,27 @@ export default class DocumentMessage extends HTMLElement {
 		return `<div class="chat-message_animated-sticker"><img src="${stickerPreviewUrl}" alt=${altEmoji}></div>`;
 	}
 
-	getSticker({ id, file_reference: fileReference, date, size, thumbs, attributes }) {
+	getSticker({ id, access_hash, file_reference: fileReference, date, size, thumbs, attributes }) {
 		const { type, w, h, bytes } = thumbs[0];
 		const [
 			{ w: width, h: height },
 			{ alt: altEmoji, stickerset: stickerSet },
 			{ file_name: fileName },
 		] = attributes;
-		const stickerUrl = `data:image/png;base64,${btoa(String.fromCharCode(...new Uint8Array(bytes)))}`;
-		console.log('sticker', altEmoji, thumbs, btoa(String.fromCharCode(...new Uint8Array(bytes))));
-		return `<div class="chat-message_sticker"><img src="${stickerUrl}" alt=${altEmoji}></div>`;
+		const stickerUrl = window.URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
+		if (!bytes) {
+			telegramApi.getDocumentPreview({ id, file_reference: fileReference, access_hash, thumbs }).then(res => {
+				const img = document.createElement('img');
+				img.src = window.URL.createObjectURL(new Blob([res.bytes], { type: 'image/png' }));
+				img.style = 'width: 100%; height: 100%';
+
+				this.querySelector('.chat-message_sticker').appendChild(img);
+			});
+		}
+		console.log('sticker', altEmoji, thumbs);
+		return `<div id='${id}' style='width: 120px; height: 120px;' class="chat-message_sticker">${
+			bytes ? `<img src="${stickerUrl}" alt=${altEmoji}>` : ''
+		}</div>`;
 	}
 
 	getAnimationItem = (data, options) => () =>

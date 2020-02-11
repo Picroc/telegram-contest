@@ -55,7 +55,6 @@ export default ({
 		}
 		const { _: mediaType, photo = {}, photos = [] } = media;
 
-		console.log(photo, photos);
 		if (mediaType === 'messageMediaPhoto') {
 			const photoElemList = photos.reduce((accum, currentPhoto) => (accum += getPhotoTemplate(currentPhoto)), ``);
 			const photoElem = getPhotoTemplate(photo);
@@ -65,7 +64,7 @@ export default ({
 	}
 
 	const forward = (forwardFrom && `<div>Was forwarded from ${forwardFrom}</div>`) || '';
-	const reply = (replyToMessageId && `<div>Reply to ${replyToMessageId}</div>`) || '';
+	const reply = (replyToMessageId && `<div class='chat-message__reply'>Reply to ${replyToMessageId}</div>`) || '';
 
 	const formattedMessage = getFormattedMessage({ message, entities });
 
@@ -141,7 +140,6 @@ const getFormattedMessage = ({ message, entities = [] }) => {
 	}
 
 	let formatted = message;
-	console.log(entities);
 
 	entities &&
 		entities.reverse().forEach(entity => {
@@ -152,8 +150,6 @@ const getFormattedMessage = ({ message, entities = [] }) => {
 				formatted = `${pre}<a href='${msg_ent}'>${msg_ent}</a>${pos}`;
 			}
 		});
-
-	console.log(formatted);
 
 	return (message && `<div class="message"><p>${formatted}</p></div>`) || '';
 };

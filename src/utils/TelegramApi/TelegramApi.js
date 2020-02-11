@@ -454,8 +454,11 @@ export default class TelegramApi {
 		const location = { ...doc };
 		let limit = 524288;
 
+		let thumb_size = doc.thumbs;
+		thumb_size = thumb_size[1] || thumb_size[0];
+
 		location._ = 'inputDocumentFileLocation';
-		location.thumb_size = 'x';
+		location.thumb_size = thumb_size.type;
 
 		return this.MtpApiManager.invokeApi('upload.getFile', {
 			location: location,

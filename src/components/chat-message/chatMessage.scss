@@ -1,6 +1,24 @@
 .chat-message {
-  max-width: 500px;
+  max-width: 390px;
   margin: 5px;
+
+  overflow: hidden;
+
+  &_sticker {
+    background-color: transparent;
+    border-radius: 0;
+  }
+
+  &__reply {
+    background-color: white;
+    padding-left: 10px;
+
+    & + .message {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+  }
+
 }
 
 .chat-message_in {
@@ -24,7 +42,13 @@
 }
 
 .chat-message__photo-media {
+  display: inline-block;
 
+  padding-bottom: 0;
+  padding-top: 0;
+
+  border-radius: 15px;
+  overflow: hidden;
 }
 
 .chat-message_media-unsupported {
@@ -42,4 +66,12 @@
 
 .message {
   white-space: pre-wrap;
+  padding-top: 5px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  background-color: white;
+
+  border-radius: 15px;
 }
