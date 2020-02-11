@@ -42,6 +42,7 @@ export default class TopBar extends HTMLElement {
 	showRightSideBar = e => {
 		const rightSidebar = document.getElementById('right-sidebar');
 		rightSidebar.classList.toggle('right-sidebar_hidden');
+		document.getElementById('right').classList.toggle('right_small');
 	};
 
 	unitCheck = unit => {
@@ -158,8 +159,10 @@ export default class TopBar extends HTMLElement {
 	};
 
 	searchClick = event => {
+		event.cancelBubble = true;
 		const search = document.getElementById('search');
-		search.focus();
+		search.peerId = this.getAttribute('user_id');
+		search.click();
 	};
 
 	connectedCallback() {
