@@ -1,11 +1,14 @@
 import { peerToId } from '../helpers';
+import { apiGetter } from '../helpers/index';
 
 window.store = new Store();
 
 function Store() {
 	this.mapId = {};
-	this.mapMediaId = {};
-	this.mapParticipantsId = {};
+	this.mapMaterails = {
+		media: {},
+		//
+	};
 	this.dialogs = [];
 	this.defaultAvatar = 'https://pcentr.by/assets/images/users/7756f7da389c7a20eab610d826a25ec7.jpg';
 }
@@ -140,7 +143,6 @@ export const updateDialogStatus = (id, status) => {
 		topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, { id }));
 	}
 	const rightSidebar = document.getElementById('right-sidebar');
-	console.log('rightSidebar', rightSidebar);
 	if (rightSidebar) {
 		rightSidebar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, status));
 	}
@@ -151,7 +153,6 @@ export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);
 export const getArchives = (offset = 0) => window.store.archives.slice(offset);
 
 export const getDialog = id => {
-	console.log('id', id);
 	const { idx, archived } = mapId(id);
 	if (archived) {
 		return window.store.archives[idx];
@@ -268,8 +269,8 @@ export const SET_ACTIVE_PEER_MEDIA = 'SET_ACTIVE_PEER_MEDIA';
 export const setPeerMediaById = (id, media, update = false, dispatchEvent = true) => {
 	//TODO: по готовности эвентов обновлений прикрутить их проверку тут
 	if (update || !window.store.mapMediaId[id]) {
-		window.store.mapMediaId[id] = media;
-		console.log('setPeerMedia', window.store.mapMediaId[id]);
+		console.log(`Filling peer ${id} with array of media promises`);
+		window.store.mapMaterails['media'][id].promisedArr = media;
 		if (dispatchEvent) {
 			document.getElementById('right-sidebar').dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER_MEDIA, id));
 		}
@@ -280,3 +281,28 @@ export const getPeerMediaById = id => {
 	console.log('getPeerMedia', window.store.mapMediaId[id]);
 	return window.store.mapMediaId[id];
 };
+
+export const peerIdToMaterialsMapper = type => id => {
+	if (!window.store.mapMaterails[type][id]) {
+		window.store.mapMaterails[type][id] = {};
+		console.log(`Getting promised ${type} fo id=${id} from API`);
+		const promisedMaterialArr = apiGetter(type)(id);
+		window.store.mapMaterails[type][id].promisedArr = promisedMaterialArr;
+		return promisedMaterialArr;
+	} else if (window.store.mapMaterails[type][id].promisedArr && !window.store.mapMaterails[type][id].cashed) {
+		console.log(`Getting promised ${type} fo id=${id}`);
+		return window.store.mapMaterails[type][id].promisedArr;
+	} else if (window.store.mapMaterails[type][id].cashed) {
+		console.log(`Getting ${type} fo id=${id} from cash`);
+		return window.store.mapMaterails[type][id].cashedHTML;
+	}
+};
+
+export const peerIdToMediaMapper = id => peerIdToMaterialsMapper('media')(id);
+
+export const cashMaterials = type => (id, materialHTML) => {
+	window.store.mapMaterails[type][id].cashedHTML = materialHTML;
+	window.store.mapMaterails[type][id].cashed = true;
+};
+
+export const cashMedia = (id, mediaHTML) => cashMaterials('media')(id, mediaHTML);

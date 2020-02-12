@@ -61,10 +61,6 @@ export const loadDialog = component => elem => dialog => {
 	telegramApi.getFullPeer(id).then(fullPeer => {
 		console.log('fullPeer', fullPeer);
 		setActivePeer({ ...fullPeer, id, avatar });
-		telegramApi.getPeerPhotos(id, 0, 20).then(media => {
-			console.log('mediaLoaded', media);
-			setPeerMediaById(id, media);
-		});
 	});
 	right.innerHTML = `<top-bar user_id="${id}"></top-bar><chat-main peer-id="${id}"></chat-main>`;
 };

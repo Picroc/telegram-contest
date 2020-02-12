@@ -1,4 +1,5 @@
 import { getDialog } from '../store/store';
+import { telegramApi } from '../App';
 
 export const cc = (cls, condition = true) => ({ class: cls, condition });
 export const tc = (cls1, cls2, conditional) => cc(conditional ? cls1 : cls2);
@@ -135,4 +136,13 @@ export const getRightSidebarFieldsFromPeer = peer => {
 export const capitalise = string => string.charAt(0).toUpperCase() + string.slice(1);
 export const peerToId = peer => {
 	return peer.user_id || peer.channel_id || peer.chat_id;
+};
+
+export const apiGetter = key => {
+	switch (key) {
+		case 'media':
+			return telegramApi.getPeerPhotos;
+		default:
+			console.log('No appropriate key is found');
+	}
 };
