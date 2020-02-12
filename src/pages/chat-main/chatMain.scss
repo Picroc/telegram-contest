@@ -4,6 +4,8 @@ chat-main {
   .all-messages {
     height: 80vh;
     overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
     &::-webkit-scrollbar {
       display: none;
     }
