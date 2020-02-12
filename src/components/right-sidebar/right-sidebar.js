@@ -9,6 +9,7 @@ import {
 	SET_ACTIVE_PEER_MEDIA,
 	getDefaultAvatar,
 	setPeerMediaById,
+	getDialog,
 } from '../../store/store';
 import { getRightSidebarFieldsFromPeer, htmlToElement, capitalise, getName } from '../../helpers/index';
 import infoSvg from './svg/info.js';
@@ -27,11 +28,11 @@ export default class RightSidebar extends HTMLElement {
 		this.avatar = this.querySelector('.right-sidebar__avatar_img');
 		this.avatar.src = getDefaultAvatar();
 
-		this.attributesElem = this.querySelector('.right-sidebar__attributes');
+		this.peerAttributes = this.querySelector('.right-sidebar__attributes');
 
-		this.tabsElem = this.querySelector('.right-sidebar__tabs');
+		this.tabs = this.querySelector('.right-sidebar__tabs');
 
-		this.materialsElem = this.querySelector('.right-sidebar__general-materials');
+		this.materials = this.querySelector('.right-sidebar__general-materials');
 		this.members = this.querySelector('.right-sidebar__general-materials__members');
 		this.media = this.querySelector('.right-sidebar__general-materials__media');
 		this.media.cashed = {};
@@ -67,8 +68,8 @@ export default class RightSidebar extends HTMLElement {
 	loadPeerSidebar = e => {
 		const peer = e.detail;
 		const setHTML = setInnerHTML.bind(this);
-		this.attributesElem.innerHTML = '';
-		// this.materialsElem.innerHTML = '';
+		this.peerAttributes.innerHTML = '';
+		// this.materials.innerHTML = '';
 		const generalizedPeer = getRightSidebarFieldsFromPeer(peer);
 		this.generalizedPeer = generalizedPeer;
 		const { notifications, name, avatar, id } = generalizedPeer;
@@ -92,22 +93,22 @@ export default class RightSidebar extends HTMLElement {
 			notifications ? 'checked' : ''
 		}>`;
 		const notificationsElem = this.createAttributeElem('notifications', 'Notifications', label, () => checkbox);
-		this.attributesElem.appendChild(notificationsElem);
-		console.log('this.attributesElem', this.attributesElem);
+		this.peerAttributes.appendChild(notificationsElem);
+		console.log('this.peerAttributes', this.peerAttributes);
 	};
 
 	loadUserAttributes = generalizedPeer => {
 		const { bio, username, phone } = generalizedPeer;
 		//TODO: будет скучно - можно ещё геолокацией заняться
-		this.attributesElem.appendChild(this.createAttributeElem('bio', bio, 'Bio', infoSvg));
-		this.attributesElem.appendChild(this.createAttributeElem('username', username, 'Username', usernameSvg));
-		this.attributesElem.appendChild(this.createAttributeElem('phone', phone, 'Phone', phoneSvg));
+		this.peerAttributes.appendChild(this.createAttributeElem('bio', bio, 'Bio', infoSvg));
+		this.peerAttributes.appendChild(this.createAttributeElem('username', username, 'Username', usernameSvg));
+		this.peerAttributes.appendChild(this.createAttributeElem('phone', phone, 'Phone', phoneSvg));
 	};
 
 	loadGroupChatAttributes = generalizedPeer => {
 		const { about, link } = generalizedPeer;
-		this.attributesElem.appendChild(this.createAttributeElem('about', about, 'About', infoSvg));
-		this.attributesElem.appendChild(this.createAttributeElem('link', link, 'Link', usernameSvg));
+		this.peerAttributes.appendChild(this.createAttributeElem('about', about, 'About', infoSvg));
+		this.peerAttributes.appendChild(this.createAttributeElem('link', link, 'Link', usernameSvg));
 	};
 
 	createAttributeElem = (name, value, label, svg) => {
@@ -121,19 +122,19 @@ export default class RightSidebar extends HTMLElement {
 	};
 
 	loadTabs = tabs => {
-		this.tabsElem.innerHTML = '';
+		this.tabs.innerHTML = '';
 		tabs.map(tab => {
 			const tabElem = this.createTabElem(tab);
 			tabElem.addEventListener('click', this.chooseTab);
-			this.tabsElem.append(tabElem);
+			this.tabs.append(tabElem);
 		});
-		this.tabsElem.firstChild.classList.add('tab_active'); //TODO: добавить прогрузку контента первого таба
+		this.tabs.firstChild.classList.add('tab_active'); //TODO: добавить прогрузку контента первого таба
 		const membersBool = tabs[0] == 'members';
 		this.underline = htmlToElement(
 			`<div class="tabs__underline underline ${membersBool ? 'underline_big' : ''}"></div>`
 		);
-		this.tabsElem.append(this.underline);
-		this.tabsElem.append(htmlToElement(`<div class="tabs__gray-line gray-line"></div>`));
+		this.tabs.append(this.underline);
+		this.tabs.append(htmlToElement(`<div class="tabs__gray-line gray-line"></div>`));
 		const tab_media = this.querySelector('#tab_media');
 		const tab_members = this.querySelector('#tab_members');
 		if (tab_media) {
@@ -150,7 +151,7 @@ export default class RightSidebar extends HTMLElement {
 	};
 
 	chooseTab = e => {
-		Array.from(this.tabsElem.children).forEach((element, index) => {
+		Array.from(this.tabs.children).forEach((element, index) => {
 			if (element == e.target) {
 				e.target.classList.add('tab_active');
 				if (e.target.innerHTML == 'Members') {
@@ -166,7 +167,7 @@ export default class RightSidebar extends HTMLElement {
 	};
 
 	hideMaterials = () => {
-		Array.from(this.materialsElem.children).forEach(elem => {
+		Array.from(this.materials.children).forEach(elem => {
 			elem.classList.add('hide');
 		});
 	};
@@ -200,7 +201,7 @@ export default class RightSidebar extends HTMLElement {
 			} else {
 				console.log('set media from store');
 				media.forEach(({ photo }) => {
-					this.materialsElem.appendChild(this.createMediaElem(photo, 'media'));
+					this.materials.appendChild(this.createMediaElem(photo, 'media'));
 				});
 			}
 		}
@@ -213,21 +214,21 @@ export default class RightSidebar extends HTMLElement {
 	};
 
 	setChatParticipants = async id => {
-		// this.materialsElem.innerHTML = '';
+		// this.materials.innerHTML = '';
 		this.hideMaterials();
-		this.materialsElem.classList.add('right-sidebar__general-materials__participants');
+		this.materials.classList.add('right-sidebar__general-materials__participants');
 		const { onlineUsers, offlineUsers } = await telegramApi.getChatParticipants(id);
 		for (const { first_name, last_name, id } of onlineUsers) {
 			const name = getName(first_name, last_name);
 			const avatar = (await telegramApi.getPeerPhoto(id)) || window.defaultAvatar;
 			const elem = this.createParticipantElem(avatar, name, 'online');
-			this.materialsElem.appendChild(elem);
+			this.materials.appendChild(elem);
 		}
 		for (const { first_name, last_name, id } of offlineUsers) {
 			const name = getName(first_name, last_name);
 			const avatar = (await telegramApi.getPeerPhoto(id)) || window.defaultAvatar;
 			const elem = this.createParticipantElem(avatar, name, 'offline');
-			this.materialsElem.appendChild(elem);
+			this.materials.appendChild(elem);
 		}
 	};
 

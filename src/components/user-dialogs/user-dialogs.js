@@ -56,7 +56,7 @@ export const loadDialog = component => elem => dialog => {
 	const avatar = elem.querySelector('.dialog__avatar').src; //TODO: getDialog(id).photo && title && id
 	elem.classList.toggle('dialog_active');
 	const right = document.getElementById('right');
-	setActivePeer(peer);
+	// setActivePeer(peer);
 	startLoading(right);
 	telegramApi.getFullPeer(id).then(fullPeer => {
 		console.log('fullPeer', fullPeer);
