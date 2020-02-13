@@ -115,15 +115,13 @@ const getPhotoTemplate = photo => {
 	const [strippedSize, normalSize, ...largeSizes] = sizes;
 	const { w: width, h: height } = normalSize;
 
-	telegramApi.getPhotoPreview(photo).then(photo => {
-		telegramApi._getImageData(photo.bytes).then(data => {
-			const container = document.getElementById(id);
-			const img = document.createElement('img');
-			img.style = 'width: 100%; height: 100%';
-			img.src = data;
+	telegramApi.getPhotoPreview(photo).then(data => {
+		const container = document.getElementById(id);
+		const img = document.createElement('img');
+		img.style = 'width: 100%; height: 100%';
+		img.src = data;
 
-			container.appendChild(img);
-		});
+		container.appendChild(img);
 	});
 	return `<div id="${id}" style="width: ${width}px;height: ${height}px;background: #fafafa"></div>`;
 	// TODO implement logic for all other sizes

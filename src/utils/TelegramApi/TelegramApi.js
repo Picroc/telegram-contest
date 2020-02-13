@@ -329,12 +329,20 @@ export default class TelegramApi {
 		});
 	};
 
-	downloadDocument = (doc, progress, autosave) => {
+	downloadDocument = (doc, progress, autosave, useCached = true) => {
 		doc = doc || {};
 		doc.id = doc.id || 0;
 		doc.access_hash = doc.access_hash || 0;
 		doc.attributes = doc.attributes || [];
 		doc.size = doc.size || 0;
+
+		const cached = this.MtpApiFileManager.getLocalFile(doc.id);
+
+		if (cached && useCached) {
+			return new Promise(resolve => {
+				resolve(cached);
+			});
+		}
 
 		if (!isFunction(progress)) {
 			progress = noop;
@@ -393,7 +401,7 @@ export default class TelegramApi {
 		});
 	};
 
-	downloadPhoto = (photo, progress, autosave) => {
+	downloadPhoto = (photo, progress, autosave, useCached = true) => {
 		const photoSize = photo.sizes[photo.sizes.length - 1];
 		const location = {
 			_: 'inputPhotoFileLocation',
@@ -402,6 +410,14 @@ export default class TelegramApi {
 			file_reference: photo.file_reference,
 			thumb_size: 'c',
 		};
+
+		const cached = this.MtpApiFileManager.getLocalFile(photo.id);
+
+		if (cached && useCached) {
+			return new Promise(resolve => {
+				resolve(cached);
+			});
+		}
 
 		if (!isFunction(progress)) {
 			progress = noop;
@@ -469,6 +485,13 @@ export default class TelegramApi {
 	};
 
 	getPhotoPreview = photo => {
+		const cached = this.MtpApiFileManager.getLocalFile(photo.id);
+		if (cached) {
+			return new Promise(resolve => {
+				resolve(cached);
+			});
+		}
+
 		let photo_size = photo.sizes;
 		photo_size = photo_size[2] || photo_size[1];
 
@@ -485,7 +508,7 @@ export default class TelegramApi {
 			location: location,
 			offset: 0,
 			limit: limit,
-		});
+		}).then(data => this._getImageData(data.bytes, photo.id));
 	};
 
 	getMessagesFromPeer = async (peer, limit = 200, offsetId = 0) => {
@@ -517,7 +540,7 @@ export default class TelegramApi {
 		)
 			.then(res => {
 				// console.log('Got file!');
-				return this._getImageData(res.bytes);
+				return this._getImageData(res.bytes, id);
 			})
 			.catch(err => {
 				if (err.type === 'FILEREF_UPGRADE_NEEDED') {
@@ -543,7 +566,7 @@ export default class TelegramApi {
 			limit: 1048576,
 		}).then(photo_file => {
 			// console.log('Got file!');
-			return this._getImageData(photo_file.bytes);
+			return this._getImageData(photo_file.bytes, peer_id);
 		});
 	};
 
@@ -589,6 +612,7 @@ export default class TelegramApi {
 				msg_photos.push({
 					photo: msg.media.photo,
 					caption: msg.message,
+					id: msg.media.photo.id,
 				});
 			});
 
@@ -1399,14 +1423,23 @@ export default class TelegramApi {
 		}
 	};
 
-	_getStickerData = async sticker => {
+	_getStickerData = async (sticker, id) => {
+		if (!(sticker instanceof Array)) {
+			console.log('GOT CACHED', sticker);
+			return sticker;
+		}
 		const decoded_text = new TextDecoder('utf-8').decode(await pako.inflate(sticker[0]));
-		return JSON.parse(decoded_text);
+		const data = JSON.parse(decoded_text);
+		if (id) {
+			console.log('SAVING', data);
+			this.MtpApiFileManager.saveLocalFile(id, { bytes: data });
+		}
+		return data;
 	};
 
-	setStickerToContainer = (sticker, container) => {
-		console.log(sticker);
-		this._getStickerData(sticker.bytes).then(st => {
+	setStickerToContainer = (sticker, container, cacheId) => {
+		console.log(sticker, cacheId);
+		this._getStickerData(sticker.bytes, cacheId).then(st => {
 			lottie.loadAnimation({
 				container: container,
 				renderer: 'svg',
@@ -1422,7 +1455,7 @@ export default class TelegramApi {
 		photos.forEach(photo => {
 			if (photo) {
 				photo_promises.push({
-					photo: this.getPhotoPreview(photo.photo).then(res => this._getImageData(res.bytes)),
+					photo: this.getPhotoPreview(photo.photo).then(res => this._getImageData(res.bytes, photo.id)),
 					caption: photo.caption,
 				});
 			}
@@ -1439,15 +1472,29 @@ export default class TelegramApi {
 		});
 	};
 
-	_getImageData = async bytes => {
-		return window.URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
+	_getImageData = async (bytes, id) => {
+		if (!(bytes instanceof Uint8Array)) {
+			return bytes;
+		}
+		const data = window.URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
+		if (id) {
+			this.MtpApiFileManager.saveLocalFile(id, data);
+		}
+		return data;
 	};
 
-	_getVideoData = async bytes => {
+	_getVideoData = async (bytes, id) => {
 		// const byteArray = ;
 		// console.log('BTARRAY', byteArray);
+		if (!(bytes instanceof Array)) {
+			return bytes;
+		}
 		const blob = new Blob(bytes, { type: 'video/mp4' });
 		console.log('BLOB', blob);
-		return window.URL.createObjectURL(blob);
+		const data = window.URL.createObjectURL(blob);
+		if (id) {
+			this.MtpApiFileManager.saveLocalFile(id, { bytes: data });
+		}
+		return data;
 	};
 }
