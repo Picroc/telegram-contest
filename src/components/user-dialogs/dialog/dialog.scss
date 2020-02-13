@@ -79,6 +79,10 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+
+    &_from {
+      color: var(--black);
+    }
   }
 
   &__info {

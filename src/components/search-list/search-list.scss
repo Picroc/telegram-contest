@@ -1,5 +1,6 @@
 .search-list {
   transition: opacity 0.1s ease-in;
+  overflow: auto;
 
   &_hidden {
     z-index: -10;
@@ -39,5 +40,17 @@
       background: var(--light-gray);
       cursor: pointer;
     }
+  }
+}
+
+.message-result {
+  &__message {
+    &_highlighted {
+      color: var(--primary);
+    }
+  }
+
+  &__time {
+    justify-self: right;
   }
 }

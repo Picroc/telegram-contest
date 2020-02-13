@@ -4,24 +4,10 @@ import { subscribe } from '../../helpers';
 import { getDialogs, getArchives } from '../../store/store';
 import { hide, show, htmlToElement } from '../../helpers/index';
 
-export const onType = event => {
-	//TODO: добавить поиск по алиасу ( и мб что-то ещё кроме названия чата)
-	const dialogs = getDialogs();
-	const string = event.target.value.toLowerCase();
-	for (const dialog of dialogs) {
-		const el = document.getElementById(`dialog_${dialog.id}`);
-		if (!dialog.title.toLowerCase().includes(string)) {
-			hide(el);
-		} else {
-			show(el);
-		}
-	}
-};
-
 let currentSeacrhTimeout;
 const tApi = window.telegramApi;
 
-const onTypeContacts = (value, searchCallback = () => {}) => {
+const onTypeContacts = (value, searchCallback = () => { }) => {
 	if (value.length == 0) {
 		clearTimeout(currentSeacrhTimeout);
 		return;
@@ -76,10 +62,6 @@ export default class Menu extends HTMLElement {
 		});
 		subscribe('.menu-list__settings')('click', this.settingsClick);
 		subscribe('.menu-list__archived')('click', this.archivesClick);
-		subscribe('.menu__search')('input', event => {
-			onType(event);
-			// onTypeContacts(event.target.value, () => {});
-		});
 		// `<div class="dialog_right_bottom dialog__unread-count dialog_muted"><div class="count archived__count"></div></div>`
 		// this.archivedCount = this.querySelector('.archived__count');
 		// this.archivedCount.innerHTML = this.countArchives();

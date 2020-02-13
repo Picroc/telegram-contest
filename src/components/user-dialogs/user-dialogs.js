@@ -42,7 +42,7 @@ export const renderDialog = (component, archived = false) => dialog => {
 	}
 };
 
-export const loadDialog = component => elem => async dialog => {
+export const loadDialog = component => elem => async (dialog, messageId) => {
 	const { id, dialog_peer: peer, photo: avatar } = dialog;
 	if (component.prevActive) {
 		if (component.prevId === id) {

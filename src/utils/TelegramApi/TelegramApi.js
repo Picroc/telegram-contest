@@ -470,7 +470,7 @@ export default class TelegramApi {
 
 	getPhotoPreview = photo => {
 		let photo_size = photo.sizes;
-		photo_size = photo_size[2] || photo_size[1] || photo_size[0];
+		photo_size = photo_size[3] || photo_size[2] || photo_size[1] || photo_size[0];
 		const location = {
 			_: 'inputPhotoFileLocation',
 			id: photo.id,
