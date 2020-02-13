@@ -177,33 +177,18 @@ export default class RightSidebar extends HTMLElement {
 	setMedia = async id => {
 		const media = await peerIdToMediaMapper(id);
 		console.log('media', media);
-		if (!media.cashedHTML) {
-			this.media.innerHTML = '';
-			console.log(`Resolving media promises for peer ${id}`);
-			const unpromisedMediaElements = media.map(async ({ photo }, index) => {
-				const placeholder = htmlToElement(
-					`<div class="right-sidebar__general-materials__media_placeholder"></div>`
-				);
-				this.media.appendChild(placeholder);
-				const image = await photo;
-				const imageElement = this.createMediaElem(image, id, index);
-				placeholder.replaceWith(imageElement);
-				return imageElement;
-			});
-			Promise.all(unpromisedMediaElements).then(elements => {
-				console.log(`All promises for ${id} resolved, setting HTML`);
-				const mediaWrapper = createDiv;
-				elements.forEach(element => {
-					mediaWrapper.appendChild(element);
-				});
-				cashMedia(id, mediaWrapper);
-				this.media.innerHTML = mediaWrapper.innerHTML;
-			});
-		} else {
-			console.log(`Getting media from store for peer ${id}`);
-			this.media.innerHTML = media.cashedHTML.innerHTML;
-		}
-	};
+		this.media.innerHTML = '';
+		console.log(`Resolving media promises for peer ${id}`);
+		media.forEach(async ({ photo }, index) => {
+			const placeholder = htmlToElement(
+				`<div class="right-sidebar__general-materials__media_placeholder"></div>`
+			);
+			this.media.appendChild(placeholder);
+			const image = await photo;
+			const imageElement = this.createMediaElem(image, id, index);
+			placeholder.replaceWith(imageElement);
+			return imageElement;
+		});
 
 	createMediaElem = (media, peerId, mediaIndex) => {
 		return htmlToElement(
