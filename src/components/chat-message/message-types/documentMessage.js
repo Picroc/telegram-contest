@@ -1,8 +1,7 @@
 import lottie from 'lottie-web';
 import { getActivePeerId, getMessage } from '../../../store/store';
-import { createDiv, createElement } from '../../../helpers';
 import { telegramApi } from '../../../App';
-import { startLoading, stopLoading } from '../../../helpers/index';
+import { startLoadingProgress, setLoadingProgress, stopLoadingProgress } from '../../../helpers/index';
 
 export default class DocumentMessage extends HTMLElement {
 	constructor() {
@@ -47,8 +46,19 @@ export default class DocumentMessage extends HTMLElement {
 	getVideoDocument(doc) {
 		console.log(doc);
 		this.addEventListener('click', () => {
-			startLoading(this.querySelector('.document-message__video'));
-			telegramApi.downloadDocument(doc).then(data => {
+			if (!this.loading) {
+				this.loading = true;
+			} else {
+				return;
+			}
+
+			const videoPlaceholder = this.querySelector('.document-message__video');
+			const handleProgress = (offset, size) => {
+				setLoadingProgress(videoPlaceholder, (offset / size) * 100);
+			};
+
+			startLoadingProgress(videoPlaceholder);
+			telegramApi.downloadDocument(doc, handleProgress).then(data => {
 				console.log(data);
 				telegramApi._getVideoData(data.bytes).then(video_data => {
 					const vid = document.createElement('video');
@@ -57,8 +67,8 @@ export default class DocumentMessage extends HTMLElement {
 					vid.height = 300;
 					vid.controls = 'controls';
 					vid.autoplay = true;
-					stopLoading(this.querySelector('.document-message__video'));
-					this.querySelector('.document-message__video').appendChild(vid);
+					stopLoadingProgress(videoPlaceholder);
+					videoPlaceholder.appendChild(vid);
 				});
 			});
 		});
