@@ -12,8 +12,6 @@ export default class ChatPage extends HTMLElement {
 		this.innerHTML = template;
 		this.className = 'chat-page';
 		this.loadData();
-		const rightSidebar = document.createElement('right-sidebar');
-		this.appendChild(rightSidebar);
 	}
 
 	connectedCallback() {
@@ -48,7 +46,6 @@ export default class ChatPage extends HTMLElement {
 				} = dialog;
 				const id = channel_id || chat_id || user_id;
 				if (type !== 'dialogFolder') {
-					console.log('id', id);
 					updateDialogUnread(id, count);
 				}
 			});
