@@ -21,7 +21,7 @@ export const onType = event => {
 let currentSeacrhTimeout;
 const tApi = window.telegramApi;
 
-const onTypeContacts = (value, searchCallback = () => { }) => {
+const onTypeContacts = (value, searchCallback = () => {}) => {
 	if (value.length == 0) {
 		clearTimeout(currentSeacrhTimeout);
 		return;

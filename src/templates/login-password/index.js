@@ -13,7 +13,7 @@ const state = {
 };
 
 const subscribe = element => {
-	return function (...args) {
+	return function(...args) {
 		document.querySelector(element).addEventListener(...args);
 	};
 };
@@ -40,7 +40,9 @@ const getAnimationItem = (elem, data, options) => () =>
 	});
 
 const animFromCloseToPeek = reverse => {
-	if (window.current_animation) window.current_animation.destroy();
+	if (window.current_animation) {
+		window.current_animation.destroy();
+	}
 
 	const elem = '.cd-tgsticker';
 
@@ -58,7 +60,9 @@ const animFromCloseToPeek = reverse => {
 };
 
 const animFromCloseToIdle = reverse => {
-	if (window.current_animation) window.current_animation.destroy();
+	if (window.current_animation) {
+		window.current_animation.destroy();
+	}
 
 	const elem = '.cd-tgsticker';
 

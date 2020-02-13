@@ -353,9 +353,9 @@ export default class TelegramApi {
 		return new Promise((resolve, request) => {
 			const bytes = [];
 
-			if (doc.size > size) {
-				throw new Error('Big file not supported');
-			}
+			// if (doc.size > size) {
+			// 	throw new Error('Big file not supported');
+			// }
 
 			size = doc.size;
 
@@ -453,8 +453,13 @@ export default class TelegramApi {
 		const location = { ...doc };
 		let limit = 524288;
 
+		let thumb_size = doc.thumbs;
+		if (thumb_size) {
+			thumb_size = thumb_size[2] || thumb_size[1] || thumb_size[0];
+			location.thumb_size = thumb_size.type;
+		}
+
 		location._ = 'inputDocumentFileLocation';
-		location.thumb_size = 'x';
 
 		return this.MtpApiManager.invokeApi('upload.getFile', {
 			location: location,
@@ -465,8 +470,7 @@ export default class TelegramApi {
 
 	getPhotoPreview = photo => {
 		let photo_size = photo.sizes;
-		photo_size = photo_size[2] || photo_size[1];
-
+		photo_size = photo_size[2] || photo_size[1] || photo_size[0];
 		const location = {
 			_: 'inputPhotoFileLocation',
 			id: photo.id,
@@ -493,9 +497,8 @@ export default class TelegramApi {
 
 	getPhotoFile = async (photo, size) => {
 		const { id, access_hash, file_reference } = photo;
-		const photo_size =
-			size >= photo.sizes.length ? photo.sizes[photo.sizes.length - 1].type : photo.sizes[size].type;
-
+		const photo_size = photo.sizes[2] || photo.sizes[1] || photo.sizes[0];
+		console.log(photo_size);
 		return await this.invokeApi(
 			'upload.getFile',
 			{
@@ -503,7 +506,7 @@ export default class TelegramApi {
 					_: 'inputPhotoFileLocation',
 					id,
 					access_hash,
-					thumb_size: photo_size,
+					thumb_size: photo_size.type,
 					file_reference,
 				},
 				offset: 0,
@@ -552,6 +555,27 @@ export default class TelegramApi {
 			filter,
 			limit,
 			hash: Math.floor(Math.random() * 1000),
+		});
+	};
+
+	searchMessagesGlobal = async (text, offset_rate = 0, limit = 0) => {
+		return this.invokeApi('messages.searchGlobal', {
+			q: text,
+			offset_rate,
+			limit,
+			offset_peer: {
+				_: 'inputPeerEmpty',
+			},
+		}).then(res => {
+			const message_items = [];
+
+			console.log('SEARCH RES SERV', res);
+
+			res.messages.forEach(message => {
+				message_items.push(this._parseSearchMessage(message, res.chats, res.users));
+			});
+
+			return message_items;
 		});
 	};
 
@@ -703,9 +727,9 @@ export default class TelegramApi {
 				photo = user.photo && user.photo._ !== 'userPhotoEmpty' && user.photo;
 				peer = user.access_hash
 					? {
-							...result,
-							access_hash: user.access_hash,
-					  }
+						...result,
+						access_hash: user.access_hash,
+					}
 					: result;
 			}
 
@@ -1089,50 +1113,65 @@ export default class TelegramApi {
 		hide_edit: this._checkFlag(msg_flags, 21),
 	});
 
-	_parseDialog = (dialog, chats, messages, users) => {
-		let peer = dialog.peer;
-		let title,
-			status,
-			photo,
-			is_supergroup = false;
-		if (peer._ === 'peerChat') {
-			const chat = chats[chats.findIndex(el => el.id === peer.chat_id)];
-			title = chat.title;
-			if (chat.photo && chat.photo._ !== 'chatPhotoEmpty') {
-				photo = chat.photo;
-			}
-		} else if (peer._ === 'peerChannel') {
-			const idx = chats.findIndex(el => el.id === peer.channel_id);
-			const channel = chats[idx];
+	_parseSearchMessage = (message, chats, users) => {
+		const text = this._getMessageText(message);
 
-			is_supergroup = this._checkFlag(channel.flags, 8);
+		let msg_type, title, from_name, photo;
 
-			title = channel.title;
-			if (channel.photo && channel.photo._ !== 'chatPhotoEmpty') {
-				photo = channel.photo;
+		let { from_id, to_id } = message;
+		to_id = to_id.user_id || to_id.chat_id || to_id.channel_id || to_id;
+
+		const { out, channel_post } = this._checkMessageFlags(message.flags);
+
+		const to_peer = (to_id && chats.filter(el => el.id === to_id)[0]) || users.filter(el => el.id === to_id)[0];
+		const from_peer = from_id && users.filter(el => el.id === from_id)[0];
+
+		if (channel_post) {
+			msg_type = 'channel';
+			title = to_peer.title;
+
+			if (to_peer && to_peer.photo && to_peer.photo._ !== 'chatPhotoEmpty') {
+				photo = this.getPeerPhoto(to_id);
 			}
-			peer = {
-				...peer,
-				access_hash: channel.access_hash,
-			};
-		} else {
-			const user = users[users.findIndex(el => el.id === peer.user_id)];
-			const last_name = user.last_name ? ' ' + user.last_name : '';
-			title = user.first_name + last_name;
-			status = user.status;
-			if (user.photo && user.first_name !== 'Telegram') {
-				photo = user.photo;
-			}
-			peer = user.access_hash
-				? {
-						...peer,
-						access_hash: user.access_hash,
-				  }
-				: peer;
 		}
-		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
-		let { message: text, date, flags: msg_flags } = message;
-		const unread_count = dialog.unread_count;
+
+		if (!channel_post) {
+			if (to_peer && to_peer._ !== 'user') {
+				msg_type = 'chat';
+				title = to_peer.title;
+				from_name = from_peer.first_name;
+
+				if (to_peer && to_peer.photo && to_peer.photo._ !== 'chatPhotoEmpty') {
+					photo = this.getPeerPhoto(to_id);
+				}
+			} else {
+				msg_type = 'pm';
+				title = from_peer.first_name + ' ' + from_peer.last_name;
+
+				if (out) {
+					photo = this.getUserPhoto();
+				} else if (from_peer && from_peer.photo && from_peer.photo._ !== 'userProfilePhotoEmpty') {
+					photo = this.getPeerPhoto(from_id);
+				}
+			}
+		}
+
+		return {
+			_: msg_type,
+			title,
+			text,
+			from_name: from_name || '',
+			to_peer: to_peer || {},
+			from_peer: from_peer || {},
+			date: message.date,
+			id: message.id,
+			photo,
+			out,
+		};
+	};
+
+	_getMessageText = message => {
+		let text = message.message;
 
 		if (!text || (message.media && message.media._ !== 'messageMediaEmpty')) {
 			if (message._ === 'messageService') {
@@ -1194,12 +1233,65 @@ export default class TelegramApi {
 						case 'messageMediaDocument':
 							text = getDocumentText(message.media);
 							break;
+						case 'messageMediaPoll':
+							text = 'Poll';
+							break;
 						default:
 							text = text || 'Unsupported message';
 					}
 				}
 			}
 		}
+
+		return text;
+	};
+
+	_parseDialog = (dialog, chats, messages, users) => {
+		let peer = dialog.peer;
+		let title,
+			status,
+			photo,
+			is_supergroup = false;
+		if (peer._ === 'peerChat') {
+			const chat = chats[chats.findIndex(el => el.id === peer.chat_id)];
+			title = chat.title;
+			if (chat.photo && chat.photo._ !== 'chatPhotoEmpty') {
+				photo = chat.photo;
+			}
+		} else if (peer._ === 'peerChannel') {
+			const idx = chats.findIndex(el => el.id === peer.channel_id);
+			const channel = chats[idx];
+
+			is_supergroup = this._checkFlag(channel.flags, 8);
+
+			title = channel.title;
+			if (channel.photo && channel.photo._ !== 'chatPhotoEmpty') {
+				photo = channel.photo;
+			}
+			peer = {
+				...peer,
+				access_hash: channel.access_hash,
+			};
+		} else {
+			const user = users[users.findIndex(el => el.id === peer.user_id)];
+			const last_name = user.last_name ? ' ' + user.last_name : '';
+			title = user.first_name + last_name;
+			status = user.status;
+			if (user.photo && user.first_name !== 'Telegram') {
+				photo = user.photo;
+			}
+			peer = user.access_hash
+				? {
+					...peer,
+					access_hash: user.access_hash,
+				}
+				: peer;
+		}
+		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
+		let { date, flags: msg_flags } = message;
+		const unread_count = dialog.unread_count;
+
+		const text = this._getMessageText(message);
 
 		if (photo) {
 			photo = this.getPeerPhoto(peer.user_id || peer.chat_id || peer.channel_id);
@@ -1316,6 +1408,7 @@ export default class TelegramApi {
 	};
 
 	setStickerToContainer = (sticker, container) => {
+		console.log(sticker);
 		this._getStickerData(sticker.bytes).then(st => {
 			lottie.loadAnimation({
 				container: container,
@@ -1350,19 +1443,14 @@ export default class TelegramApi {
 	};
 
 	_getImageData = async bytes => {
-		const chunk = 0x8000;
+		return window.URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
+	};
 
-		let index = 0;
-		let length = bytes.length;
-
-		let result = '';
-		let slice;
-
-		while (index < length) {
-			slice = bytes.slice(index, Math.min(index + chunk, length));
-			result += String.fromCharCode.apply(null, new Uint8Array(slice));
-			index += chunk;
-		}
-		return 'data:image/png;base64,' + btoa(result);
+	_getVideoData = async bytes => {
+		// const byteArray = ;
+		// console.log('BTARRAY', byteArray);
+		const blob = new Blob(bytes, { type: 'video/mp4' });
+		console.log('BLOB', blob);
+		return window.URL.createObjectURL(blob);
 	};
 }

@@ -26,6 +26,10 @@ svg,
   transition: 0.4s;
 }
 
+video:focus {
+  outline: none;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -70,6 +74,22 @@ svg,
     border-right-color: var(--primary);
     border-top-color: var(--primary);
     animation: spin 1s ease-in-out infinite;
+  }
+}
+
+.loading_progress {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  & svg {
+    animation: spin 3s linear infinite;
+  }
+
+  & .progress-ring__circle {
+    transition: 0.35s stroke-dashoffset;
+    // axis compensation
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
   }
 }
 

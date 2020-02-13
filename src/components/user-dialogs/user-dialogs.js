@@ -42,8 +42,8 @@ export const renderDialog = (component, archived = false) => dialog => {
 	}
 };
 
-export const loadDialog = component => elem => dialog => {
-	const { id, dialog_peer: peer } = dialog;
+export const loadDialog = component => elem => async dialog => {
+	const { id, dialog_peer: peer, photo: avatar } = dialog;
 	if (component.prevActive) {
 		if (component.prevId === id) {
 			return;
@@ -53,15 +53,11 @@ export const loadDialog = component => elem => dialog => {
 	}
 	component.prevActive = elem;
 	component.prevId = id;
-	const avatar = elem.querySelector('.dialog__avatar').src; //TODO: getDialog(id).photo && title && id
 	elem.classList.toggle('dialog_active');
 	const right = document.getElementById('right');
-	// setActivePeer(peer);
 	startLoading(right);
-	telegramApi.getFullPeer(id).then(fullPeer => {
-		console.log('fullPeer', fullPeer);
-		setActivePeer({ ...fullPeer, id, avatar }); //initialize RSB load
-	});
+	const fullPeer = await telegramApi.getFullPeer(id);
+	setActivePeer({ fullPeer: { ...fullPeer, avatar, id }, ...peer });
 	right.innerHTML = `<top-bar user_id="${id}"></top-bar><chat-main peer-id="${id}"></chat-main>`;
 };
 
