@@ -751,9 +751,9 @@ export default class TelegramApi {
 				photo = user.photo && user.photo._ !== 'userPhotoEmpty' && user.photo;
 				peer = user.access_hash
 					? {
-						...result,
-						access_hash: user.access_hash,
-					}
+							...result,
+							access_hash: user.access_hash,
+					  }
 					: result;
 			}
 
@@ -1306,9 +1306,9 @@ export default class TelegramApi {
 			}
 			peer = user.access_hash
 				? {
-					...peer,
-					access_hash: user.access_hash,
-				}
+						...peer,
+						access_hash: user.access_hash,
+				  }
 				: peer;
 		}
 		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
@@ -1458,7 +1458,7 @@ export default class TelegramApi {
 		photos.forEach(photo => {
 			if (photo) {
 				photo_promises.push({
-					photo: this.getPhotoPreview(photo.photo).then(res => this._getImageData(res.bytes, photo.id)),
+					photo: this.getPhotoPreview(photo.photo),
 					caption: photo.caption,
 				});
 			}
@@ -1476,6 +1476,7 @@ export default class TelegramApi {
 	};
 
 	_getImageData = async (bytes, id) => {
+		console.log('SOME BYTES', typeof bytes);
 		if (!(bytes instanceof Uint8Array)) {
 			return bytes;
 		}
