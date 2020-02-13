@@ -1,65 +1,66 @@
-import $rootScope from './angular/$rootScope';
-import $timeout from './angular/$timeout';
+import $rootScope from "./angular/$rootScope";
+import $timeout from "./angular/$timeout";
 
 export default class IdleManagerModule {
-	toPromise = false;
-	started = false;
-	hidden = 'hidden';
-	visibilityChange = 'visibilitychange';
 
-	constructor() {
-		$rootScope.idle = { isIDLE: false };
+    toPromise = false;
+    started = false;
+    hidden = 'hidden';
+    visibilityChange = 'visibilitychange';
 
-		if (typeof document.hidden !== 'undefined') {
-			// default
-		} else if (typeof document.mozHidden !== 'undefined') {
-			this.hidden = 'mozHidden';
-			this.visibilityChange = 'mozvisibilitychange';
-		} else if (typeof document.msHidden !== 'undefined') {
-			this.hidden = 'msHidden';
-			this.visibilityChange = 'msvisibilitychange';
-		} else if (typeof document.webkitHidden !== 'undefined') {
-			this.hidden = 'webkitHidden';
-			this.visibilityChange = 'webkitvisibilitychange';
-		}
-	}
+    constructor() {
+        $rootScope.idle = { isIDLE: false };
 
-	start() {
-		if (!this.started) {
-			this.started = true;
-			window.addEventListener(this.visibilityChange + ' blur focus keydown mousedown touchstart', this.onEvent);
+        if (typeof document.hidden !== 'undefined') {
+            // default
+        } else if (typeof document.mozHidden !== 'undefined') {
+            this.hidden = 'mozHidden';
+            this.visibilityChange = 'mozvisibilitychange';
+        } else if (typeof document.msHidden !== 'undefined') {
+            this.hidden = 'msHidden';
+            this.visibilityChange = 'msvisibilitychange';
+        } else if (typeof document.webkitHidden !== 'undefined') {
+            this.hidden = 'webkitHidden';
+            this.visibilityChange = 'webkitvisibilitychange';
+        }
+    }
 
-			setTimeout(() => {
-				this.onEvent({ type: 'blur' });
-			}, 0);
-		}
-	}
+    start() {
+        if (!this.started) {
+            this.started = true;
+            window.addEventListener(this.visibilityChange + ' blur focus keydown mousedown touchstart', this.onEvent);
 
-	onEvent(e) {
-		if (e.type == 'mousemove') {
-			const e = e.originalEvent || e;
-			if (e && e.movementX === 0 && e.movementY === 0) {
-				return;
-			}
-			window.removeEventListener('mousemove', this.onEvent);
-		}
+            setTimeout(() => {
+                this.onEvent({ type: 'blur' });
+            }, 0);
+        }
+    }
 
-		let isIDLE = e.type == 'blur' || e.type == 'timeout' ? true : false;
-		if (this.hidden && document[this.hidden]) {
-			isIDLE = true;
-		}
+    onEvent(e) {
+        if (e.type == 'mousemove') {
+            const e = e.originalEvent || e;
+            if (e && e.movementX === 0 && e.movementY === 0) {
+                return;
+            }
+            window.removeEventListener('mousemove', this.onEvent);
+        }
 
-		$timeout.cancel(this.toPromise);
+        let isIDLE = e.type == 'blur' || e.type == 'timeout' ? true : false;
+        if (this.hidden && document[this.hidden]) {
+            isIDLE = true;
+        }
 
-		if (!isIDLE) {
-			// console.log('update timeout');
-			this.toPromise = $timeout(() => {
-				this.onEvent({ type: 'timeout' });
-			}, 30000);
-		}
+        $timeout.cancel(this.toPromise);
 
-		if (isIDLE && e.type == 'timeout') {
-			window.addEventListener('mousemove', this.onEvent);
-		}
-	}
+        if (!isIDLE) {
+            // console.log('update timeout');
+            this.toPromise = $timeout(() => {
+                this.onEvent({ type: 'timeout' });
+            }, 30000);
+        }
+
+        if (isIDLE && e.type == 'timeout') {
+            window.addEventListener('mousemove', this.onEvent);
+        }
+    }
 }
