@@ -59,7 +59,6 @@ export default class DocumentMessage extends HTMLElement {
 
 			startLoadingProgress(videoPlaceholder);
 			telegramApi.downloadDocument(doc, handleProgress).then(data => {
-				console.log(data);
 				telegramApi._getVideoData(data.bytes).then(video_data => {
 					const vid = document.createElement('video');
 					vid.src = video_data;
@@ -88,25 +87,45 @@ export default class DocumentMessage extends HTMLElement {
 	}
 
 	getSticker({ id, access_hash, file_reference: fileReference, date, size, thumbs, attributes }) {
-		const { type, w, h, bytes } = thumbs[0];
-		const [
-			{ w: width, h: height },
-			{ alt: altEmoji, stickerset: stickerSet },
-			{ file_name: fileName },
-		] = attributes;
+		const { bytes } = thumbs[0];
+		const scale = 300 / 512;
+		let { w, h } = attributes[0];
+		const { alt: altEmoji } = attributes[1];
+		w *= scale;
+		h *= scale;
 		const stickerUrl = window.URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
-		if (!bytes) {
-			telegramApi.getDocumentPreview({ id, file_reference: fileReference, access_hash, thumbs }).then(res => {
-				const img = document.createElement('img');
-				img.src = window.URL.createObjectURL(new Blob([res.bytes], { type: 'image/png' }));
-				img.style = 'width: 100%; height: 100%';
-
+		// if (!bytes) {
+		telegramApi.getDocumentPreview({ id, file_reference: fileReference, access_hash, thumbs }).then(res => {
+			let img = this.querySelector('img');
+			if (!img) {
+				img = document.createElement('img');
+				this.querySelector('.chat-message_sticker').innerHTML = '';
 				this.querySelector('.chat-message_sticker').appendChild(img);
-			});
-		}
-		console.log('sticker', altEmoji, thumbs);
-		return `<div id='${id}' style='width: 120px; height: 120px;' class="chat-message_sticker">${
-			bytes ? `<img src="${stickerUrl}" alt=${altEmoji}>` : ''
+			}
+			if (img.classList.contains('chat-message_sticker_full')) {
+				return;
+			}
+
+			img.src = window.URL.createObjectURL(new Blob([res.bytes], { type: 'image/png' }));
+			img.style = `width: ${w}px; height: ${h}px`;
+		});
+		telegramApi.getDocumentPreview({ id, file_reference: fileReference, access_hash }).then(res => {
+			let img = this.querySelector('img');
+			if (!img) {
+				img = document.createElement('img');
+				this.querySelector('.chat-message_sticker').innerHTML = '';
+				this.querySelector('.chat-message_sticker').appendChild(img);
+			}
+
+			img.src = window.URL.createObjectURL(new Blob([res.bytes], { type: 'image/png' }));
+			img.style = `width: ${w}px; height: ${h}px`;
+
+			img.classList.add('chat-message_sticker_full');
+		});
+		return `<div id='${id}' class="chat-message_sticker">${
+			bytes
+				? `<img style='width: ${w}px; height: ${h}px;' src="${stickerUrl}" alt=${altEmoji}>`
+				: `<div style='width: ${w}px; height: ${h}px;'></div>`
 		}</div>`;
 	}
 

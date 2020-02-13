@@ -76,6 +76,11 @@
   border-radius: 15px;
 }
 
+.chat-message_sticker {
+  max-width: 300px;
+  max-height: 300px;
+}
+
 .document-message__video {
   overflow: hidden;
   border-radius: 10px;

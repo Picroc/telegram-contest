@@ -66,10 +66,7 @@ export default class PollMessage extends HTMLElement {
 		const poll_body = this.querySelector('.poll-message');
 
 		results.results.forEach((result, idx) => {
-			console.log(result);
 			const poll_item = answers.filter(el => {
-				console.log('Comparing', el.option, result.option);
-				console.log(this.compareOptions(el.option, result.option));
 				return this.compareOptions(el.option, result.option);
 			})[0];
 			const item = this.querySelector(`input[value='${poll_item.text}']`).parentElement;

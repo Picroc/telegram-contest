@@ -116,7 +116,6 @@ const getPhotoTemplate = photo => {
 	const { w: width, h: height } = normalSize;
 
 	telegramApi.getPhotoPreview(photo).then(photo => {
-		console.log('DOWNLOADED', photo);
 		telegramApi._getImageData(photo.bytes).then(data => {
 			const container = document.getElementById(id);
 			const img = document.createElement('img');

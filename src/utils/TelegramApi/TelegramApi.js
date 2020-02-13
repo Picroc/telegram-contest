@@ -345,7 +345,6 @@ export default class TelegramApi {
 			id: doc.id,
 			access_hash: doc.access_hash,
 			file_reference: doc.file_reference,
-			thumb_size: 'x',
 		};
 		let fileName = 'FILE';
 		let size = 15728640;
@@ -455,10 +454,12 @@ export default class TelegramApi {
 		let limit = 524288;
 
 		let thumb_size = doc.thumbs;
-		thumb_size = thumb_size[1] || thumb_size[0];
+		if (thumb_size) {
+			thumb_size = thumb_size[2] || thumb_size[1] || thumb_size[0];
+			location.thumb_size = thumb_size.type;
+		}
 
 		location._ = 'inputDocumentFileLocation';
-		location.thumb_size = thumb_size.type;
 
 		return this.MtpApiManager.invokeApi('upload.getFile', {
 			location: location,
@@ -1439,20 +1440,7 @@ export default class TelegramApi {
 	};
 
 	_getImageData = async bytes => {
-		const chunk = 0x8000;
-
-		let index = 0;
-		let length = bytes.length;
-
-		let result = '';
-		let slice;
-
-		while (index < length) {
-			slice = bytes.slice(index, Math.min(index + chunk, length));
-			result += String.fromCharCode.apply(null, new Uint8Array(slice));
-			index += chunk;
-		}
-		return 'data:image/png;base64,' + btoa(result);
+		return window.URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
 	};
 
 	_getVideoData = async bytes => {
