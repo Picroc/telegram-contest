@@ -142,6 +142,8 @@ export const apiGetter = key => {
 	switch (key) {
 		case 'media':
 			return telegramApi.getPeerPhotos;
+		case 'members':
+			return telegramApi.getChatParticipants;
 		default:
 			console.log('No appropriate key is found');
 	}

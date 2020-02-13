@@ -156,16 +156,22 @@
         display: grid;
 
         &__media {
+            display: grid;
             grid-template-columns: repeat(3,32%);
             grid-auto-rows: 80px;
-            column-gap: 2%;
-            row-gap: 2%;
+            row-gap: 2px;
             justify-items: center;
 
             &-element {
                 width: 80px;
                 height: 80px;
             }
+
+            &_placeholder {
+            width: 80px;
+            height: 80px;
+            background-color: gray;
+        }
         }
 
         &_placeholder {

@@ -11,9 +11,10 @@ import {
 	setPeerMediaById,
 	getDialog,
 	peerIdToMediaMapper,
+	peerIdToMembersMapper,
 	cashMedia,
 } from '../../store/store';
-import { getRightSidebarFieldsFromPeer, htmlToElement, capitalise, getName } from '../../helpers/index';
+import { getRightSidebarFieldsFromPeer, htmlToElement, capitalise, getName, createDiv } from '../../helpers/index';
 import infoSvg from './svg/info.js';
 import phoneSvg from './svg/phone.js';
 import usernameSvg from './svg/username.js';
@@ -37,7 +38,6 @@ export default class RightSidebar extends HTMLElement {
 		this.materials = this.querySelector('.right-sidebar__general-materials');
 		this.members = this.querySelector('.right-sidebar__general-materials__members');
 		this.media = this.querySelector('.right-sidebar__general-materials__media');
-		this.media.cashed = {};
 		this.docs = this.querySelector('.right-sidebar__general-materials__docs');
 		this.links = this.querySelector('.right-sidebar__general-materials__links');
 		this.audio = this.querySelector('.right-sidebar__general-materials__audio');
@@ -50,7 +50,7 @@ export default class RightSidebar extends HTMLElement {
 
 		this.addEventListener(UPDATE_DIALOG_STATUS, this.updateStatus);
 		this.addEventListener(SET_ACTIVE_PEER, this.loadPeerSidebar);
-		// this.addEventListener(SET_ACTIVE_PEER_MEDIA, this.setMediaNew);
+		// this.addEventListener(SET_ACTIVE_PEER_MEDIA, this.setMedia);
 	}
 
 	backButtonListener = e => {
@@ -74,7 +74,8 @@ export default class RightSidebar extends HTMLElement {
 		const generalizedPeer = getRightSidebarFieldsFromPeer(peer);
 		this.generalizedPeer = generalizedPeer;
 		const { notifications, name, avatar, id } = generalizedPeer;
-		this.setMediaNew(id);
+		this.setMedia(id);
+		// this.setMembers(id);
 		this.avatar.src = avatar;
 		this.peerId = id;
 		setHTML('.right-sidebar__name')(name);
@@ -87,7 +88,7 @@ export default class RightSidebar extends HTMLElement {
 			case 'groupChat':
 				this.loadGroupChatAttributes(generalizedPeer);
 				this.loadTabs(['members', 'media', 'docs', 'links']);
-				// this.setChatParticipants(id);
+				// this.setMembers(id);
 				break;
 		}
 		const label = notifications ? 'Enabled' : 'Disabled';
@@ -173,14 +174,16 @@ export default class RightSidebar extends HTMLElement {
 		});
 	};
 
-	setMediaNew = async id => {
+	setMedia = async id => {
 		const media = await peerIdToMediaMapper(id);
 		console.log('media', media);
-		if (media instanceof Array) {
+		if (!media.cashedHTML) {
 			this.media.innerHTML = '';
 			console.log(`Resolving media promises for peer ${id}`);
 			const unpromisedMediaElements = media.map(async ({ photo }, index) => {
-				const placeholder = htmlToElement(`<div class="right-sidebar__general-materials_placeholder"></div>`);
+				const placeholder = htmlToElement(
+					`<div class="right-sidebar__general-materials__media_placeholder"></div>`
+				);
 				this.media.appendChild(placeholder);
 				const image = await photo;
 				const imageElement = this.createMediaElem(image, id, index);
@@ -189,22 +192,17 @@ export default class RightSidebar extends HTMLElement {
 			});
 			Promise.all(unpromisedMediaElements).then(elements => {
 				console.log(`All promises for ${id} resolved, setting HTML`);
-				const mediaWrapper = this.createMaterialWrapper('media', id);
+				const mediaWrapper = createDiv;
 				elements.forEach(element => {
 					mediaWrapper.appendChild(element);
 				});
 				cashMedia(id, mediaWrapper);
-				console.log('mediaWrapper', mediaWrapper, this.media.classList.contains('hide'));
-				this.media.outerHTML = mediaWrapper;
+				this.media.innerHTML = mediaWrapper.innerHTML;
 			});
 		} else {
 			console.log(`Getting media from store for peer ${id}`);
-			this.media.outerHTML = mediaWrapper;
+			this.media.innerHTML = media.cashedHTML.innerHTML;
 		}
-	};
-
-	createMaterialWrapper = (name, id, hide) => {
-		return `<div class="right-sidebar__general-materials__${name} ${hide ? 'hide' : ''}" id="${id}" ></div>`;
 	};
 
 	createMediaElem = (media, peerId, mediaIndex) => {
@@ -213,22 +211,27 @@ export default class RightSidebar extends HTMLElement {
 		);
 	};
 
-	setChatParticipants = async id => {
-		// this.materials.innerHTML = '';
-		this.hideMaterials();
-		this.materials.classList.add('right-sidebar__general-materials__participants');
-		const { onlineUsers, offlineUsers } = await telegramApi.getChatParticipants(id);
-		for (const { first_name, last_name, id } of onlineUsers) {
-			const name = getName(first_name, last_name);
-			const avatar = (await telegramApi.getPeerPhoto(id)) || window.defaultAvatar;
-			const elem = this.createParticipantElem(avatar, name, 'online');
-			this.materials.appendChild(elem);
-		}
-		for (const { first_name, last_name, id } of offlineUsers) {
-			const name = getName(first_name, last_name);
-			const avatar = (await telegramApi.getPeerPhoto(id)) || window.defaultAvatar;
-			const elem = this.createParticipantElem(avatar, name, 'offline');
-			this.materials.appendChild(elem);
+	setMembers = async id => {
+		// const { onlineUsers, offlineUsers, cashedUsers } = await peerIdToMembersMapper(id);
+		// console.log('users', onlineUsers, offlineUsers, cashedUsets);
+		const users = await peerIdToMembersMapper(id);
+		console.log('users', users);
+		if (!users.cashedHTML) {
+			this.members.innerHTML = '';
+			const { onlineUsers, offlineUsers } = users;
+			console.log(`Resolving members promises for peer ${id}`);
+			for (const { first_name, last_name, id } of onlineUsers) {
+				const name = getName(first_name, last_name);
+				const avatar = (await telegramApi.getPeerPhoto(id)) || window.defaultAvatar;
+				const elem = this.createParticipantElem(avatar, name, 'online');
+				this.materials.appendChild(elem);
+			}
+			for (const { first_name, last_name, id } of offlineUsers) {
+				const name = getName(first_name, last_name);
+				const avatar = (await telegramApi.getPeerPhoto(id)) || window.defaultAvatar;
+				const elem = this.createParticipantElem(avatar, name, 'offline');
+				this.materials.appendChild(elem);
+			}
 		}
 	};
 
