@@ -5,7 +5,7 @@ import { idle, track as peek } from '../../utils/anim-monkey';
 import lottie from 'lottie-web';
 
 const subscribe = element => {
-	return function (...args) {
+	return function(...args) {
 		document.querySelector(element).addEventListener(...args);
 	};
 };

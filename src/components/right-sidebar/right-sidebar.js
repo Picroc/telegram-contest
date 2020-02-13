@@ -189,6 +189,7 @@ export default class RightSidebar extends HTMLElement {
 			placeholder.replaceWith(imageElement);
 			return imageElement;
 		});
+	};
 
 	createMediaElem = (media, peerId, mediaIndex) => {
 		return htmlToElement(
