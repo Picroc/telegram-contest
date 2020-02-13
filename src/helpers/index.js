@@ -68,6 +68,55 @@ export const startLoading = elem => {
 	elem.classList.add('loading');
 };
 
+export const startLoadingProgress = elem => {
+	elem.innerHTML = '';
+	elem.classList.add('loading_progress');
+
+	let circle;
+
+	if (!elem.querySelector('.progress-ring')) {
+		const svg = htmlToElement(`<svg
+		class="progress-ring"
+		width="120"
+		height="120">
+	   <circle
+		 class="progress-ring__circle"
+		 stroke="black"
+		 stroke-width="4"
+		 fill="transparent"
+		 r="52"
+		 cx="60"
+		 cy="60"/>
+	 </svg>`);
+
+		elem.appendChild(svg);
+	}
+
+	circle = elem.querySelector('.progress-ring__circle');
+	const rad = circle.r.baseVal.value;
+	const circ = rad * 2 * Math.PI;
+
+	circle.style.strokeDasharray = `${circ} ${circ}`;
+	circle.style.strokeDashoffset = circ;
+};
+
+export const setLoadingProgress = (elem, progress = 0) => {
+	const circle = elem.querySelector('.progress-ring__circle');
+	if (!circle) {
+		return;
+	}
+
+	const rad = circle.r.baseVal.value;
+	const circ = rad * 2 * Math.PI;
+	const offset = circ - (progress / 100) * circ;
+	circle.style.strokeDashoffset = offset;
+};
+
+export const stopLoadingProgress = elem => {
+	elem.innerHTML = '';
+	elem.classList.remove('loading_progress');
+};
+
 export const stopLoading = elem => {
 	elem.classList.remove('loading');
 };
