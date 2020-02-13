@@ -13,6 +13,7 @@ import {
 	peerIdToMediaMapper,
 	peerIdToMembersMapper,
 	cashMedia,
+	cashMaterials,
 } from '../../store/store';
 import { getRightSidebarFieldsFromPeer, htmlToElement, capitalise, getName, createDiv } from '../../helpers/index';
 import infoSvg from './svg/info.js';
@@ -75,7 +76,7 @@ export default class RightSidebar extends HTMLElement {
 		this.generalizedPeer = generalizedPeer;
 		const { notifications, name, avatar, id } = generalizedPeer;
 		this.setMedia(id);
-		// this.setMembers(id);
+		this.setMembers(id);
 		this.avatar.src = avatar;
 		this.peerId = id;
 		setHTML('.right-sidebar__name')(name);
@@ -189,6 +190,7 @@ export default class RightSidebar extends HTMLElement {
 			placeholder.replaceWith(imageElement);
 			return imageElement;
 		});
+	};
 
 	createMediaElem = (media, peerId, mediaIndex) => {
 		return htmlToElement(
@@ -197,30 +199,43 @@ export default class RightSidebar extends HTMLElement {
 	};
 
 	setMembers = async id => {
-		// const { onlineUsers, offlineUsers, cashedUsers } = await peerIdToMembersMapper(id);
-		// console.log('users', onlineUsers, offlineUsers, cashedUsets);
 		const users = await peerIdToMembersMapper(id);
-		console.log('users', users);
-		if (!users.cashedHTML) {
-			this.members.innerHTML = '';
-			const { onlineUsers, offlineUsers } = users;
-			console.log(`Resolving members promises for peer ${id}`);
-			for (const { first_name, last_name, id } of onlineUsers) {
-				const name = getName(first_name, last_name);
-				const avatar = (await telegramApi.getPeerPhoto(id)) || window.defaultAvatar;
-				const elem = this.createParticipantElem(avatar, name, 'online');
-				this.materials.appendChild(elem);
-			}
-			for (const { first_name, last_name, id } of offlineUsers) {
-				const name = getName(first_name, last_name);
-				const avatar = (await telegramApi.getPeerPhoto(id)) || window.defaultAvatar;
-				const elem = this.createParticipantElem(avatar, name, 'offline');
-				this.materials.appendChild(elem);
-			}
+
+		this.members.innerHTML = '';
+		console.log(`Resolving members promises for peer ${id}`);
+		const { onlineCash, onlineUsers, offlineCash, offlineUsers } = users;
+		console.log('users', onlineCash, onlineUsers, offlineCash, offlineUsers);
+		if (!onlineCash) {
+			this.pasteMembersInDOMAndStore(onlineUsers, 'online');
+		}
+		if (!offlineCash) {
+			this.pasteMembersInDOMAndStore(offlineUsers, 'offline', true);
 		}
 	};
 
-	createParticipantElem = (avatar, name, status) => {
+	pasteMembersInDOMAndStore = async (userArr, status, cashInStore = false) => {
+		const usersToCash = userArr.map(async user => {
+			const { first_name, last_name, id, cashedAvatar } = user;
+			const name = getName(first_name, last_name);
+			let avatar;
+			if (!cashedAvatar) {
+				avatar = await telegramApi.getPeerPhoto(id).catch(err => getDefaultAvatar());
+			} else {
+				avatar = cashedAvatar;
+			}
+			user.cashedAvatar = avatar;
+			const elem = this.createMemberElem(avatar, name, status);
+			if (status === 'online') {
+				this.members.insertAdjacentElement('afterbegin', elem);
+			} else {
+				this.members.insertAdjacentElement('beforeend', elem);
+			}
+			return user;
+		});
+		Promise.all(usersToCash).then(users => cashMaterials(users, `${status}Cash`, cashInStore));
+	};
+
+	createMemberElem = (avatar, name, status) => {
 		return htmlToElement(`<div class="right-sidebar__general-materials__participants__participant">
         <div class="participants__avatar-wrapper">
             <img src="${avatar}" alt="avatar" class="participants__avatar avatar avatar_small">

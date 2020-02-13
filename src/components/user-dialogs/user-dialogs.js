@@ -60,7 +60,7 @@ export const loadDialog = component => elem => dialog => {
 	startLoading(right);
 	telegramApi.getFullPeer(id).then(fullPeer => {
 		console.log('fullPeer', fullPeer);
-		setActivePeer({ ...fullPeer, id, avatar });
+		setActivePeer({ ...fullPeer, id, avatar }); //initialize RSB load
 	});
 	right.innerHTML = `<top-bar user_id="${id}"></top-bar><chat-main peer-id="${id}"></chat-main>`;
 };
