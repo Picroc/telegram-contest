@@ -170,9 +170,19 @@ export default function MtpApiFileManagerModule() {
 		});
 	};
 
+	const saveLocalFile = (id, blob) => {
+		cachedDownloads[id] = blob;
+	};
+
+	const getLocalFile = id => {
+		return cachedDownloads[id];
+	};
+
 	return {
 		downloadRequest,
 		downloadCheck,
 		uploadFile,
+		saveLocalFile,
+		getLocalFile,
 	};
 }
