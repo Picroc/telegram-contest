@@ -1,38 +1,44 @@
-import { Config } from "../lib/config";
+import { Config } from '../lib/config';
 
 export default function MtpDcConfiguratorModule() {
-    window.chosenServers = {};
+	window.chosenServers = {};
 
-    const chooseServer = (dcID, upload) => {
-        const dcOptions = Config.Modes.test ? Config.Server.Test : Config.Server.Production;
+	const chooseServer = (dcID, upload) => {
+		const dcOptions = Config.Modes.test ? Config.Server.Test : Config.Server.Production;
 
-        if (chosenServers[dcID] === undefined) {
-            let chosenServer = false,
-                i, dcOption;
+		if (chosenServers[dcID] === undefined) {
+			let chosenServer = false,
+				i,
+				dcOption;
 
-            for (i = 0; i < dcOptions.length; i++) {
-                dcOption = dcOptions[i];
-                if (dcOption.id == dcID) {
-                    chosenServer = chooseProtocol() + '//' + dcOption.host + (dcOption.port != 80 ? ':' + dcOption.port : '') + '/apiw1';
-                    break;
-                }
-            }
-            chosenServers[dcID] = chosenServer;
-        }
+			for (i = 0; i < dcOptions.length; i++) {
+				dcOption = dcOptions[i];
+				if (dcOption.id == dcID) {
+					chosenServer =
+						chooseProtocol() +
+						'//' +
+						dcOption.host +
+						(dcOption.port != 80 ? ':' + dcOption.port : '') +
+						'/apiw1';
+					break;
+				}
+			}
+			chosenServers[dcID] = chosenServer;
+		}
 
-        return chosenServers[dcID];
-    }
+		return chosenServers[dcID];
+	};
 
-    const chooseProtocol = () => {
-        if (location.protocol.indexOf('http') != -1) {
-            return location.protocol;
-        }
+	const chooseProtocol = () => {
+		if (location.protocol.indexOf('http') != -1) {
+			return location.protocol;
+		}
 
-        return 'http:';
-    }
+		return 'http:';
+	};
 
-    return {
-        chooseServer,
-        chooseProtocol
-    }
+	return {
+		chooseServer,
+		chooseProtocol,
+	};
 }

@@ -20,10 +20,10 @@ export default ({
 	return `
         <div class="dialog" name="${title}" anim="ripple">
             <div class="${clsx(
-		'dialog__avatar-wrapper',
-		cc('dialog__avatar_online', isOnline),
-		cc('dialog__saved', savedMessages)
-	)}">
+				'dialog__avatar-wrapper',
+				cc('dialog__avatar_online', isOnline),
+				cc('dialog__saved', savedMessages)
+			)}">
                 ${icon}
             </div>
             <div class="dialog__name">${savedMessages ? 'Saved Messages' : title}</div>

@@ -1,21 +1,21 @@
 export default class InvoiceMessage extends HTMLElement {
-    constructor() {
-        super();
-    }
+	constructor() {
+		super();
+	}
 
-    render() {
-        this.innerHTML = `<div class="invoice-message"></div>`;
-    }
+	render() {
+		this.innerHTML = `<div class="invoice-message"></div>`;
+	}
 
-    connectedCallback() {
-        this.render();
-    }
+	connectedCallback() {
+		this.render();
+	}
 
-    static get observedAttributes() {
-        return [];
-    }
+	static get observedAttributes() {
+		return [];
+	}
 
-    attributeChangedCallback(name, oldValue, newValue) {
-        this.render();
-    }
+	attributeChangedCallback(name, oldValue, newValue) {
+		this.render();
+	}
 }

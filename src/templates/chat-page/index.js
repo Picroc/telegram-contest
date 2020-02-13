@@ -50,7 +50,7 @@ const loadPhotos = async () => {
 					if (photo) {
 						try {
 							dialogs.data[ind].children[0].children[0].src = photo;
-						} catch { }
+						} catch {}
 					}
 				});
 			})(i),
