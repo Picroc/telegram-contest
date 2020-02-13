@@ -470,8 +470,7 @@ export default class TelegramApi {
 
 	getPhotoPreview = photo => {
 		let photo_size = photo.sizes;
-		photo_size = photo_size[2] || photo_size[1];
-
+		photo_size = photo_size[2] || photo_size[1] || photo_size[0];
 		const location = {
 			_: 'inputPhotoFileLocation',
 			id: photo.id,
@@ -498,8 +497,8 @@ export default class TelegramApi {
 
 	getPhotoFile = async (photo, size) => {
 		const { id, access_hash, file_reference } = photo;
-		const photo_size = photo.sizes[2] || photo.sizes[1];
-
+		const photo_size = photo.sizes[2] || photo.sizes[1] || photo.sizes[0];
+		console.log(photo_size);
 		return await this.invokeApi(
 			'upload.getFile',
 			{
@@ -728,9 +727,9 @@ export default class TelegramApi {
 				photo = user.photo && user.photo._ !== 'userPhotoEmpty' && user.photo;
 				peer = user.access_hash
 					? {
-							...result,
-							access_hash: user.access_hash,
-					  }
+						...result,
+						access_hash: user.access_hash,
+					}
 					: result;
 			}
 
@@ -1283,9 +1282,9 @@ export default class TelegramApi {
 			}
 			peer = user.access_hash
 				? {
-						...peer,
-						access_hash: user.access_hash,
-				  }
+					...peer,
+					access_hash: user.access_hash,
+				}
 				: peer;
 		}
 		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
