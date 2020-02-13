@@ -68,10 +68,10 @@ export default class RightSidebar extends HTMLElement {
 	};
 
 	loadPeerSidebar = e => {
-		const peer = e.detail;
+		const { fullPeer } = e.detail;
 		const setHTML = setInnerHTML.bind(this);
 		this.peerAttributes.innerHTML = '';
-		const generalizedPeer = getRightSidebarFieldsFromPeer(peer);
+		const generalizedPeer = getRightSidebarFieldsFromPeer(fullPeer);
 		this.generalizedPeer = generalizedPeer;
 		const { notifications, name, avatar, id } = generalizedPeer;
 		this.setMedia(id);
@@ -94,7 +94,7 @@ export default class RightSidebar extends HTMLElement {
 		const label = notifications ? 'Enabled' : 'Disabled';
 		const checkbox = `<input type="checkbox" class="item__icon notifications__icon" name="notifications" id="notifications"${
 			notifications ? 'checked' : ''
-		}>`;
+			}>`;
 		const notificationsElem = this.createAttributeElem('notifications', 'Notifications', label, () => checkbox);
 		this.peerAttributes.appendChild(notificationsElem);
 	};
@@ -176,7 +176,6 @@ export default class RightSidebar extends HTMLElement {
 
 	setMedia = async id => {
 		const media = await peerIdToMediaMapper(id);
-		console.log('media', media);
 		this.media.innerHTML = '';
 		console.log(`Resolving media promises for peer ${id}`);
 		media.forEach(async ({ photo }, index) => {
