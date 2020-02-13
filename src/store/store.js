@@ -290,21 +290,24 @@ export const peerIdToMaterialsMapper = type => id => {
 		const promisedMaterialStructure = apiGetter(type)(id);
 		window.store.mapMaterails[type][id].promisedStructure = promisedMaterialStructure;
 		return promisedMaterialStructure;
-	} else if (window.store.mapMaterails[type][id].promisedStructure && !window.store.mapMaterails[type][id].cashed) {
+	} else if (window.store.mapMaterails[type][id].promisedStructure) {
+		//&& !window.store.mapMaterails[type][id].cashed
 		console.log(`Getting promised ${type} fo id=${id}`);
 		return window.store.mapMaterails[type][id].promisedStructure;
-	} else if (window.store.mapMaterails[type][id].cashed) {
-		console.log(`Getting ${type} fo id=${id} from cash`);
-		return window.store.mapMaterails[type][id]; //.cashedHTML
 	}
+	// else if (window.store.mapMaterails[type][id].cashed) {
+	// 	console.log(`Getting ${type} fo id=${id} from cash`);
+	// 	return window.store.mapMaterails[type][id]; //.cashedHTML
+	// }
 };
 
 export const peerIdToMediaMapper = id => peerIdToMaterialsMapper('media')(id);
 export const peerIdToMembersMapper = id => peerIdToMaterialsMapper('members')(id);
 
-export const cashMaterials = type => (id, materialHTML) => {
-	window.store.mapMaterails[type][id].cashedHTML = materialHTML;
-	window.store.mapMaterails[type][id].cashed = true;
+export const cashMaterials = type => (id, materialHTML, cashAttr = 'cashedHTML') => {
+	//, cashingFinished = false
+	window.store.mapMaterails[type][id][cashAttr] = materialHTML;
+	// window.store.mapMaterails[type][id].cashed = cashingFinished;
 };
 
 export const cashMedia = (id, mediaHTML) => cashMaterials('media')(id, mediaHTML);
