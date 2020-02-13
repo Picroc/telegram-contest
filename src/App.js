@@ -102,7 +102,7 @@ telegramApi
 	.catch(err => console.log('err', err));
 
 const changeState = transform => {
-	return function (...args) {
+	return function(...args) {
 		const [oldState, newState] = [state, transform(...args)];
 
 		state = {
