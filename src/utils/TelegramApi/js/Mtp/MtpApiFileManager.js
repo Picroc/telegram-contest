@@ -170,6 +170,10 @@ export default function MtpApiFileManagerModule() {
 		});
 	};
 
+	const saveLocalFile = (id, blob) => {
+		cachedDownloads[id] = blob;
+	};
+
 	return {
 		downloadRequest,
 		downloadCheck,
