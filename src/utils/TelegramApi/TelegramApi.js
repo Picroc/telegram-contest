@@ -551,6 +551,12 @@ export default class TelegramApi {
 	getPeerPhoto = async peer_id => {
 		const peer = await this.getPeerByID(peer_id);
 
+		const cached = this.MtpApiFileManager.getLocalFile(peer_id);
+
+		if (cached) {
+			return cached;
+		}
+
 		const photo = peer.photo.photo_small;
 		// console.log('PEER', peer);
 		// console.log('PHOTO', photo);
