@@ -80,11 +80,12 @@ export default class UserDialogs extends HTMLElement {
 				from_id,
 				message,
 				date,
-				message_info: { out, channel_post },
+				message_info: { out },
 			} = data;
-			let id = from_id;
-			if (out || channel_post) {
-				id = to_id;
+			let id = to_id;
+			const myId = getUser();
+			if (to_id === myId) {
+				id = from_id;
 			}
 			const dialog = getDialog(id);
 			if (!dialog) {
@@ -106,7 +107,7 @@ export default class UserDialogs extends HTMLElement {
 					info.querySelector('.dialog__time').classList.remove('full', true);
 					info.prepend(this.out);
 				}
-			} else {
+			} else if (to_id !== from_id) {
 				updateDialogUnread(id, Number(unreadCount) + 1);
 			}
 
@@ -124,6 +125,7 @@ export default class UserDialogs extends HTMLElement {
 
 	updateListener = event => {
 		const dialogs = getDialogs(event.detail.length);
+		console.log('dialogs', dialogs);
 		dialogs.forEach(this.renderDialog);
 	};
 
