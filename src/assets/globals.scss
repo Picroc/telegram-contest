@@ -115,6 +115,10 @@ ul {
     border-radius: 50%;
     cursor: pointer;
   }
+
+  &_active {
+    fill: var(--primary);
+  }
 }
 
 .hide {

@@ -7,7 +7,7 @@ import { hide, show, htmlToElement } from '../../helpers/index';
 let currentSeacrhTimeout;
 const tApi = window.telegramApi;
 
-const onTypeContacts = (value, searchCallback = () => { }) => {
+const onTypeContacts = (value, searchCallback = () => {}) => {
 	if (value.length == 0) {
 		clearTimeout(currentSeacrhTimeout);
 		return;
@@ -112,6 +112,7 @@ export default class Menu extends HTMLElement {
 	};
 
 	menuClick = e => {
+		e.cancelBubble = true;
 		if (this.menuIcon.classList.contains('arrow')) {
 			this.search.value = '';
 			this.overlay.classList.toggle('hide');
