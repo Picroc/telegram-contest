@@ -86,7 +86,11 @@ export default class UserDialogs extends HTMLElement {
 			if (out || channel_post) {
 				id = to_id;
 			}
-			const { archived, unreadCount, pinned } = getDialog(id);
+			const dialog = getDialog(id);
+			if (dialog) {
+				return;
+			}
+			const { archived, unreadCount, pinned } = dialog;
 			if (archived) {
 				return;
 			}

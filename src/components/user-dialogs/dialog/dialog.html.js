@@ -42,13 +42,14 @@ export default ({
 		? saved
 		: `<img src="${avatar}" alt="avatar" class="dialog__avatar avatar avatar_medium">`;
 
-	const { out } = message_info;
-	const rightBottomContent = unreadCount > 0 ? `<div class="count">${unreadCount}</div>` : pinned ? pinnedSvg : '';
+	const { out, outRead } = message_info;
+	const haveUnread = unreadCount > 0;
+	const rightBottomContent = haveUnread ? `<div class="count">${unreadCount}</div>` : pinned ? pinnedSvg : '';
 	const rightBottom = `<div class="${clsx(
 		'dialog_right_bottom',
-		unreadCount > 0 && 'dialog__unread-count',
+		haveUnread && 'dialog__unread-count',
 		muted && 'dialog_muted',
-		pinned && 'dialog_pinned'
+		!haveUnread && pinned && 'dialog_pinned'
 	)}">${rightBottomContent}</div>`;
 	return `
             <div class="${clsx(
@@ -62,7 +63,7 @@ export default ({
             <div class="dialog__name">${title}</div>
 			<div class="dialog__short-msg">${text}</div>
 			<div class="dialog__info">
-				${out ? `<div class="dialog__out">${outSvg}</div>` : ''}
+				${out ? `<div class="dialog__out">${outRead ? outSvg : outNotReadSvg}</div>` : ''}
             	<div class="${clsx('dialog__time', !out && 'full')}">${time}</div>
 			</div>
             ${rightBottom}

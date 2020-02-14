@@ -154,7 +154,11 @@ export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);
 export const getArchives = (offset = 0) => window.store.archives.slice(offset);
 
 export const getDialog = id => {
-	const { idx, archived } = mapId(id);
+	const did = mapId(id);
+	if (!did) {
+		return;
+	}
+	const { idx, archived } = did;
 	if (archived) {
 		return window.store.archives[idx];
 	} else {
