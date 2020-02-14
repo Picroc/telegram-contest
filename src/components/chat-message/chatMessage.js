@@ -10,10 +10,10 @@ export default class ChatMessage extends HTMLElement {
 		const { _: type } = getActivePeer();
 		const messageId = this.getAttribute('id');
 		const message = getMessage(peerId)(messageId);
-		const { from_id, media, flags, date } = message;
+		const { from_id, media, flags, date, _: messageType } = message;
 		const { out, channel_post: post, ...pflags } = telegramApi._checkMessageFlags(flags);
 
-		const withAvatar = !out && !(type === 'peerUser' || post);
+		const withAvatar = !out && !(type === 'peerUser' || post || messageType === 'messageService');
 		this.className = clsx(
 			'chat-message',
 			tc('chat-message_out', 'chat-message_in', out),

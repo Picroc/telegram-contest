@@ -540,7 +540,12 @@ export default class TelegramApi {
 				if (idx === 0) {
 					return { prepend: false, ...msg };
 				}
-				return { prepend: Math.abs(msg.date - res.messages[idx - 1].date) < 60, ...msg };
+				return {
+					prepend:
+						msg.from_id === res.messages[idx - 1].from_id &&
+						Math.abs(msg.date - res.messages[idx - 1].date) < 60,
+					...msg,
+				};
 			});
 			return { ...res, messages };
 		});
