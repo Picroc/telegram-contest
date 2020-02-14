@@ -1,0 +1,83 @@
+.media-drop {
+
+    &__paranja {
+        position: absolute;
+        left: 0;
+        top: 0;
+
+        width: 100%;
+        height: 100%;
+
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    &__pane {
+        position: relative;
+        margin: auto;
+        background: white;
+
+        display: grid;
+        grid-template-rows: 60px 240px 200px;
+
+        border-radius: 10px;
+
+        width: 500px;
+        height: 500px;
+
+        top: calc(60% - 250px);
+        padding: 0 15px;
+    }
+
+    &__header {
+        display: grid;
+        grid-template-columns: 20px auto 60px;
+    }
+
+    &__accept-button {
+        width: 70px;
+        height: 35px;
+        color: white;
+        font-weight: bold;
+        background-color: var(--primary);
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+    }
+}
+
+
+
+// .accept-button,
+// .close-button {
+//     position: absolute;
+//     background: rgb(79, 164, 246);
+//     width: 53px;
+//     height: 53px;
+
+//     display: flex;
+
+//     border-radius: 26px;
+
+//     & img {
+//         position: relative;
+//         margin: auto;
+//         vertical-align: middle;
+//         display: inline-block;
+//         filter: invert(1);
+//     }
+// }
+
+// .accept-button {
+//     bottom: 22px;
+//     right: 20px;
+// }
+
+// .close-button {
+//     top: 2px;
+//     left: 10px;
+//     background: transparent;
+
+//     & img {
+//         filter: none;
+//     }
+// }

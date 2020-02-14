@@ -102,7 +102,7 @@ telegramApi
 	.catch(err => console.log('err', err));
 
 const changeState = transform => {
-	return function (...args) {
+	return function(...args) {
 		const [oldState, newState] = [state, transform(...args)];
 
 		state = {
@@ -126,20 +126,11 @@ window.updateRipple = () => {
 };
 
 document.addEventListener('click', event => {
-	let target = event.target;
-	if (target.attributes.length === 0) {
-		target = target.parentNode.parentNode.parentNode;
-	} else if (target.classList.contains('burger')) {
-		target = target.parentNode.parentNode;
-	} else if (target.tagName === 'IMG' || target.tagName === 'SVG' || target.classList.contains('icon')) {
-		target = target.parentNode;
-	}
-	const popup = document.querySelector('.popup');
-	const icon = document.querySelector('.menu__icon_active');
-	if (popup && !target.contains(popup) && icon) {
-		popup.classList.add('popup_hidden');
-		icon.classList.remove('menu__icon_active');
-	}
+	const popups = document.querySelectorAll('.popup');
+	popups.forEach(popup => popup.classList.add('popup_hidden'));
+
+	const activeIcons = document.querySelectorAll('.icon_active');
+	activeIcons.forEach(activeIcon => activeIcon.classList.remove('icon_active'));
 });
 
 document.addEventListener('click', event => {

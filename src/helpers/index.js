@@ -213,6 +213,20 @@ export const onScrollBottom = (element, callback) => {
 	});
 };
 
+export const sanitize = value => {
+	const lt = /</g,
+		gt = />/g,
+		ap = /'/g,
+		ic = /"/g;
+
+	return value
+		.toString()
+		.replace(lt, '&lt;')
+		.replace(gt, '&gt;')
+		.replace(ap, '&#39;')
+		.replace(ic, '&#34;');
+};
+
 export const capitalise = string => string.charAt(0).toUpperCase() + string.slice(1);
 export const peerToId = peer => {
 	return peer.user_id || peer.channel_id || peer.chat_id;
