@@ -24,15 +24,19 @@ export default class Dialog extends HTMLElement {
 
 	updateDialogUnreadListener = event => {
 		event.preventDefault();
-		const { id } = event.detail;
+		const { id, count } = event.detail;
 		const dialog = getDialog(id);
-		const count = dialog.unread_count;
+		console.log('dialog', dialog);
+
+		if (count > 0 && dialog.pinned) {
+			this.rightBottom.classList.remove('dialog_pinned');
+		}
 		if (count > 0) {
-			this.rightBottom.classList.remove('dialog__pinned');
 			this.rightBottom.classList.add('dialog__unread-count');
 			this.rightBottom.innerHTML = `<div class="count">${count}</div>`;
 		} else if (dialog.pinned) {
-			this.rightBottom.classList.add('dialog__pinned');
+			this.rightBottom.classList.remove('dialog__unread-count');
+			this.rightBottom.classList.add('dialog_pinned');
 			this.rightBottom.innerHTML = pinnedSvg;
 		}
 	};

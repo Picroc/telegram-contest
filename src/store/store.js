@@ -130,8 +130,8 @@ export const updateDialogPhoto = (id, photo) => {
 export const UPDATE_DIALOG_UNREAD = `UPDATE_DIALOG_UNREAD`;
 export const updateDialogUnread = (id, count) => {
 	const dialog = getDialog(id);
-	dialog.unread_count = count;
-	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_UNREAD, { id }));
+	dialog.unreadCount = count;
+	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_UNREAD, { id, count }));
 };
 
 export const UPDATE_DIALOG_STATUS = `UPDATE_DIALOG_STATUS`;
@@ -152,7 +152,11 @@ export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);
 export const getArchives = (offset = 0) => window.store.archives.slice(offset);
 
 export const getDialog = id => {
-	const { idx, archived } = mapId(id);
+	const did = mapId(id);
+	if (!did) {
+		return;
+	}
+	const { idx, archived } = did;
 	if (archived) {
 		return window.store.archives[idx];
 	} else {

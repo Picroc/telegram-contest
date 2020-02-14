@@ -5,9 +5,7 @@ import {
 	setActivePeer,
 	getUser,
 	getDialog,
-	setPeerMediaById,
-	updateDialog,
-	setActivePeerPhoto,
+	updateDialogUnread,
 } from '../../store/store';
 import {
 	htmlToElement,
@@ -32,7 +30,7 @@ export const renderDialog = (component, archived = false) => dialog => {
 	const elem = htmlToElement(
 		`<my-dialog anim="ripple" class="dialog" id="dialog_${id}" archived="${archived}"></my-dialog>`
 	);
-	elem.addEventListener('click', () => loadDialog(component)(elem)(dialog));
+	elem.addEventListener('click', () => loadDialog(component)(elem)(id));
 
 	if (pinned) {
 		component.pinned.appendChild(elem);
@@ -42,8 +40,9 @@ export const renderDialog = (component, archived = false) => dialog => {
 	}
 };
 
-export const loadDialog = component => elem => async (dialog, messageId) => {
-	const { id, dialog_peer: peer, photo: avatar } = dialog;
+export const loadDialog = component => elem => async (dialogId, messageId) => {
+	const dialog = getDialog(dialogId);
+	let { id, dialog_peer: peer, photo: avatar } = dialog;
 	if (component.prevActive) {
 		if (component.prevId === id) {
 			return;
@@ -73,17 +72,33 @@ export default class UserDialogs extends HTMLElement {
 		this.normal.id = 'normal_dialogs';
 		this.appendChild(this.pinned);
 		this.appendChild(this.normal);
-		telegramApi.subscribeToUpdates('messages', data => console.log('data', data));
 		telegramApi.subscribeToUpdates('dialogs', data => {
-			const { to_peer, from_peer, message, date } = data;
-			const time = telegramApi._convertDate(date);
-			let { id } = to_peer;
-			const dialog = document.getElementById(`dialog_${id}`);
-			if (to_peer._ === 'user' && from_peer._ === 'user' && !from_peer.pFlags.self) {
-				id = from_peer.id;
+			console.log('data', data);
+			const {
+				_: type,
+				to_id,
+				from_id,
+				message,
+				date,
+				message_info: { out, channel_post },
+			} = data;
+			let id = from_id;
+			if (out || channel_post) {
+				id = to_id;
 			}
-			if (from_peer.id === getUser().id && from_peer.id !== to_peer.id) {
-				const info = dialog.querySelector('.dialog__info');
+			const dialog = getDialog(id);
+			if (!dialog) {
+				return;
+			}
+			const { archived, unreadCount, pinned } = dialog;
+			if (archived) {
+				return;
+			}
+			const time = telegramApi._convertDate(date);
+			const dialogElem = document.getElementById(`dialog_${id}`);
+			if (out) {
+				id = to_id;
+				const info = dialogElem.querySelector('.dialog__info');
 				if (!info.querySelector('.dialog__out')) {
 					if (!this.out) {
 						this.out = htmlToElement(`<div class="dialog__out">${outSvg}</div>`);
@@ -91,12 +106,14 @@ export default class UserDialogs extends HTMLElement {
 					info.querySelector('.dialog__time').classList.remove('full', true);
 					info.prepend(this.out);
 				}
+			} else {
+				updateDialogUnread(id, Number(unreadCount) + 1);
 			}
 
-			dialog.querySelector('.dialog__short-msg').innerHTML = message;
-			dialog.querySelector('.dialog__time').innerHTML = time;
-			if (!getDialog(id).pinned) {
-				this.normal.prepend(dialog);
+			dialogElem.querySelector('.dialog__short-msg').innerHTML = message;
+			dialogElem.querySelector('.dialog__time').innerHTML = time;
+			if (!pinned) {
+				this.normal.prepend(dialogElem);
 			}
 		});
 	}

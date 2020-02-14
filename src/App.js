@@ -102,7 +102,7 @@ telegramApi
 	.catch(err => console.log('err', err));
 
 const changeState = transform => {
-	return function(...args) {
+	return function (...args) {
 		const [oldState, newState] = [state, transform(...args)];
 
 		state = {
@@ -128,9 +128,10 @@ window.updateRipple = () => {
 document.addEventListener('click', event => {
 	let target = event.target;
 	if (target.attributes.length === 0) {
+		target = target.parentNode.parentNode.parentNode;
+	} else if (target.classList.contains('burger')) {
 		target = target.parentNode.parentNode;
-	}
-	if (target.tagName === 'IMG' || target.tagName === 'SVG' || target.classList.contains('burger')) {
+	} else if (target.tagName === 'IMG' || target.tagName === 'SVG' || target.classList.contains('icon')) {
 		target = target.parentNode;
 	}
 	const popup = document.querySelector('.popup');
@@ -143,10 +144,17 @@ document.addEventListener('click', event => {
 
 document.addEventListener('click', event => {
 	const search = document.getElementById('search');
-	const icon = document.querySelector('.menu .menu__icon');
+	const icon = document.querySelector('.menu .menu__icon > div');
 	const searchOverlay = document.querySelector('.menu__search_overlay');
 	const userDialogs = document.getElementById('user-dialogs');
 	const searchList = document.getElementById('search-list');
+
+	if (search && search.value !== '') {
+		hide(userDialogs);
+		show(searchList);
+		setZeroTimeout(() => searchList.classList.remove('search-list_hidden'));
+		return;
+	}
 
 	if (event.target !== search) {
 		searchOverlay.classList.add('hide');

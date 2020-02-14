@@ -50,6 +50,6 @@ export default class ChatPage extends HTMLElement {
 				}
 			});
 		});
-		telegramApi.getDialogsParsed(100).then(load);
+		telegramApi.getDialogsParsed(30).then(load);
 	};
 }
