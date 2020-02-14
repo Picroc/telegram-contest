@@ -24,32 +24,6 @@ export default class Archives extends HTMLElement {
 		this.normal.id = 'normal_dialogs';
 		this.userDialogs.appendChild(this.pinned);
 		this.userDialogs.appendChild(this.normal);
-		telegramApi.subscribeToUpdates('messages', data => console.log('data', data));
-		telegramApi.subscribeToUpdates('dialogs', data => {
-			const { to_peer, from_peer, message, date } = data;
-			const time = telegramApi._convertDate(date);
-			let { id } = to_peer;
-			const dialog = document.getElementById(`dialog_${id}`);
-			if (to_peer._ === 'user' && from_peer._ === 'user' && !from_peer.pFlags.self) {
-				id = from_peer.id;
-			}
-			if (from_peer.id === getUser().id && from_peer.id !== to_peer.id) {
-				const info = dialog.querySelector('.dialog__info');
-				if (!info.querySelector('.dialog__out')) {
-					if (!this.out) {
-						this.out = htmlToElement(`<div class="dialog__out">${outSvg}</div>`);
-					}
-					info.querySelector('.dialog__time').classList.remove('full', true);
-					info.prepend(this.out);
-				}
-			}
-
-			dialog.querySelector('.dialog__short-msg').innerHTML = message;
-			dialog.querySelector('.dialog__time').innerHTML = time;
-			if (!getDialog(id).pinned) {
-				this.normal.prepend(dialog);
-			}
-		});
 	}
 
 	setListener = event => {

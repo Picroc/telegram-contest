@@ -102,7 +102,7 @@ telegramApi
 	.catch(err => console.log('err', err));
 
 const changeState = transform => {
-	return function(...args) {
+	return function (...args) {
 		const [oldState, newState] = [state, transform(...args)];
 
 		state = {
@@ -147,6 +147,10 @@ document.addEventListener('click', event => {
 	const searchOverlay = document.querySelector('.menu__search_overlay');
 	const userDialogs = document.getElementById('user-dialogs');
 	const searchList = document.getElementById('search-list');
+
+	if (search && search.value !== '') {
+		return;
+	}
 
 	if (event.target !== search) {
 		searchOverlay.classList.add('hide');

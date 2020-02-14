@@ -47,7 +47,7 @@ export default class SearchList extends HTMLElement {
 				if (type === 'peerUser' && id != user_id) {
 					const p = htmlToElement(person(dialog));
 					p.addEventListener(UPDATE_DIALOG_PHOTO, this.updatePhotoListener);
-					p.addEventListener('click', () => this.loadDialog(p)(dialog));
+					p.addEventListener('click', () => this.loadDialog(p)(user_id));
 					this.people.appendChild(p);
 				}
 			});
@@ -84,12 +84,23 @@ export default class SearchList extends HTMLElement {
 			if (result.length > 0) {
 				const resultHTML = await result.map(async dialog => {
 					const avatar = await dialog.photo;
-					let { title, from_name: from, text, date } = dialog;
+					let {
+						_: type,
+						title,
+						from_name: from,
+						text,
+						date,
+						to_peer: { id: tid },
+						from_peer: { id: fid },
+						id: messageId,
+					} = dialog;
 					date = new Date(date * 1000);
 					date = date.toLocaleString('en-US', { month: 'short', day: 'numeric' });
 					text = this.highlightText(text, value);
+
 					const resHtml = htmlToElement(messageResult({ avatar, title, text, date, from }));
-					resHtml.addEventListener('click', () => this.loadDialog(resHtml)(dialog, dialog.id));
+					const dialogId = type === 'pm' ? fid : tid;
+					resHtml.addEventListener('click', () => this.loadDialog(resHtml)(dialogId, messageId));
 					return resHtml;
 				});
 
