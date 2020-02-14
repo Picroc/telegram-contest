@@ -35,9 +35,7 @@ export default ({
 	media_unread: mediaUnread = false,
 	from_scheduled: fromScheduled = false,
 	post_author: postAuthor = '',
-	withAvatar,
 }) => {
-	const isOutgoing = out;
 	const hasMedia = !!media;
 
 	let photoMedia = '';

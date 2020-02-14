@@ -34,10 +34,20 @@ export default ({
 	id,
 	photo,
 	pinned,
+	from_name: from = '',
+	is_supergroup,
+	dialog_peer: { _: type },
 }) => {
+	if (type === 'peerChat' || is_supergroup) {
+		from = from ? `<span class="dialog__short-msg_from">${from}: </span>` : '';
+	} else {
+		from = '';
+	}
+
 	if (!(photo instanceof Promise) && photo) {
 		avatar = photo;
 	}
+
 	const icon = savedMessages
 		? saved
 		: `<img src="${avatar}" alt="avatar" class="dialog__avatar avatar avatar_medium">`;
@@ -61,7 +71,7 @@ export default ({
                 ${icon}
             </div>
             <div class="dialog__name">${title}</div>
-			<div class="dialog__short-msg">${text}</div>
+			<div class="dialog__short-msg">${from}${text}</div>
 			<div class="dialog__info">
 				${out ? `<div class="dialog__out">${outRead ? outSvg : outNotReadSvg}</div>` : ''}
             	<div class="${clsx('dialog__time', !out && 'full')}">${time}</div>
