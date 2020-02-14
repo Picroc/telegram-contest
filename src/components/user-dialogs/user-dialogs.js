@@ -6,6 +6,8 @@ import {
 	getUser,
 	getDialog,
 	updateDialogUnread,
+	updateDialogShort,
+	updateDialogDate,
 } from '../../store/store';
 import {
 	htmlToElement,
@@ -13,6 +15,7 @@ import {
 	stopLoading,
 	createDiv,
 	getNotificationsModeBoolByPeer,
+	hide,
 } from '../../helpers/index';
 import chatMain from '../../pages/chat-main/index';
 import './user-dialogs.scss';
@@ -73,51 +76,65 @@ export default class UserDialogs extends HTMLElement {
 		this.appendChild(this.pinned);
 		this.appendChild(this.normal);
 		telegramApi.subscribeToUpdates('dialogs', data => {
-			console.log('data', data);
-			const {
-				_: type,
-				to_id,
-				from_id,
-				message,
-				date,
-				message_info: { out },
-			} = data;
-			let id = to_id;
-			const myId = getUser();
-			if (to_id === myId) {
-				id = from_id;
-			}
-			const dialog = getDialog(id);
-			if (!dialog) {
-				return;
-			}
-			const { archived, unreadCount, pinned } = dialog;
-			if (archived) {
-				return;
-			}
-			const time = telegramApi._convertDate(date);
-			const dialogElem = document.getElementById(`dialog_${id}`);
-			if (out) {
-				id = to_id;
-				const info = dialogElem.querySelector('.dialog__info');
-				if (!info.querySelector('.dialog__out')) {
-					if (!this.out) {
-						this.out = htmlToElement(`<div class="dialog__out">${outSvg}</div>`);
-					}
-					info.querySelector('.dialog__time').classList.remove('full', true);
-					info.prepend(this.out);
-				}
-			} else if (to_id !== from_id) {
-				updateDialogUnread(id, Number(unreadCount) + 1);
-			}
-
-			dialogElem.querySelector('.dialog__short-msg').innerHTML = message;
-			dialogElem.querySelector('.dialog__time').innerHTML = time;
-			if (!pinned) {
-				this.normal.prepend(dialogElem);
+			const { _: type } = data;
+			switch (type) {
+				case 'newMessage':
+					this.updateMessage(data);
 			}
 		});
 	}
+
+	updateMessage = data => {
+		const {
+			to_id,
+			from_id,
+			message,
+			date,
+			message_info: { out },
+		} = data;
+		let id = to_id;
+		const myId = getUser();
+		if (to_id === myId) {
+			id = from_id;
+		}
+		const dialog = getDialog(id);
+		if (!dialog) {
+			return;
+		}
+		const { archived, unreadCount, pinned } = dialog;
+		if (archived) {
+			return;
+		}
+		const time = telegramApi._convertDate(date);
+		const dialogElem = document.getElementById(`dialog_${id}`);
+		const info = dialogElem.querySelector('.dialog__info');
+		if (out) {
+			id = to_id;
+			if (!info.querySelector('.dialog__out')) {
+				if (!this.out) {
+					this.out = htmlToElement(`<div class="dialog__out">${outSvg}</div>`);
+				}
+				info.querySelector('.dialog__time').classList.remove('full', true);
+				info.prepend(this.out);
+			}
+		} else if (to_id !== from_id) {
+			const out = info.querySelector('.dialog__out');
+			const time = info.querySelector('.dialog__time');
+			time.classList.add('full');
+			if (out) {
+				out.remove();
+			}
+			updateDialogUnread(id, Number(unreadCount) + 1);
+		}
+
+		dialogElem.querySelector('.dialog__short-msg').innerHTML = message;
+		dialogElem.querySelector('.dialog__time').innerHTML = time;
+		updateDialogShort(id, message);
+		updateDialogDate(id, date);
+		if (!pinned) {
+			this.normal.prepend(dialogElem);
+		}
+	};
 
 	setListener = event => {
 		getDialogs().forEach(this.renderDialog);
