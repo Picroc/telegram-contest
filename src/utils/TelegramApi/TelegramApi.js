@@ -1222,12 +1222,72 @@ export default class TelegramApi {
 		};
 	};
 
+	_getServiceMessage = message => {
+		const from_peer = this.AppUsersManager.getUser(message.from_id);
+		const result = {};
+
+		let name;
+
+		if (from_peer.id === this.MtpApiManager.getUserID()) {
+			name = 'You';
+		} else {
+			name = (from_peer.first_name + ' ' + (from_peer.last_name || '')).trim();
+		}
+
+		const { action } = message;
+
+		switch (action._) {
+			case 'messageActionChatJoinedByLink':
+				result.text = name + ' joined the group via invite link';
+				break;
+			case 'messageActionChatCreate':
+				result.text = name + ' created the chat';
+				break;
+			case 'messageActionChatEditTitle':
+				result.text = name + ' changed the chat title to ' + action.title;
+				break;
+			case 'messageActionChatEditPhoto':
+				result.text = name + ' changed the chat photo';
+				result.photo = this.getPhotoPreview(action.photo);
+				break;
+			case 'messageActionChatDeletePhoto':
+				result.text = name + ' deleted the chat photo';
+				break;
+			case 'messageActionChatAddUser':
+				result.text = action.users.reduce((prev, user) => {
+					const new_peer = this.AppUsersManager.getUser(user);
+					return (
+						(prev || '') + name + ' added ' + new_peer.first_name + ' ' + (new_peer.last_name || '') + '\n'
+					);
+				}, 0);
+				break;
+			case 'messageActionChatDeleteUser':
+				result.text = name + ' left the group';
+				break;
+			case 'messageActionChannelCreate':
+				result.text = 'Channel was created';
+				break;
+			case 'messageActionPinMessage':
+				result.text = name + ' pinned the message';
+				break;
+			case 'messageActionPhoneCall':
+				result.text = 'Incoming call';
+				result.duration = action.duration;
+				break;
+			case 'messageActionContactSignUp':
+				result.text = name + ' just joined the Telegram!';
+				break;
+		}
+
+		return result;
+	};
+
 	_getMessageText = message => {
 		let text = message.message;
 
 		if (!text || (message.media && message.media._ !== 'messageMediaEmpty')) {
 			if (message._ === 'messageService') {
-				text = 'Service message';
+				text = this._getServiceMessage(message).text;
 			} else {
 				const type = message.media && message.media._;
 				const getDocumentText = media => {
