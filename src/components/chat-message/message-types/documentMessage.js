@@ -3,6 +3,8 @@ import { getActivePeerId, getMessage } from '../../../store/store';
 import { telegramApi } from '../../../App';
 import { startLoadingProgress, setLoadingProgress, stopLoadingProgress } from '../../../helpers/index';
 
+import docIcon from './doc';
+
 export default class DocumentMessage extends HTMLElement {
 	constructor() {
 		super();
@@ -35,12 +37,18 @@ export default class DocumentMessage extends HTMLElement {
 				return this.getAnimatedSticker(document);
 			case 'image/webp':
 				return this.getSticker(document);
+			case 'video/quicktime':
 			case 'video/mp4':
 				return this.getVideoDocument(document);
 			default:
-				console.log('UNDEFINED', document);
-				'DOCUMENT';
+				// console.log('UNDEFINED', document);
+				return this.getDocument(document);
 		}
+	}
+
+	getDocument(doc) {
+		// console.log('JUST DOC', doc);
+		return `<div class='document-message__document'>${docIcon()} <p>${doc.attributes[0].file_name}</p></div>`;
 	}
 
 	getVideoDocument(doc) {

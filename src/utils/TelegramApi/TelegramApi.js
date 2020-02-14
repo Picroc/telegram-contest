@@ -358,7 +358,7 @@ export default class TelegramApi {
 		let size = 15728640;
 		let limit = 524288;
 		let offset = 0;
-		return new Promise((resolve, request) => {
+		const promise = new Promise((resolve, request) => {
 			const bytes = [];
 
 			// if (doc.size > size) {
@@ -399,6 +399,8 @@ export default class TelegramApi {
 
 			$timeout(download);
 		});
+		this.MtpApiFileManager.saveDownloadingPromise(doc.id, promise);
+		return promise;
 	};
 
 	downloadPhoto = (photo, progress, autosave, useCached = true) => {
@@ -428,7 +430,7 @@ export default class TelegramApi {
 		let limit = 524288;
 		let offset = 0;
 
-		return new Promise((resolve, reject) => {
+		const promise = new Promise((resolve, reject) => {
 			const bytes = [];
 
 			if (photoSize.size > size) {
@@ -463,6 +465,8 @@ export default class TelegramApi {
 
 			$timeout(download);
 		});
+		this.MtpApiFileManager.saveDownloadingPromise(photo.id, promise);
+		return promise;
 	};
 
 	getDocumentPreview = doc => {
@@ -503,11 +507,13 @@ export default class TelegramApi {
 		};
 		let limit = 524288;
 
-		return this.MtpApiManager.invokeApi('upload.getFile', {
+		const promise = this.MtpApiManager.invokeApi('upload.getFile', {
 			location: location,
 			offset: 0,
 			limit: limit,
 		}).then(data => this._getImageData(data.bytes, photo.id));
+		this.MtpApiFileManager.saveDownloadingPromise(photo.id, promise);
+		return promise;
 	};
 
 	getMessagesFromPeer = async (peer, limit = 200, offsetId = 0) => {
@@ -560,7 +566,7 @@ export default class TelegramApi {
 		const photo = peer.photo.photo_small;
 		// console.log('PEER', peer);
 		// console.log('PHOTO', photo);
-		return this.invokeApi('upload.getFile', {
+		const promise = this.invokeApi('upload.getFile', {
 			location: {
 				_: 'inputPeerPhotoFileLocation',
 				peer: this.mapPeerToTruePeer(peer),
@@ -573,6 +579,8 @@ export default class TelegramApi {
 			// console.log('Got file!');
 			return this._getImageData(photo_file.bytes, peer_id);
 		});
+		this.MtpApiFileManager.saveDownloadingPromise(peer_id, promise);
+		return promise;
 	};
 
 	searchPeerMessages = async (peer_id, text, filter = { _: 'inputMessagesFilterEmpty' }, limit = 100) => {
@@ -608,7 +616,7 @@ export default class TelegramApi {
 		});
 	};
 
-	getPeerPhotos = async (peer_id, offset = 0, limit = 100) => {
+	getPeerPhotos = async (peer_id, offset = 0, limit = 30) => {
 		return this.searchPeerMessages(peer_id, '', { _: 'inputMessagesFilterPhotos' }, limit).then(messages => {
 			const msg_photos = [];
 			console.log('MSGS', messages);
@@ -1279,6 +1287,7 @@ export default class TelegramApi {
 	_parseDialog = (dialog, chats, messages, users) => {
 		let peer = dialog.peer;
 		let title,
+			from_name,
 			status,
 			photo,
 			is_supergroup = false;
@@ -1318,6 +1327,10 @@ export default class TelegramApi {
 				: peer;
 		}
 		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
+		from_name = users.filter(el => el.id === message.from_id)[0];
+		if (from_name) {
+			from_name = from_name.first_name;
+		}
 		let { date, flags: msg_flags } = message;
 		const unread_count = dialog.unread_count;
 
@@ -1327,11 +1340,18 @@ export default class TelegramApi {
 			photo = this.getPeerPhoto(peer.user_id || peer.chat_id || peer.channel_id);
 		}
 
+		const message_info = this._checkMessageFlags(msg_flags);
+
+		if (message_info.out) {
+			message_info.outRead = dialog.read_outbox_max_id >= dialog.top_message;
+			from_name = 'You';
+		}
+
 		return {
 			title: title,
 			isOnline: status && status._ === 'userStatusOnline',
 			text: text,
-			message_info: this._checkMessageFlags(msg_flags),
+			message_info,
 			pinned: this._checkFlag(dialog.flags, 2),
 			muted: this._checkFlag(dialog.notify_settings.flags, 1),
 			draft: dialog.draft && dialog.draft._ !== 'draftMessageEmpty' ? dialog.draft : null,
@@ -1341,6 +1361,7 @@ export default class TelegramApi {
 			dialog_peer: peer,
 			is_supergroup,
 			photo,
+			from_name,
 		};
 	};
 
