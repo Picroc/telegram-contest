@@ -92,15 +92,12 @@ export default class UserDialogs extends HTMLElement {
 			date,
 			message_info: { out },
 		} = data;
-		console.log('data', data);
 		let id = from_id;
 		const { id: myId } = getUser();
 		if (to_id && to_id !== myId) {
 			id = to_id;
 		}
-		console.log('myId', id);
 		const dialog = getDialog(id);
-		console.log('dialog', dialog);
 		if (!dialog) {
 			return;
 		}
