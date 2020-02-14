@@ -191,6 +191,11 @@ $status-size: 16px;
 
 .document-message__video {
   overflow: hidden;
+  border-radius: 10px;
+
+  &_round {
+    border-radius: 150px;
+  }
 }
 
 .document-message__document {
