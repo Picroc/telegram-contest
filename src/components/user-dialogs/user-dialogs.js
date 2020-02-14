@@ -53,6 +53,9 @@ export const loadDialog = component => elem => async (dialogId, messageId) => {
 			component.prevActive.classList.toggle('dialog_active');
 		}
 	}
+	telegramApi.readPeerHistory(id).then(() => {
+		updateDialogUnread(dialogId, 0);
+	});
 	component.prevActive = elem;
 	component.prevId = id;
 	elem.classList.toggle('dialog_active');

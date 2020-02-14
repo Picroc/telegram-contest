@@ -75,6 +75,10 @@ export default class AppUpdatesManagerModule {
 					console.log(update);
 					this._handleUserTyping(update);
 					break;
+				case 'updateChatParticipantAdd':
+					break;
+				case 'updateChatParticipantDelete':
+					break;
 				default:
 					console.log('UNHANDLED', update);
 			}
