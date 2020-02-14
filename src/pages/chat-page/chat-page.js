@@ -1,7 +1,7 @@
 import { router, telegramApi } from '../../App';
 import { setDialogs, appendDialogs, setArchives, appendArchives, updateDialogUnread } from '../../store/store';
 import template from './chat-page.html';
-import { stopLoading } from '../../helpers/index';
+import { stopLoading, sanitize } from '../../helpers/index';
 import './chat-page.scss';
 export default class ChatPage extends HTMLElement {
 	constructor() {
@@ -25,7 +25,9 @@ export default class ChatPage extends HTMLElement {
 				const left = document.getElementById('left');
 				stopLoading(left);
 				left.innerHTML = `<my-archives></my-archives><my-menu></my-menu><user-dialogs></user-dialogs><search-list></search-list>`;
-				console.log('dialogs', data);
+				data.forEach(item => {
+					item.text = sanitize(item.text);
+				});
 				setDialogs(data);
 				setArchives(archived_items);
 				first = false;

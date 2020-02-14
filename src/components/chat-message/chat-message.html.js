@@ -7,7 +7,7 @@ import sendingError from './sending-error.svg';
 import { clsx, tc, cc } from '../../helpers';
 import { telegramApi } from '../../App';
 import { outSvg, outNotReadSvg } from '../user-dialogs/dialog/dialog.html';
-import { startLoading, stopLoading } from '../../helpers/index';
+import { startLoading, stopLoading, sanitize } from '../../helpers/index';
 
 export default ({
 	id,
@@ -35,9 +35,7 @@ export default ({
 	media_unread: mediaUnread = false,
 	from_scheduled: fromScheduled = false,
 	post_author: postAuthor = '',
-	withAvatar,
 }) => {
-	const isOutgoing = out;
 	const hasMedia = !!media;
 
 	let photoMedia = '';
@@ -139,10 +137,10 @@ const getFormattedMessage = ({ message, entities = [], time, out, outRead }) => 
 		return '';
 	}
 	if (isEmoji(message)) {
-		return `<div class="chat-message_emoji">${message}</div>`;
+		return `<div class="chat-message_emoji">${sanitize(message)}</div>`;
 	}
 
-	let formatted = message;
+	let formatted = sanitize(message);
 
 	entities &&
 		entities.reverse().forEach(entity => {
