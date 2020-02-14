@@ -19,6 +19,7 @@ export default ({
 	media = null,
 	entities = null,
 	out = false,
+	outRead = false,
 	post = false,
 	silent = false,
 	mentioned = false,
@@ -37,6 +38,7 @@ export default ({
 	post_author: postAuthor = '',
 }) => {
 	const hasMedia = !!media;
+	const outIcon = out ? (outRead ? outSvg : outNotReadSvg) : '';
 
 	let photoMedia = '';
 	if (hasMedia) {
@@ -51,7 +53,7 @@ export default ({
 			? `<div class="${clsx(
 				'message__info',
 				!message && hasMedia && 'message__info_media_no-message'
-			)}">${time}</div>`
+			)}">${time}${outIcon}</div>`
 			: '';
 
 		if (mediaType === 'messageMediaPhoto') {
@@ -67,7 +69,7 @@ export default ({
 	const forward = (forwardFrom && `<div>Was forwarded from ${forwardFrom}</div>`) || '';
 	const reply = (replyToMessageId && `<div class='chat-message__reply'>Reply to ${replyToMessageId}</div>`) || '';
 
-	const formattedMessage = getFormattedMessage({ message, entities, time });
+	const formattedMessage = getFormattedMessage({ message, entities, time, outIcon });
 
 	// TODO add handlers for reply & message
 	return `
@@ -132,7 +134,7 @@ const getPhotoTemplate = photo => {
 };
 
 // TODO implement formatted message
-const getFormattedMessage = ({ message, entities = [], time, out, outRead }) => {
+const getFormattedMessage = ({ message, entities = [], time, outIcon }) => {
 	if (!message) {
 		return '';
 	}
@@ -155,7 +157,7 @@ const getFormattedMessage = ({ message, entities = [], time, out, outRead }) => 
 	const messageInfo = `<div class="${clsx(
 		'message__info',
 		!message && hasMedia && 'message__info_media_no-message'
-	)}">${time}</div>`;
+	)}">${time}${outIcon}</div>`;
 	return (message && `<div class="message">${formatted} ${messageInfo}</div>`) || '';
 };
 

@@ -154,10 +154,10 @@ export const UPDATE_DIALOG_STATUS = `UPDATE_DIALOG_STATUS`;
 export const updateDialogStatus = (id, status) => {
 	const dialog = getDialog(id);
 	dialog.onlineStatus = status;
-	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, { id }));
+	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, { id, status }));
 	const topBar = document.querySelector('top-bar');
 	if (topBar && topBar.getAttribute('user_id') == id) {
-		topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, { id }));
+		topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, { id, status }));
 	}
 	const rightSidebar = document.querySelector('.right-sidebar');
 	rightSidebar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, status));

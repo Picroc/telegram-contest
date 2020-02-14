@@ -1,9 +1,10 @@
 import lottie from 'lottie-web';
 import { getActivePeerId, getMessage } from '../../../store/store';
 import { telegramApi } from '../../../App';
-import { startLoadingProgress, setLoadingProgress, stopLoadingProgress } from '../../../helpers/index';
+import { startLoadingProgress, setLoadingProgress, stopLoadingProgress, clsx } from '../../../helpers/index';
 
 import docIcon from './doc';
+import { outSvg, outNotReadSvg } from '../../user-dialogs/dialog/dialog.html';
 
 export default class DocumentMessage extends HTMLElement {
 	constructor() {
@@ -15,8 +16,18 @@ export default class DocumentMessage extends HTMLElement {
 	render() {
 		const {
 			media: { document },
+			date,
+			outRead,
+			flags,
 		} = getMessage(this.peerId)(this.id);
-		this.innerHTML = `<div class="document-message">${this.getContentByMimeType(document)}</div>`;
+		const { out } = telegramApi._checkMessageFlags(flags);
+
+		const outIcon = out ? (outRead ? outSvg : outNotReadSvg) : '';
+		let time = new Date(date * 1000);
+		time = `${time.getHours()}:${time.getMinutes() > 9 ? time.getMinutes() : '0' + time.getMinutes()}`;
+		const messageInfo = `<div class="${clsx('message__info')}">${time}${outIcon}</div>`;
+
+		this.innerHTML = `<div class="document-message">${this.getContentByMimeType(document)}${messageInfo}</div>`;
 	}
 
 	connectedCallback() {
@@ -168,7 +179,7 @@ export default class DocumentMessage extends HTMLElement {
 			bytes
 				? `<img style='width: ${w}px; height: ${h}px;' src="${stickerUrl}" alt=${altEmoji}>`
 				: `<div style='width: ${w}px; height: ${h}px;'></div>`
-		}</div>`;
+			}</div>`;
 	}
 
 	getAnimationItem = (data, options) => () =>

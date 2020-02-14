@@ -37,7 +37,7 @@ export default class Settings extends HTMLElement {
 
 	logoutHandler = () => {
 		telegramApi.logOut().then(() => {
-			router('login');
+			router('login-form');
 		});
 	};
 

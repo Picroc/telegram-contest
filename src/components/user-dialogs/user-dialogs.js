@@ -8,6 +8,7 @@ import {
 	updateDialogUnread,
 	updateDialogShort,
 	updateDialogDate,
+	updateDialogStatus,
 } from '../../store/store';
 import {
 	htmlToElement,
@@ -82,9 +83,14 @@ export default class UserDialogs extends HTMLElement {
 		this.appendChild(this.normal);
 		telegramApi.subscribeToUpdates('dialogs', data => {
 			const { _: type } = data;
+			console.log('type', type);
 			switch (type) {
 				case 'newMessage':
 					this.updateMessage(data);
+					break;
+				case 'userStatus':
+					this.updateStatus(data);
+					break;
 			}
 		});
 	}
@@ -138,6 +144,11 @@ export default class UserDialogs extends HTMLElement {
 		if (!pinned) {
 			this.normal.prepend(dialogElem);
 		}
+	};
+
+	updateStatus = data => {
+		const { user_id, online } = data;
+		updateDialogStatus(user_id, online);
 	};
 
 	setListener = event => {
