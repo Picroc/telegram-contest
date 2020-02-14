@@ -1,6 +1,7 @@
 .message-input {
   position: fixed;//absolute?
   bottom: 20px;
+  right: 100px;
   display: grid;
   grid-template-columns: 90% 10%;
   column-gap: 10px;
@@ -14,22 +15,28 @@
   place-items: center;
   background-color: var(--white);
   border-radius: 0.5em 0.5em 0 0.5em;
+  overflow: scroll;
+  overflow-x: hidden;
+  max-height: 300px;
 
-
-  .svg {
-    padding-bottom: 10px;
-  }
-
-  &:after {
-    content: " ";
+  &::-webkit-scrollbar {
     position: absolute;
-    right: -15px;
-    border: 20px solid transparent;
-    border-left-color: var(--white);
-    border-right: 0;
-    border-bottom: 0;
-    bottom: 0;
+    right: 200px;
+    transform: translateX(-20px);
+    margin-right: 20px;
+    padding-right: 20px;
   }
+
+  // &:after {
+  //   content: " ";
+  //   position: absolute;
+  //   right: -15px;
+  //   border: 20px solid transparent;
+  //   border-left-color: var(--white);
+  //   border-right: 0;
+  //   border-bottom: 0;
+  //   bottom: 0;
+  // }
 
   &__input {
     border: 0 solid transparent;
@@ -49,10 +56,32 @@
     }
   }
 }
+.attach-media {
+
+  &__popup {
+    right: 55px;
+    bottom: 65px;
+    max-width: 200px;
+
+    .popup-item {
+      cursor: pointer;
+      justify-content: flex-start;
+      width: 200px;
+    }
+
+  }
+
+  &__img {
+    width: 24px;
+    height: 24px;
+    padding-right: 25px;
+  }
+
+}
 
 .voice-message {
   cursor: pointer;
-  background-color: var(--primary);
+  background-color: white;
   padding: 16px !important;
   border-radius: 2.5em;
   fill: var(--white);
@@ -85,6 +114,9 @@ $send-button-size: 26px;
     width: 24px;
     height: 24px;
     opacity: 0.5;
+    position: fixed;
+    bottom: 35px;
+    transform: translateX(-10px);
     &.active {
       fill: var(--primary);
       opacity: 0.7;

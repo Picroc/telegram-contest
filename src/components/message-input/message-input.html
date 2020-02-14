@@ -2,8 +2,36 @@
 <div class="message-input">
         <div class="text-input">
             <div class="svg emoji-set"></div>
+
             <div contenteditable="true" class="text-input__input" placeholder="Message"></div>
             <div class="svg attach-media"></div>
          </div>
+         <ul class="attach-media__popup popup popup_hidden">
+            <li class="attach-media__media popup-item">
+                <img src="./svg/photo.svg" alt="" class="media__img attach-media__img">
+                <div class="media__text attach-media__text">Photo or Video</div>
+            </li>
+            <li class="attach-media__document popup-item">
+                <img src="./svg/document.svg" alt="" class="document__img attach-media__img">
+                <div class="document__text attach-media__text">Document</div>
+            </li>
+            <li class="attach-media__poll popup-item">
+                <img src="./svg/poll.svg" alt="" class="poll__img attach-media__img">
+                <div class="poll__text attach-media__text">Poll</div>
+            </li>
+        </ul>
         <div class="svg voice-message"><div id="send-button" class="microphone"></div></div>
     </div>
+<div class="media-drop__paranja hide">
+    <div class="media-drop__pane">
+        <div class="media-drop__header">
+            <div class="media-drop__close-button">
+                <img src="../../static/images/close.svg" alt="" class="close-icon">
+            </div>
+            <h3 class="media-drop__text">Drag to Reposition</h3>
+            <div class="media-drop__accept-button">SEND</div>
+        </div>
+        <div class="media-drop__image-place"></div>
+        <input type="text" placeholder="Add a caption..." class="media-drop__caption">
+    </div>
+</div>
