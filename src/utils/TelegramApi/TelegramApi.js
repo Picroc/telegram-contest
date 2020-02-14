@@ -1287,6 +1287,7 @@ export default class TelegramApi {
 	_parseDialog = (dialog, chats, messages, users) => {
 		let peer = dialog.peer;
 		let title,
+			from_name,
 			status,
 			photo,
 			is_supergroup = false;
@@ -1326,6 +1327,10 @@ export default class TelegramApi {
 				: peer;
 		}
 		const message = messages[messages.findIndex(el => el.id === dialog.top_message)];
+		from_name = users.filter(el => el.id === message.from_id)[0];
+		if (from_name) {
+			from_name = from_name.first_name;
+		}
 		let { date, flags: msg_flags } = message;
 		const unread_count = dialog.unread_count;
 
@@ -1335,11 +1340,17 @@ export default class TelegramApi {
 			photo = this.getPeerPhoto(peer.user_id || peer.chat_id || peer.channel_id);
 		}
 
+		const message_info = this._checkMessageFlags(msg_flags);
+
+		if (message_info.out) {
+			message_info.outRead = dialog.read_outbox_max_id >= dialog.top_message;
+		}
+
 		return {
 			title: title,
 			isOnline: status && status._ === 'userStatusOnline',
 			text: text,
-			message_info: this._checkMessageFlags(msg_flags),
+			message_info,
 			pinned: this._checkFlag(dialog.flags, 2),
 			muted: this._checkFlag(dialog.notify_settings.flags, 1),
 			draft: dialog.draft && dialog.draft._ !== 'draftMessageEmpty' ? dialog.draft : null,
@@ -1349,6 +1360,7 @@ export default class TelegramApi {
 			dialog_peer: peer,
 			is_supergroup,
 			photo,
+			from_name,
 		};
 	};
 
