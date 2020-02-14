@@ -1344,6 +1344,7 @@ export default class TelegramApi {
 
 		if (message_info.out) {
 			message_info.outRead = dialog.read_outbox_max_id >= dialog.top_message;
+			from_name = 'You';
 		}
 
 		return {
