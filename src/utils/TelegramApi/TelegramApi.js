@@ -19,6 +19,7 @@ import { inflate } from 'pako/lib/inflate';
 import pako from 'pako';
 
 import lottie from 'lottie-web';
+import AppMessagesManagerModule from './js/App/AppMessagesManager';
 
 export default class TelegramApi {
 	options = { dcID: 2, createNetworker: true };
@@ -530,11 +531,27 @@ export default class TelegramApi {
 		return promise;
 	};
 
-	getMessagesFromPeer = async (peer, limit = 200, offsetId = 0) => {
+	getMessagesFromPeer = async (peer, limit = 200, offsetId = 0, max_id = -1, min_id = -1) => {
+		const messagesManager = new AppMessagesManagerModule(
+			peer.user_id || peer.channel_id || peer.chat_id || peer.id
+		);
+
+		const cached =
+			min_id > 0
+				? await messagesManager.getDownMessages(min_id, limit)
+				: await messagesManager.getUpMessages(offsetId, limit);
+
+		if (cached && cached.length >= limit) {
+			console.log('RETURNING CACHED', cached);
+			return { messages: cached };
+		}
+
 		return await this.invokeApi('messages.getHistory', {
 			peer: this.mapPeerToTruePeer(peer),
 			limit,
 			offset_id: offsetId,
+			max_id,
+			min_id,
 		}).then(res => {
 			const messages = res.messages.map((msg, idx) => {
 				if (idx === 0) {
@@ -547,6 +564,9 @@ export default class TelegramApi {
 					...msg,
 				};
 			});
+
+			messagesManager.saveMessages(messages);
+
 			return { ...res, messages };
 		});
 	};
@@ -582,6 +602,9 @@ export default class TelegramApi {
 	};
 
 	getPeerPhoto = async peer_id => {
+		if (!peer_id) {
+			return;
+		}
 		const peer = await this.getPeerByID(peer_id);
 
 		const cached = this.MtpApiFileManager.getLocalFile(peer_id);
@@ -730,6 +753,7 @@ export default class TelegramApi {
 			// console.log('Saving users', dialogsResult);
 			this.AppUsersManager.saveApiUsers(dialogsResult.users);
 			this.AppChatsManager.saveApiChats(dialogsResult.chats);
+			this.AppChatsManager.saveDialogs(dialogsResult.dialogs);
 
 			const dates = map(dialogsResult.messages, msg => {
 				return msg.date;

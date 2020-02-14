@@ -197,6 +197,22 @@ export const getRightSidebarFieldsFromPeer = peer => {
 	return generalizedPeer;
 };
 
+export const onScrollTop = (element, callback) => {
+	element.addEventListener('scroll', () => {
+		if (element.scrollTop < 500) {
+			callback();
+		}
+	});
+};
+
+export const onScrollBottom = (element, callback) => {
+	element.addEventListener('scroll', () => {
+		if (element.scrollTop + element.clientHeight >= element.scrollHeight - 300) {
+			callback();
+		}
+	});
+};
+
 export const capitalise = string => string.charAt(0).toUpperCase() + string.slice(1);
 export const peerToId = peer => {
 	return peer.user_id || peer.channel_id || peer.chat_id;

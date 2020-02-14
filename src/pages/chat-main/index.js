@@ -3,7 +3,7 @@ import './messages.scss';
 import './chatMain.scss';
 import { getActivePeer, getAllMessages, putMessage } from '../../store/store';
 import { telegramApi } from '../../App';
-import { startLoading, htmlToElement } from '../../helpers/index';
+import { startLoading, htmlToElement, onScrollTop, onScrollBottom } from '../../helpers/index';
 
 export default class ChatMain extends HTMLElement {
 	render() {
@@ -22,14 +22,17 @@ export default class ChatMain extends HTMLElement {
 
 		this.loading = false;
 
-		this.messagesList.addEventListener('scroll', async () => {
-			if (this.messagesList.scrollTop < 500 && !this.loading) {
+		onScrollTop(this.messagesList, async () => {
+			if (!this.loading) {
 				console.log('Hello');
 				this.loading = true;
 				console.log('First', this.firstMessage, 'Last', this.lastMessage);
 				await this.getMessages(peerId, this.lastMessage);
 				this.loading = false;
 			}
+		});
+		onScrollBottom(this.messagesList, () => {
+			console.log('HELLO FROM SCROLL BOTTOM');
 		});
 	}
 
@@ -38,11 +41,11 @@ export default class ChatMain extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['peer-id', 'start-message'];
+		return [''];
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		// this.render();
+		this.render();
 	}
 
 	getMessages = async (peerId, startMessageId) => {
