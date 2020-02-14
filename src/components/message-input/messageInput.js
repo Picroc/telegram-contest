@@ -21,7 +21,17 @@ export default class MessageInput extends HTMLElement {
 		setAttr('.text-input__input')('value', message);
 		setHTML('.emoji-set')(emojiSvg());
 		setHTML('.attach-media')(attachSvg());
+		this.inputArea = this.querySelector('.text-input__input');
+		this.inputArea.addEventListener('input', this.resizeTextarea);
 	}
+
+	resizeTextarea = e => {
+		if (this.inputArea.innerHTML != '') {
+			this.inputArea.setAttribute('placeholder', '');
+		} else {
+			this.inputArea.setAttribute('placeholder', 'Message');
+		}
+	};
 
 	connectedCallback() {
 		// (2)
