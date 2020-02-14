@@ -3,6 +3,8 @@ import { getActivePeerId, getMessage } from '../../../store/store';
 import { telegramApi } from '../../../App';
 import { startLoadingProgress, setLoadingProgress, stopLoadingProgress } from '../../../helpers/index';
 
+import docIcon from './doc';
+
 export default class DocumentMessage extends HTMLElement {
 	constructor() {
 		super();
@@ -35,12 +37,18 @@ export default class DocumentMessage extends HTMLElement {
 				return this.getAnimatedSticker(document);
 			case 'image/webp':
 				return this.getSticker(document);
+			case 'video/quicktime':
 			case 'video/mp4':
 				return this.getVideoDocument(document);
 			default:
-				console.log('UNDEFINED', document);
-				'DOCUMENT';
+				// console.log('UNDEFINED', document);
+				return this.getDocument(document);
 		}
+	}
+
+	getDocument(doc) {
+		// console.log('JUST DOC', doc);
+		return `<div class='document-message__document'>${docIcon()} <p>${doc.attributes[0].file_name}</p></div>`;
 	}
 
 	getVideoDocument(doc) {
@@ -59,7 +67,7 @@ export default class DocumentMessage extends HTMLElement {
 
 			startLoadingProgress(videoPlaceholder);
 			telegramApi.downloadDocument(doc, handleProgress).then(data => {
-				telegramApi._getVideoData(data.bytes).then(video_data => {
+				telegramApi._getVideoData(data.bytes, doc.id).then(video_data => {
 					const vid = document.createElement('video');
 					vid.src = video_data;
 					vid.width = 300;
@@ -80,7 +88,7 @@ export default class DocumentMessage extends HTMLElement {
 		const [{ w: width, h: height }, { alt: altEmoji, stickerset: stickerSet }] = attributes;
 		const stickerPreviewUrl = `data:image/png;base64,${btoa(String.fromCharCode(...new Uint8Array(bytes)))}`;
 		telegramApi.downloadDocument(doc).then(data => {
-			telegramApi.setStickerToContainer(data, this.querySelector(`.chat-message_animated-sticker`));
+			telegramApi.setStickerToContainer(data, this.querySelector(`.chat-message_animated-sticker`), id);
 			this.querySelector('.chat-message_animated-sticker img').remove();
 		});
 		return `<div class="chat-message_animated-sticker"><img src="${stickerPreviewUrl}" alt=${altEmoji}></div>`;
