@@ -23,7 +23,6 @@ export default class ChatMain extends HTMLElement {
 		this.loading = false;
 
 		this.messagesList.addEventListener('scroll', async () => {
-			console.log(this.messagesList.scrollTop, this.messagesList.clientHeight, this.messagesList.scrollHeight);
 			if (this.messagesList.scrollTop < 500 && !this.loading) {
 				console.log('Hello');
 				this.loading = true;

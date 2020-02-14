@@ -66,6 +66,7 @@ export default class TopBar extends HTMLElement {
 	};
 
 	loadStatus = id => {
+		let onlineStatus;
 		telegramApi
 			.getPeerByID(id)
 			.then(({ status, _: type, pFlags: { megagroup } }) => {
@@ -74,7 +75,8 @@ export default class TopBar extends HTMLElement {
 				} else if (type === 'channel') {
 					return telegramApi.getFullPeer(id);
 				}
-				this.onlineStatus = this.statusTransform(status);
+				onlineStatus = this.statusTransform(status);
+				// updateDialogStatus(id, onlineStatus);
 			})
 			.then(data => {
 				if (!data) {
@@ -88,16 +90,18 @@ export default class TopBar extends HTMLElement {
 					all = all + online;
 					all = `${this.transformNumber(all)} ${all > 1 ? 'members' : 'member'}`;
 					online = online && `${this.transformNumber(online)} online`;
-					this.onlineStatus = online ? `${all}, ${online}` : all;
+					onlineStatus = online ? `${all}, ${online}` : all;
 				} else {
 					const count = data.full_chat.participants_count;
 					const sub = 'subsriber' + this.unitCheck(count);
-					this.onlineStatus = `${this.transformNumber(count)} ${sub}`;
+					onlineStatus = `${this.transformNumber(count)} ${sub}`;
 				}
 			})
 			.then(() => {
-				if (this.onlineStatus) {
-					updateDialogStatus(id, this.onlineStatus);
+				console.log('!!!!', onlineStatus);
+				if (onlineStatus) {
+					console.log('It is here');
+					updateDialogStatus(id, onlineStatus);
 				}
 			});
 	};
@@ -123,8 +127,7 @@ export default class TopBar extends HTMLElement {
 		let time;
 		let unit;
 		if (diff < step) {
-			this.online.innerHTML = `last seen just now`;
-			return;
+			return `last seen just now`;
 		} else if (diff < step ** 2) {
 			unit = new Date(diff * unixShift).getMinutes();
 			time = 'minute';

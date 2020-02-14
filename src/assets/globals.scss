@@ -104,11 +104,17 @@ ul {
   display: flex;
   justify-content: center;
   align-items: center;
+  align-self: center;
+  justify-self: center;
+  width: 40px;
+  height: 40px;
+
   &:hover {
     background: var(--light-gray);
     border-radius: 50%;
     cursor: pointer;
   }
+
 }
 
 .hide {
