@@ -115,6 +115,9 @@ ul {
     cursor: pointer;
   }
 
+  &_active {
+    fill: var(--primary);
+  }
 }
 
 .hide {
