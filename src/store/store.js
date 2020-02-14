@@ -144,9 +144,7 @@ export const updateDialogStatus = (id, status) => {
 		topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, { id }));
 	}
 	const rightSidebar = document.getElementById('right-sidebar');
-	if (rightSidebar) {
-		rightSidebar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, status));
-	}
+	rightSidebar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, status));
 };
 
 export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);

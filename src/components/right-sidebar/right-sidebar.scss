@@ -45,6 +45,18 @@
         justify-items: center;
 
     }
+
+    &__name {
+        font-weight: bolder;
+    }
+
+    &__status {
+        font-size: 10px;
+        color: var(--gray);
+        &_online {
+            color: var(--primary);
+        }
+    }
     &__attributes {
         grid-area: attributes;
 
@@ -58,6 +70,11 @@
             &__item {
                 display: grid;
                 grid-template-columns: 60px 1fr;
+
+                path {
+
+                    fill: var(--dark-gray);
+                }
             }
 
             & input {
@@ -158,18 +175,23 @@
         &__media {
             display: grid;
             grid-template-columns: repeat(3,32%);
-            grid-auto-rows: 80px;
+            grid-auto-rows: 100px;
+            column-gap: 2px;
             row-gap: 2px;
             justify-items: center;
 
+
+
             &-element {
-                width: 80px;
-                height: 80px;
+                object-fit: cover;
+                width: 100px;
+                height: 100px;
             }
 
             &_placeholder {
-            width: 80px;
-            height: 80px;
+            object-fit: cover;
+            width: 100px;
+            height: 100px;
             background-color: gray;
         }
         }
