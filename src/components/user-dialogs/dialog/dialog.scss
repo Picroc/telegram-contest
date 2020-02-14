@@ -24,6 +24,9 @@
   }
 
   &__saved {
+    &::before {
+      display: none;
+    }
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -53,8 +56,8 @@
         border-radius: 50%;
         background: var(--green);
         border: 2px solid var(--white);
-        right: 2px;
-        bottom: 4px;
+        right: 0;
+        bottom: 2px;
       }
     }
   }

@@ -12,20 +12,20 @@ export default class ChatMessage extends HTMLElement {
 		const message = getMessage(peerId)(messageId);
 		const { from_id, media, flags, date, _: messageType } = message;
 		const { out, channel_post: post, ...pflags } = telegramApi._checkMessageFlags(flags);
-
 		const withAvatar = !out && !(type === 'peerUser' || post || messageType === 'messageService');
 		this.className = clsx(
 			'chat-message',
 			tc('chat-message_out', 'chat-message_in', out),
 			post && 'chat-message_post',
 			media && 'chat-message_full-media',
-			withAvatar && 'chat-message_with_avatar'
+			withAvatar && 'chat-message_with_avatar',
+			!message.message && 'chat-message_without_message'
 			// out && 'chat-message_post_out_last',
 			// !out && 'chat-message_post_in_last'
 		);
 		let time = new Date(date * 1000);
 		time = `${time.getHours()}:${time.getMinutes() > 9 ? time.getMinutes() : '0' + time.getMinutes()}`;
-		this.innerHTML = `${makeTemplate({ ...message, ...pflags, time, withAvatar })}`;
+		this.innerHTML = `${makeTemplate({ ...message, ...pflags, time, out, withAvatar })}`;
 		const avatar = await telegramApi.getPeerPhoto(from_id);
 		if (withAvatar) {
 			this.prepend(htmlToElement(`<img class="chat-message__avatar avatar avatar_small" src=${avatar}></img>`));
