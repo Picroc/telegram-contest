@@ -40,7 +40,7 @@ export default class TopBar extends HTMLElement {
 	};
 
 	showRightSideBar = e => {
-		const rightSidebar = document.getElementById('right-sidebar');
+		const rightSidebar = document.querySelector('.right-sidebar');
 		rightSidebar.classList.toggle('right-sidebar_hidden');
 		document.getElementById('right').classList.toggle('right_small');
 	};
@@ -76,7 +76,6 @@ export default class TopBar extends HTMLElement {
 					return telegramApi.getFullPeer(id);
 				}
 				onlineStatus = this.statusTransform(status);
-				// updateDialogStatus(id, onlineStatus);
 			})
 			.then(data => {
 				if (!data) {
@@ -98,9 +97,7 @@ export default class TopBar extends HTMLElement {
 				}
 			})
 			.then(() => {
-				console.log('!!!!', onlineStatus);
 				if (onlineStatus) {
-					console.log('It is here');
 					updateDialogStatus(id, onlineStatus);
 				}
 			});

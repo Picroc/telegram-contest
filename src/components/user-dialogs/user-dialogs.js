@@ -58,6 +58,8 @@ export const loadDialog = component => elem => async (dialogId, messageId) => {
 	});
 	component.prevActive = elem;
 	component.prevId = id;
+	const rightSidebar = document.querySelector('.right-sidebar');
+	rightSidebar.id = `right-sidebar_${id}`;
 	elem.classList.toggle('dialog_active');
 	const right = document.getElementById('right');
 	startLoading(right);

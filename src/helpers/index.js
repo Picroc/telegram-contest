@@ -170,7 +170,11 @@ export const getRightSidebarFieldsFromPeer = peer => {
 		generalizedPeer.username = peer.user.username;
 		generalizedPeer.phone = peer.user.phone || '';
 	} else if (peer._ === 'messages.chatFull') {
-		generalizedPeer.type = 'groupChat';
+		if (telegramApi._checkFlag(peer.chats[0].flags, 8)) {
+			generalizedPeer.type = 'groupChat';
+		} else {
+			generalizedPeer.type = 'channel';
+		}
 		generalizedPeer.name = peer.chats[0].title;
 		generalizedPeer.about = peer.full_chat.about;
 		generalizedPeer.link = (peer.full_chat.username && 't.me/' + peer.full_chat.username) || '';

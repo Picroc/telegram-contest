@@ -15,6 +15,7 @@ import {
 	cashMedia,
 	cashMaterials,
 	getActivePeerId,
+	UPDATE_DIALOG_PHOTO,
 } from '../../store/store';
 import { getRightSidebarFieldsFromPeer, htmlToElement, capitalise, getName, createDiv } from '../../helpers/index';
 import infoSvg from './svg/info.js';
@@ -52,11 +53,13 @@ export default class RightSidebar extends HTMLElement {
 
 		this.addEventListener(UPDATE_DIALOG_STATUS, this.updateStatus);
 		this.addEventListener(SET_ACTIVE_PEER, this.loadPeerSidebar);
+		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updateAvatar);
 		// this.addEventListener(SET_ACTIVE_PEER_MEDIA, this.setMedia);
 	}
 
 	backButtonListener = e => {
 		this.classList.toggle('right-sidebar_hidden');
+		document.getElementById('right').classList.toggle('right_small');
 	};
 
 	moreButtonListener = e => {
@@ -72,19 +75,29 @@ export default class RightSidebar extends HTMLElement {
 		statusElem.innerHTML = status;
 	};
 
+	updateAvatar = e => {
+		const { id, avatar } = e.detail;
+		const peerId = this.id.split('_')[1];
+		if (id == peerId) {
+			this.avatar.src = avatar;
+		}
+	};
+
 	loadPeerSidebar = e => {
 		const { fullPeer } = e.detail;
 		const setHTML = setInnerHTML.bind(this);
 		this.peerAttributes.innerHTML = '';
 		const generalizedPeer = getRightSidebarFieldsFromPeer(fullPeer);
 		this.generalizedPeer = generalizedPeer;
-		const { notifications, name, avatar, id } = generalizedPeer;
+		const { notifications, name, avatar, id, type } = generalizedPeer;
+		if (avatar) {
+			this.avatar.src = avatar;
+		}
 		this.setMedia(id);
 		this.setMembers(id);
-		this.avatar.src = avatar || getDefaultAvatar();
-		this.peerId = id;
 		setHTML('.right-sidebar__name')(name);
-		switch (generalizedPeer.type) {
+		switch (type) {
+			case 'channel':
 			case 'user':
 				this.loadUserAttributes(generalizedPeer);
 				this.loadTabs(['media', 'docs', 'links', 'audio']);
@@ -182,7 +195,6 @@ export default class RightSidebar extends HTMLElement {
 
 	showMaterial = materialName => {
 		Array.from(this.materials.children).forEach(elem => {
-			console.log('elem.id', elem.id);
 			elem.id == materialName ? elem.classList.remove('hide') : elem.classList.add('hide');
 		});
 	};
@@ -191,7 +203,6 @@ export default class RightSidebar extends HTMLElement {
 		const media = await peerIdToMediaMapper(id);
 		this.media.innerHTML = '';
 		console.log(`Resolving media promises for peer ${id}`);
-		console.log('media', media);
 		media.forEach(async ({ photo }, index) => {
 			const placeholder = htmlToElement(
 				`<div class="right-sidebar__general-materials__media_placeholder"></div>`
@@ -216,7 +227,6 @@ export default class RightSidebar extends HTMLElement {
 		this.members.innerHTML = '';
 		console.log(`Resolving members promises for peer ${id}`);
 		const { onlineCash, onlineUsers, offlineCash, offlineUsers } = users;
-		console.log('users', onlineCash, onlineUsers, offlineCash, offlineUsers);
 		if (!onlineCash) {
 			this.pasteMembersInDOMAndStore(onlineUsers, id, 'online');
 		}
