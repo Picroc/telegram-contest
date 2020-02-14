@@ -229,5 +229,12 @@
     &__name-and-status {
         display: grid;
         grid-template-rows: 20px 20px;
+
+        &__status {
+            font-size: 12px;
+        }
     }
+}
+.online {
+    color: var(--primary)
 }
