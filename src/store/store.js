@@ -134,6 +134,20 @@ export const updateDialogUnread = (id, count) => {
 	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_UNREAD, { id, count }));
 };
 
+export const UPDATE_DIALOG_SHORT = `UPDATE_DIALOG_SHORT`;
+export const updateDialogShort = (id, short) => {
+	const dialog = getDialog(id);
+	dialog.short = short;
+	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_SHORT, { id, short }));
+};
+
+export const UPDATE_DIALOG_DATE = `UPDATE_DIALOG_DATE`;
+export const updateDialogDate = (id, date) => {
+	const dialog = getDialog(id);
+	dialog.date = date;
+	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_DATE, { id, date }));
+};
+
 export const UPDATE_DIALOG_STATUS = `UPDATE_DIALOG_STATUS`;
 export const updateDialogStatus = (id, status) => {
 	const dialog = getDialog(id);
