@@ -48,6 +48,18 @@ $status-size: 16px;
     grid-template-columns: 60px 1fr;
     .message {
       grid-column: 2;
+      position: relative;
+      border-bottom-left-radius: 0 !important;
+
+      &::after {
+        background: url('./message-tail.svg');
+        position: absolute;
+        left: -9px;
+        content: '';
+        width: 11px;
+        height: 20px;
+        bottom: -1px;
+      }
     }
   }
 
@@ -80,6 +92,21 @@ $status-size: 16px;
 
   &_out {
     align-self: flex-end;
+    position: relative;
+
+    .message {
+      border-bottom-right-radius: 0 !important;
+      &::after {
+        background: url('./message-tail.svg');
+        position: absolute;
+        right: -9px;
+        content: '';
+        width: 11px;
+        height: 20px;
+        bottom: -1px;
+        transform: rotateY(180deg);
+      }
+    }
   }
 
   .message-content {
@@ -169,6 +196,7 @@ $status-size: 16px;
 }
 
 .chat-message_emoji {
+  font-size: 80px;
 }
 
 .chat-message_animated-sticker {
