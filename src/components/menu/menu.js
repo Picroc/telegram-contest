@@ -49,10 +49,11 @@ export default class Menu extends HTMLElement {
 	render() {
 		this.innerHTML = template;
 		this.menuList = this.querySelector('.menu-list');
-		this.menuIcon = this.querySelector('.menu__icon');
+		this.menuIcon = this.querySelector('.burger');
 		this.search = this.querySelector('.menu__search');
 		this.overlay = this.querySelector('.menu__search_overlay');
-		subscribe('.menu__checkbox')('click', this.menuClick);
+		this.checkbox = this.querySelector('.menu__checkbox');
+		this.checkbox.addEventListener('click', this.menuClick);
 		this.search.addEventListener('click', event => {
 			if (this.overlay.classList.contains('hide')) {
 				this.overlay.classList.toggle('hide');
@@ -111,6 +112,9 @@ export default class Menu extends HTMLElement {
 	};
 
 	menuClick = e => {
+		if (this.menuIcon.classList.contains('arrow')) {
+			return;
+		}
 		this.menuIcon.classList.toggle('menu__icon_active');
 		this.menuList.classList.toggle('popup_hidden');
 	};
