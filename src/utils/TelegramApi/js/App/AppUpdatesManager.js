@@ -199,11 +199,13 @@ export default class AppUpdatesManagerModule {
 
 		const to_id = message.to_id.user_id || message.to_id.chat_id || message.to_id.channel_id;
 
+		this.AppUsersManager.saveApiUsers(update.users);
+
 		const payload = {
 			_: 'newMessage',
 			from_id,
 			to_id,
-			message: message.message,
+			message: message._ === 'messageService' ? telegramApi._getServiceMessage(message).text : message.message,
 			message_info: this._checkMessageFlags(message.flags),
 			date: message.date,
 			id: message.id,
