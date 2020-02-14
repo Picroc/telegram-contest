@@ -5,9 +5,9 @@ import {
 	setActivePeer,
 	getUser,
 	getDialog,
-	setPeerMediaById,
-	updateDialog,
-	setActivePeerPhoto,
+	updateDialogUnread,
+	updateDialogShort,
+	updateDialogDate,
 } from '../../store/store';
 import {
 	htmlToElement,
@@ -15,6 +15,7 @@ import {
 	stopLoading,
 	createDiv,
 	getNotificationsModeBoolByPeer,
+	hide,
 } from '../../helpers/index';
 import chatMain from '../../pages/chat-main/index';
 import './user-dialogs.scss';
@@ -32,7 +33,7 @@ export const renderDialog = (component, archived = false) => dialog => {
 	const elem = htmlToElement(
 		`<my-dialog anim="ripple" class="dialog" id="dialog_${id}" archived="${archived}"></my-dialog>`
 	);
-	elem.addEventListener('click', () => loadDialog(component)(elem)(dialog));
+	elem.addEventListener('click', () => loadDialog(component)(elem)(id));
 
 	if (pinned) {
 		component.pinned.appendChild(elem);
@@ -42,8 +43,9 @@ export const renderDialog = (component, archived = false) => dialog => {
 	}
 };
 
-export const loadDialog = component => elem => async dialog => {
-	const { id, dialog_peer: peer, photo: avatar } = dialog;
+export const loadDialog = component => elem => async (dialogId, messageId) => {
+	const dialog = getDialog(dialogId);
+	let { id, dialog_peer: peer, photo: avatar } = dialog;
 	if (component.prevActive) {
 		if (component.prevId === id) {
 			return;
@@ -51,6 +53,9 @@ export const loadDialog = component => elem => async dialog => {
 			component.prevActive.classList.toggle('dialog_active');
 		}
 	}
+	telegramApi.readPeerHistory(id).then(() => {
+		updateDialogUnread(dialogId, 0);
+	});
 	component.prevActive = elem;
 	component.prevId = id;
 	const rightSidebar = document.querySelector('.right-sidebar');
@@ -75,33 +80,65 @@ export default class UserDialogs extends HTMLElement {
 		this.normal.id = 'normal_dialogs';
 		this.appendChild(this.pinned);
 		this.appendChild(this.normal);
-		telegramApi.subscribeToUpdates('messages', data => console.log('data', data));
 		telegramApi.subscribeToUpdates('dialogs', data => {
-			const { to_peer, from_peer, message, date } = data;
-			const time = telegramApi._convertDate(date);
-			let { id } = to_peer;
-			const dialog = document.getElementById(`dialog_${id}`);
-			if (to_peer._ === 'user' && from_peer._ === 'user' && !from_peer.pFlags.self) {
-				id = from_peer.id;
-			}
-			if (from_peer.id === getUser().id && from_peer.id !== to_peer.id) {
-				const info = dialog.querySelector('.dialog__info');
-				if (!info.querySelector('.dialog__out')) {
-					if (!this.out) {
-						this.out = htmlToElement(`<div class="dialog__out">${outSvg}</div>`);
-					}
-					info.querySelector('.dialog__time').classList.remove('full', true);
-					info.prepend(this.out);
-				}
-			}
-
-			dialog.querySelector('.dialog__short-msg').innerHTML = message;
-			dialog.querySelector('.dialog__time').innerHTML = time;
-			if (!getDialog(id).pinned) {
-				this.normal.prepend(dialog);
+			const { _: type } = data;
+			switch (type) {
+				case 'newMessage':
+					this.updateMessage(data);
 			}
 		});
 	}
+
+	updateMessage = data => {
+		const {
+			to_id,
+			from_id,
+			message,
+			date,
+			message_info: { out },
+		} = data;
+		let id = from_id;
+		const { id: myId } = getUser();
+		if (to_id && to_id !== myId) {
+			id = to_id;
+		}
+		const dialog = getDialog(id);
+		if (!dialog) {
+			return;
+		}
+		const { archived, unreadCount, pinned } = dialog;
+		if (archived) {
+			return;
+		}
+		const time = telegramApi._convertDate(date);
+		const dialogElem = document.getElementById(`dialog_${id}`);
+		const info = dialogElem.querySelector('.dialog__info');
+		if (out) {
+			if (!info.querySelector('.dialog__out')) {
+				if (!this.out) {
+					this.out = htmlToElement(`<div class="dialog__out">${outSvg}</div>`);
+				}
+				info.querySelector('.dialog__time').classList.remove('full', true);
+				info.prepend(this.out);
+			}
+		} else if (to_id !== from_id) {
+			const out = info.querySelector('.dialog__out');
+			const time = info.querySelector('.dialog__time');
+			time.classList.add('full');
+			if (out) {
+				out.remove();
+			}
+			updateDialogUnread(id, Number(unreadCount) + 1);
+		}
+
+		dialogElem.querySelector('.dialog__short-msg').innerHTML = message;
+		dialogElem.querySelector('.dialog__time').innerHTML = time;
+		updateDialogShort(id, message);
+		updateDialogDate(id, date);
+		if (!pinned) {
+			this.normal.prepend(dialogElem);
+		}
+	};
 
 	setListener = event => {
 		getDialogs().forEach(this.renderDialog);
@@ -109,6 +146,7 @@ export default class UserDialogs extends HTMLElement {
 
 	updateListener = event => {
 		const dialogs = getDialogs(event.detail.length);
+		console.log('dialogs', dialogs);
 		dialogs.forEach(this.renderDialog);
 	};
 

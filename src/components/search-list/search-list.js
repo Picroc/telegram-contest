@@ -1,6 +1,6 @@
-import { searchContainer, person } from './search-list.html.js';
+import { searchContainer, person, messageResult } from './search-list.html.js';
 import './search-list.scss';
-import { htmlToElement } from '../../helpers/index.js';
+import { htmlToElement, hide, show } from '../../helpers/index.js';
 import {
 	getDialogs,
 	getUser,
@@ -18,9 +18,7 @@ export default class SearchList extends HTMLElement {
 		this.id = 'search-list';
 		this.className = 'search-list search-list_hidden hide';
 		this.appendChild(htmlToElement(searchContainer('People')));
-		this.appendChild(htmlToElement(searchContainer('Recent')));
 		this.people = document.getElementById('search-list__people');
-		this.recent = document.getElementById('search-list__recent');
 		this.search = document.getElementById('search');
 		this.addEventListener(SET_DIALOGS, this.peopleRender);
 		this.addEventListener(APPEND_DIALOGS, this.peopleRender);
@@ -49,18 +47,69 @@ export default class SearchList extends HTMLElement {
 				if (type === 'peerUser' && id != user_id) {
 					const p = htmlToElement(person(dialog));
 					p.addEventListener(UPDATE_DIALOG_PHOTO, this.updatePhotoListener);
-					p.addEventListener('click', () => this.loadDialog(p)(dialog));
+					p.addEventListener('click', () => this.loadDialog(p)(user_id));
 					this.people.appendChild(p);
 				}
 			});
 		}
 	};
 
+	highlightText = (text, searchValue) => {
+		const reg = new RegExp(searchValue, 'gi');
+		return text.replace(reg, str => `<span class="message-result__message_highlighted">${str}</span>`);
+	};
+
+	showOne = elem => {
+		Array.from(elem.parentNode.parentNode.chidlren, container => {
+			if (container !== elem) {
+				hide(container);
+			} else {
+				show(elem);
+			}
+		});
+	};
+
 	searchUpdate = async event => {
 		const { value, peerId } = this.search;
-		if (peerId) {
-			const result = await telegramApi.searchPeerMessages(peerId, value);
-			console.log('result', result);
+		if (value === '') {
+			this.innerHTML = '';
+			this.render();
+			this.className = 'search-list';
+			this.peopleRender();
+		} else {
+			this.innerHTML = '';
+			this.appendChild(htmlToElement(searchContainer('Global search', 'global-message')));
+			const globalSearch = document.getElementById('search-list__global-message');
+			const result = await telegramApi.searchMessagesGlobal(value);
+			if (result.length > 0) {
+				const resultHTML = await result.map(async dialog => {
+					const avatar = await dialog.photo;
+					let {
+						_: type,
+						title,
+						from_name: from,
+						text,
+						date,
+						to_peer: { id: tid },
+						from_peer: { id: fid },
+						id: messageId,
+					} = dialog;
+					date = new Date(date * 1000);
+					date = date.toLocaleString('en-US', { month: 'short', day: 'numeric' });
+					text = this.highlightText(text, value);
+
+					const resHtml = htmlToElement(messageResult({ avatar, title, text, date, from }));
+					const dialogId = type === 'pm' ? fid : tid;
+					resHtml.addEventListener('click', () => this.loadDialog(resHtml)(dialogId, messageId));
+					return resHtml;
+				});
+
+				globalSearch.innerHTML = '';
+
+				resultHTML.forEach(async html => {
+					globalSearch.appendChild(await html);
+				});
+			}
 		}
 	};
 

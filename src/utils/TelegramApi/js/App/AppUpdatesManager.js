@@ -2,6 +2,7 @@ import MtpNetworkerFactoryModule from '../Mtp/MtpNetworkerFactory';
 import { telegramApi } from '../../../../App';
 import { Config } from '../lib/config';
 import { dT } from '../lib/utils';
+import AppUsersManagerModule from './AppUsersManager';
 
 export default class AppUpdatesManagerModule {
 	subscribed = {
@@ -12,6 +13,7 @@ export default class AppUpdatesManagerModule {
 	};
 
 	MtpNetworkerFactory = MtpNetworkerFactoryModule();
+	AppUsersManager = new AppUsersManagerModule();
 
 	_checkFlag = (flags, idx) => {
 		return (flags & (2 ** idx)) === 2 ** idx;
@@ -66,9 +68,19 @@ export default class AppUpdatesManagerModule {
 					this._handleNewUserMessage(update);
 					break;
 				case 'updateUserStatus':
-					// console.log(telegramApi.AppUsersManager.getUser(update.user_id));
+					this._handleUserStatus(update);
+					break;
+				case 'updateChatUserTyping':
+				case 'updateUserTyping':
+					console.log(update);
+					this._handleUserTyping(update);
+					break;
+				case 'updateChatParticipantAdd':
+					break;
+				case 'updateChatParticipantDelete':
 					break;
 				default:
+					console.log('UNHANDLED', update);
 			}
 		};
 		if (data.updates) {
@@ -78,7 +90,72 @@ export default class AppUpdatesManagerModule {
 		}
 	};
 
-	_handleNewUserMessage = async message => {};
+	_handleUserStatus = async update => {
+		const payload = {
+			_: 'userStatus',
+			user_id: update.user_id,
+			online: update.status._ === 'userStatusOnline',
+		};
+
+		this._dispatchForDialogs(payload);
+	};
+
+	_handleUserTyping = async update => {
+		const user = this.AppUsersManager.getUser(update.user_id);
+
+		const payload = {
+			_: update._ === 'updateUserTyping' ? 'userTyping' : 'chatTyping',
+			user_id: update.user_id,
+			chat_id: update.chat_id,
+			from_name: user.first_name,
+		};
+
+		let action;
+		switch (update.action._) {
+			case 'sendMessageTypingAction':
+				action = 'is typing';
+				break;
+			case 'sendMessageRecordVideoAction':
+				action = 'is recording video';
+				break;
+			case 'sendMessageUploadVideoAction':
+				action = 'is uploading video';
+				break;
+			case 'sendMessageRecordAudioAction':
+				action = 'is recording voice message';
+				break;
+			case 'sendMessageUploadAudioAction':
+				action = 'is uploading audio';
+				break;
+			case 'sendMessageUploadPhotoAction':
+				action = 'is uploading photo';
+				break;
+			case 'sendMessageUploadDocumentAction':
+				action = 'is uploading document';
+				break;
+			case 'sendMessageGeoLocationAction':
+				action = 'is sharing geo location';
+				break;
+			case 'sendMessageChooseContactAction':
+				action = 'is sharing contact';
+				break;
+			case 'sendMessageGamePlayAction':
+				action = 'is playing a game';
+				break;
+			case 'sendMessageRecordRoundAction':
+				action = 'is recording a story';
+				break;
+			case 'sendMessageUploadRoundAction':
+				action = 'is uploading a story';
+				break;
+			default:
+				action = '';
+		}
+
+		payload.action = action;
+
+		this._dispatchForDialogs(payload);
+	};
 
 	_handleNewChatMessage = async message => {
 		const { from_id, chat_id, message: text, date, id, flags } = message;

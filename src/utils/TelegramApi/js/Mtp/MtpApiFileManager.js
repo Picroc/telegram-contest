@@ -174,8 +174,15 @@ export default function MtpApiFileManagerModule() {
 		cachedDownloads[id] = blob;
 	};
 
+	const saveDownloadingPromise = (id, promise = new Promise()) => {
+		cachedDownloadPromises[id] = promise;
+		promise.then(() => {
+			delete cachedDownloadPromises[id];
+		});
+	};
+
 	const getLocalFile = id => {
-		return cachedDownloads[id];
+		return cachedDownloads[id] || cachedDownloadPromises[id];
 	};
 
 	return {
@@ -184,5 +191,6 @@ export default function MtpApiFileManagerModule() {
 		uploadFile,
 		saveLocalFile,
 		getLocalFile,
+		saveDownloadingPromise,
 	};
 }

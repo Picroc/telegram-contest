@@ -79,6 +79,10 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+
+    &_from {
+      color: var(--black);
+    }
   }
 
   &__info {
@@ -119,7 +123,7 @@
     justify-content: center;
   }
 
-  &__pinned {
+  &_pinned {
     background-color: var(--pinned);
     width: 24px;
     border-radius: 50%;
