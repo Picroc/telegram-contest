@@ -57,6 +57,13 @@ export default class DocumentMessage extends HTMLElement {
 
 	getVideoDocument(doc) {
 		console.log(doc);
+		const attrs = doc.attributes.filter(el => el._ === 'documentAttributeVideo')[0];
+		const isRound = telegramApi._checkFlag(attrs.flags, 0);
+		setZeroTimeout(() => {
+			if (isRound) {
+				this.querySelector('.document-message__video').classList.add('document-message__video_round');
+			}
+		});
 		this.addEventListener('click', () => {
 			if (!this.loading) {
 				this.loading = true;
@@ -76,14 +83,37 @@ export default class DocumentMessage extends HTMLElement {
 					vid.src = video_data;
 					vid.width = 300;
 					vid.height = 300;
-					vid.controls = 'controls';
-					vid.autoplay = true;
+					vid.controls = isRound ? '' : 'controls';
+					vid.autoplay = false;
 					stopLoadingProgress(videoPlaceholder);
 					videoPlaceholder.appendChild(vid);
+
+					if (isRound) {
+						const progressContainer = document.createElement('div');
+						progressContainer.style = 'position: absolute; width: 100%; height: 100%; top: 0; left: 0;';
+						videoPlaceholder.appendChild(progressContainer);
+						startLoadingProgress(progressContainer, false, vid.width, false);
+						vid.ontimeupdate = () => {
+							setLoadingProgress(progressContainer, (vid.currentTime / vid.duration) * 100);
+						};
+						let isPlaying = false;
+						progressContainer.addEventListener('click', () => {
+							if (isPlaying) {
+								vid.pause();
+								isPlaying = false;
+							} else {
+								vid.play();
+								isPlaying = true;
+							}
+						});
+						vid.onended = () => {
+							isPlaying = false;
+						};
+					}
 				});
 			});
 		});
-		return `<div style='width: 300px; height: 300px;background: url("https://riggswealth.com/wp-content/uploads/2016/06/Riggs-Video-Placeholder.jpg"); background-position: center center;' class='document-message__video'></div>`;
+		return `<div style='position: relative; width: 300px; height: 300px;background: url("https://riggswealth.com/wp-content/uploads/2016/06/Riggs-Video-Placeholder.jpg"); background-position: center center;' class='document-message__video'></div>`;
 	}
 
 	getAnimatedSticker(doc) {

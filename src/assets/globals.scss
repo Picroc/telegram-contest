@@ -81,7 +81,7 @@ video:focus {
   display: flex;
   justify-content: center;
   align-items: center;
-  & svg {
+  &_spin svg {
     animation: spin 3s linear infinite;
   }
 

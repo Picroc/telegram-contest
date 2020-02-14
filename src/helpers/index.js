@@ -71,25 +71,33 @@ export const startLoading = elem => {
 	elem.classList.add('loading');
 };
 
-export const startLoadingProgress = elem => {
-	elem.innerHTML = '';
+export const startLoadingProgress = (elem, spin = true, size = 120, clear = true) => {
+	if (clear) {
+		elem.innerHTML = '';
+	}
 	elem.classList.add('loading_progress');
+	if (spin) {
+		elem.classList.add('loading_progress_spin');
+	}
+
+	const radiusRatio = 56 / 120;
 
 	let circle;
 
 	if (!elem.querySelector('.progress-ring')) {
 		const svg = htmlToElement(`<svg
 		class="progress-ring"
-		width="120"
-		height="120">
+		width="${size}"
+		height="${size}">
 	   <circle
 		 class="progress-ring__circle"
-		 stroke="black"
+		 stroke="${spin ? 'black' : 'white'}"
+		 stroke-opacity="0.4"
 		 stroke-width="4"
 		 fill="transparent"
-		 r="52"
-		 cx="60"
-		 cy="60"/>
+		 r="${size * radiusRatio}"
+		 cx="${size / 2}"
+		 cy="${size / 2}"/>
 	 </svg>`);
 
 		elem.appendChild(svg);
@@ -118,6 +126,9 @@ export const setLoadingProgress = (elem, progress = 0) => {
 export const stopLoadingProgress = elem => {
 	elem.innerHTML = '';
 	elem.classList.remove('loading_progress');
+	if (elem.classList.contains('loading_progress_spin')) {
+		elem.classList.remove('loading_progress_spin');
+	}
 };
 
 export const stopLoading = elem => {
