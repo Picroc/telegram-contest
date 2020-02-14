@@ -6,17 +6,18 @@ import sending from './sending.svg';
 import sendingError from './sending-error.svg';
 import { clsx, tc, cc } from '../../helpers';
 import { telegramApi } from '../../App';
+import { outSvg, outNotReadSvg } from '../user-dialogs/dialog/dialog.html';
 
 export default ({
 	id,
-	date,
+	time,
 	toId,
 	userId,
 	message,
 	views = 0,
 	media = null,
 	entities = null,
-	out = true,
+	out = false,
 	post = false,
 	silent = false,
 	mentioned = false,
@@ -33,32 +34,33 @@ export default ({
 	media_unread: mediaUnread = false,
 	from_scheduled: fromScheduled = false,
 	post_author: postAuthor = '',
+	withAvatar,
 }) => {
-	const isOutgoing = out && fromId === userId;
+	const isOutgoing = out;
 	const hasMedia = !!media;
-
-	const chatMessageClass = clsx(
-		'chat-message',
-		tc('chat-message_out', 'chat-message_in', isOutgoing),
-		cc('chat-message_post', post),
-		cc('chat-message_post_out_last', isLastFromUser && isOutgoing),
-		cc('chat-message_post_in_last', isLastFromUser && !isOutgoing)
-	);
 
 	let photoMedia = '';
 	if (hasMedia) {
 		const fullMessageMedia = getFullMessageMediaTemplate(media, id);
 		if (fullMessageMedia.length !== 0) {
-			return `<div class=${chatMessageClass + 'chat-message_full-media'}>
+			return `
                 ${fullMessageMedia}
-                </div>`;
+                `;
 		}
 		const { _: mediaType, photo = {}, photos = [] } = media;
+		const messageInfo = !message
+			? `<div class="${clsx(
+				'message__info',
+				!message && hasMedia && 'message__info_media_no-message'
+			)}">${time}</div>`
+			: '';
 
 		if (mediaType === 'messageMediaPhoto') {
 			const photoElemList = photos.reduce((accum, currentPhoto) => (accum += getPhotoTemplate(currentPhoto)), ``);
 			const photoElem = getPhotoTemplate(photo);
-			photoMedia = `<div class="chat-message__photo-media">${photoElemList || photoElem}</div>`;
+			const photoCls = clsx('chat-message__photo-media', message && 'chat-message__photo-media_with_message');
+
+			photoMedia = `<div class="${photoCls}">${photoElemList || photoElem} ${messageInfo} </div>`;
 		}
 		// TODO implement logic for messageMediaWebPage
 	}
@@ -66,15 +68,14 @@ export default ({
 	const forward = (forwardFrom && `<div>Was forwarded from ${forwardFrom}</div>`) || '';
 	const reply = (replyToMessageId && `<div class='chat-message__reply'>Reply to ${replyToMessageId}</div>`) || '';
 
-	const formattedMessage = getFormattedMessage({ message, entities });
+	const formattedMessage = getFormattedMessage({ message, entities, time });
 
 	// TODO add handlers for reply & message
 	return `
-        <div class=${chatMessageClass}>
             ${reply}
             ${photoMedia}
-            ${formattedMessage}
-        </div>`;
+			${formattedMessage}
+        `;
 };
 
 const getFullMessageMediaTemplate = ({ _: mediaType }, messageId) => {
@@ -128,7 +129,7 @@ const getPhotoTemplate = photo => {
 };
 
 // TODO implement formatted message
-const getFormattedMessage = ({ message, entities = [] }) => {
+const getFormattedMessage = ({ message, entities = [], time, out, outRead }) => {
 	if (!message) {
 		return '';
 	}
@@ -148,7 +149,11 @@ const getFormattedMessage = ({ message, entities = [] }) => {
 			}
 		});
 
-	return (message && `<div class="message"><p>${formatted}</p></div>`) || '';
+	const messageInfo = `<div class="${clsx(
+		'message__info',
+		!message && hasMedia && 'message__info_media_no-message'
+	)}">${time}</div>`;
+	return (message && `<div class="message">${formatted} ${messageInfo}</div>`) || '';
 };
 
 const isEmoji = message => {
