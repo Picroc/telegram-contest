@@ -114,6 +114,11 @@ export default class Menu extends HTMLElement {
 	menuClick = e => {
 		e.cancelBubble = true;
 		if (this.menuIcon.classList.contains('arrow')) {
+			this.search.value = '';
+			this.overlay.classList.toggle('hide');
+			this.menuIcon.classList.toggle('arrow');
+			this.menuIcon.classList.toggle('burger');
+			document.getElementById('search-list').searchUpdate(e);
 			return;
 		}
 		this.menuIcon.classList.toggle('menu__icon_active');

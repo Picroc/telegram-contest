@@ -1,6 +1,12 @@
 import './dialog.scss';
 import template, { pinnedSvg } from './dialog.html.js';
-import { UPDATE_DIALOG_PHOTO, updateDialogPhoto, getDialog, UPDATE_DIALOG_UNREAD } from '../../../store/store';
+import {
+	UPDATE_DIALOG_PHOTO,
+	updateDialogPhoto,
+	getDialog,
+	UPDATE_DIALOG_UNREAD,
+	UPDATE_DIALOG_STATUS,
+} from '../../../store/store';
 
 export default class Dialog extends HTMLElement {
 	render() {
@@ -14,12 +20,23 @@ export default class Dialog extends HTMLElement {
 		this.dialog = dialog;
 		this.innerHTML = template(dialog);
 		this.rightBottom = this.querySelector('.dialog_right_bottom');
+		this.avatar = this.querySelector('.dialog__avatar-wrapper');
 		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updateDialogPhotoListener);
 		this.addEventListener(UPDATE_DIALOG_UNREAD, this.updateDialogUnreadListener);
+		this.addEventListener(UPDATE_DIALOG_STATUS, this.updateDialogStatusListener);
 	}
 
 	updateDialogListener = event => {
 		this.render();
+	};
+
+	updateDialogStatusListener = ({ status }) => {
+		const {
+			dialog_peer: { _: type },
+		} = this.dialog;
+		if (type === 'peerUser') {
+			this.avatar.classList.toggle('dialog__avatar_online', status);
+		}
 	};
 
 	updateDialogUnreadListener = event => {
@@ -46,7 +63,7 @@ export default class Dialog extends HTMLElement {
 	updateDialogPhotoListener = event => {
 		event.preventDefault();
 		const { id } = event.detail;
-		const elem = this.querySelector('.dialog__avatar-wrapper img');
+		const elem = this.avatar.querySelector('img');
 		if (elem) {
 			elem.src = getDialog(id).photo;
 		}
