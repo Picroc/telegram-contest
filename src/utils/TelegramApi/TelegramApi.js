@@ -254,6 +254,20 @@ export default class TelegramApi {
 		});
 	};
 
+	readPeerHistory = async peer_id => {
+		const peer = this.mapPeerToTruePeer(await this.getPeerByID(peer_id));
+
+		if (peer._ === 'inputPeerChannel') {
+			return this.invokeApi('channels.readHistory', {
+				channel: this.mapPeerToInputPeer(peer),
+			});
+		}
+
+		return this.invokeApi('messages.readHistory', {
+			peer,
+		});
+	};
+
 	deleteMessages = ids => {
 		if (!isArray(ids)) {
 			ids = [ids];
@@ -904,7 +918,7 @@ export default class TelegramApi {
 			});
 
 			return { onlineUsers, offlineUsers };
-		} else if (chat.full_chat._ === 'channelFull') {
+		} else if (chat && chat.full_chat && chat.full_chat._ === 'channelFull') {
 			const channel_peer = await this.getPeerByID(chat_id, 'chat');
 
 			if (!this._checkFlag(channel_peer.flags, 8)) {
@@ -1455,20 +1469,19 @@ export default class TelegramApi {
 
 	_getStickerData = async (sticker, id) => {
 		if (!(sticker instanceof Array)) {
-			console.log('GOT CACHED', sticker);
+			Config.Modes.debug && console.log('GOT CACHED', sticker);
 			return sticker;
 		}
 		const decoded_text = new TextDecoder('utf-8').decode(await pako.inflate(sticker[0]));
 		const data = JSON.parse(decoded_text);
 		if (id) {
-			console.log('SAVING', data);
+			Config.Modes.debug && console.log('SAVING', data);
 			this.MtpApiFileManager.saveLocalFile(id, { bytes: data });
 		}
 		return data;
 	};
 
 	setStickerToContainer = (sticker, container, cacheId) => {
-		console.log(sticker, cacheId);
 		this._getStickerData(sticker.bytes, cacheId).then(st => {
 			lottie.loadAnimation({
 				container: container,
@@ -1503,7 +1516,6 @@ export default class TelegramApi {
 	};
 
 	_getImageData = async (bytes, id) => {
-		console.log('SOME BYTES', typeof bytes);
 		if (!(bytes instanceof Uint8Array)) {
 			return bytes;
 		}
