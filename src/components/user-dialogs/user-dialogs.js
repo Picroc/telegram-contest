@@ -109,7 +109,6 @@ export default class UserDialogs extends HTMLElement {
 		const dialogElem = document.getElementById(`dialog_${id}`);
 		const info = dialogElem.querySelector('.dialog__info');
 		if (out) {
-			id = to_id;
 			if (!info.querySelector('.dialog__out')) {
 				if (!this.out) {
 					this.out = htmlToElement(`<div class="dialog__out">${outSvg}</div>`);
