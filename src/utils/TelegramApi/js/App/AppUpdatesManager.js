@@ -158,14 +158,14 @@ export default class AppUpdatesManagerModule {
 	};
 
 	_handleNewChatMessage = async message => {
-		const { from_id, chat_id, message: text, date, id, flags } = message;
+		const { from_id, chat_id, date, id, flags } = message;
 
 		const payload = {
 			_: 'newMessage',
 			from_id,
 			to_id: chat_id,
 			date,
-			message: text,
+			message: telegramApi._getMessageText(message),
 			id,
 			message_info: this._checkMessageFlags(flags),
 		};
@@ -175,13 +175,13 @@ export default class AppUpdatesManagerModule {
 	};
 
 	_handleNewUserMessage = async message => {
-		const { user_id, message: text, date, id, flags } = message;
+		const { user_id, date, id, flags } = message;
 
 		const payload = {
 			_: 'newMessage',
 			from_id: user_id,
 			date,
-			message: text,
+			message: telegramApi._getMessageText(message),
 			id,
 			message_info: this._checkMessageFlags(flags),
 		};
@@ -205,7 +205,10 @@ export default class AppUpdatesManagerModule {
 			_: 'newMessage',
 			from_id,
 			to_id,
-			message: message._ === 'messageService' ? telegramApi._getServiceMessage(message).text : message.message,
+			message:
+				message._ === 'messageService'
+					? telegramApi._getServiceMessage(message).text
+					: telegramApi._getMessageText(message),
 			message_info: this._checkMessageFlags(message.flags),
 			date: message.date,
 			id: message.id,

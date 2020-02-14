@@ -535,6 +535,14 @@ export default class TelegramApi {
 			peer: this.mapPeerToTruePeer(peer),
 			limit,
 			offset_id: offsetId,
+		}).then(res => {
+			const messages = res.messages.map((msg, idx) => {
+				if (idx === 0) {
+					return { prepend: false, ...msg };
+				}
+				return { prepend: Math.abs(msg.date - res.messages[idx - 1].date) < 60, ...msg };
+			});
+			return { ...res, messages };
 		});
 	};
 
@@ -633,7 +641,6 @@ export default class TelegramApi {
 	getPeerPhotos = async (peer_id, offset = 0, limit = 30) => {
 		return this.searchPeerMessages(peer_id, '', { _: 'inputMessagesFilterPhotos' }, limit).then(messages => {
 			const msg_photos = [];
-			console.log('MSGS', messages);
 
 			messages.messages.forEach(msg => {
 				msg_photos.push({
@@ -1235,7 +1242,6 @@ export default class TelegramApi {
 		}
 
 		const { action } = message;
-		console.log(action);
 
 		switch (action._) {
 			case 'messageActionChatJoinedByLink':

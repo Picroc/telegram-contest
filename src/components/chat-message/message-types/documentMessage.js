@@ -39,6 +39,7 @@ export default class DocumentMessage extends HTMLElement {
 				return this.getSticker(document);
 			case 'video/quicktime':
 			case 'video/mp4':
+			case 'video/x-msvideo':
 				return this.getVideoDocument(document);
 			default:
 				// console.log('UNDEFINED', document);
@@ -48,6 +49,9 @@ export default class DocumentMessage extends HTMLElement {
 
 	getDocument(doc) {
 		// console.log('JUST DOC', doc);
+		this.addEventListener('click', () => {
+			telegramApi.downloadDocument(doc, null, true);
+		});
 		return `<div class='document-message__document'>${docIcon()} <p>${doc.attributes[0].file_name}</p></div>`;
 	}
 

@@ -2,7 +2,7 @@ import MtpApiManagerModule from './MtpApiManager';
 import { Config } from '../lib/config';
 import { nextRandomInt } from '../lib/bin_utils';
 import { dT } from '../lib/utils';
-import { noop } from '../Etc/Helper';
+import { noop, isFunction } from '../Etc/Helper';
 
 export default function MtpApiFileManagerModule() {
 	let cachedFs = false;
@@ -61,7 +61,7 @@ export default function MtpApiFileManagerModule() {
 		);
 	};
 
-	const uploadFile = file => {
+	const uploadFile = (file, progress) => {
 		let fileSize = file.size,
 			isBigFile = fileSize >= 10485760,
 			canceled = false,
@@ -72,6 +72,10 @@ export default function MtpApiFileManagerModule() {
 
 		if (!fileSize) {
 			return Promise.reject({ type: 'EMPTY_FILE' });
+		}
+
+		if (!isFunction(progress)) {
+			progress = noop;
 		}
 
 		if (fileSize > 67108864) {
@@ -147,6 +151,7 @@ export default function MtpApiFileManagerModule() {
 										} else {
 											Config.Modes.debug &&
 												console.log(dT(), 'Progress', (doneParts * partSize) / fileSize);
+											progress(offset < fileSize ? offset : fileSize, fileSize);
 											// resolve({ done: doneParts * partSize, total: fileSize });
 										}
 									}, errorHandler);
