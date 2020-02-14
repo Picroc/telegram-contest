@@ -23,11 +23,9 @@ export default class Dialog extends HTMLElement {
 	};
 
 	updateDialogUnreadListener = event => {
-		console.log('event', event);
 		event.preventDefault();
 		const { id, count } = event.detail;
 		const dialog = getDialog(id);
-		console.log('dialog', dialog);
 
 		if (count > 0 && dialog.pinned) {
 			this.rightBottom.classList.remove('dialog_pinned');

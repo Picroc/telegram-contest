@@ -7,6 +7,7 @@ import sendingError from './sending-error.svg';
 import { clsx, tc, cc } from '../../helpers';
 import { telegramApi } from '../../App';
 import { outSvg, outNotReadSvg } from '../user-dialogs/dialog/dialog.html';
+import { startLoading, stopLoading } from '../../helpers/index';
 
 export default ({
 	id,
@@ -116,13 +117,17 @@ const getPhotoTemplate = photo => {
 	const [strippedSize, normalSize, ...largeSizes] = sizes;
 	const { w: width, h: height } = normalSize;
 
-	telegramApi.getPhotoPreview(photo).then(data => {
-		const container = document.getElementById(id);
-		const img = document.createElement('img');
-		img.style = 'width: 100%; height: 100%';
-		img.src = data;
+	setZeroTimeout(() => {
+		startLoading(document.getElementById(id));
+		telegramApi.getPhotoPreview(photo).then(data => {
+			const container = document.getElementById(id);
+			const img = document.createElement('img');
+			img.style = 'width: 100%; height: 100%';
+			img.src = data;
 
-		container.appendChild(img);
+			stopLoading(container);
+			container.appendChild(img);
+		});
 	});
 	return `<div id="${id}" style="width: ${width}px;height: ${height}px;background: #fafafa"></div>`;
 	// TODO implement logic for all other sizes

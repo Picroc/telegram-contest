@@ -535,6 +535,14 @@ export default class TelegramApi {
 			peer: this.mapPeerToTruePeer(peer),
 			limit,
 			offset_id: offsetId,
+		}).then(res => {
+			const messages = res.messages.map((msg, idx) => {
+				if (idx === 0) {
+					return { prepend: false, ...msg };
+				}
+				return { prepend: Math.abs(msg.date - res.messages[idx - 1].date) < 60, ...msg };
+			});
+			return { ...res, messages };
 		});
 	};
 
@@ -633,7 +641,6 @@ export default class TelegramApi {
 	getPeerPhotos = async (peer_id, offset = 0, limit = 30) => {
 		return this.searchPeerMessages(peer_id, '', { _: 'inputMessagesFilterPhotos' }, limit).then(messages => {
 			const msg_photos = [];
-			console.log('MSGS', messages);
 
 			messages.messages.forEach(msg => {
 				msg_photos.push({
@@ -1198,7 +1205,7 @@ export default class TelegramApi {
 				}
 			} else {
 				msg_type = 'pm';
-				title = from_peer.first_name + ' ' + from_peer.last_name;
+				title = (from_peer.first_name + ' ' + (from_peer.last_name || '')).trim();
 
 				if (out) {
 					photo = this.getUserPhoto();
@@ -1222,12 +1229,80 @@ export default class TelegramApi {
 		};
 	};
 
+	_getServiceMessage = message => {
+		const from_peer = this.AppUsersManager.getUser(message.from_id);
+		const result = {};
+
+		let name;
+
+		if (from_peer.id === this.user.id) {
+			name = 'You';
+		} else {
+			name = (from_peer.first_name + ' ' + (from_peer.last_name || '')).trim();
+		}
+
+		const { action } = message;
+
+		switch (action._) {
+			case 'messageActionChatJoinedByLink':
+				result.text = name + ' joined the group via invite link';
+				break;
+			case 'messageActionChatCreate':
+				result.text = name + ' created the chat';
+				break;
+			case 'messageActionChatEditTitle':
+				result.text = name + ' changed the chat title to ' + action.title;
+				break;
+			case 'messageActionChatEditPhoto':
+				result.text = name + ' changed the chat photo';
+				result.photo = this.getPhotoPreview(action.photo);
+				break;
+			case 'messageActionChatDeletePhoto':
+				result.text = name + ' deleted the chat photo';
+				break;
+			case 'messageActionChatAddUser':
+				result.text = action.users.reduce((prev, user) => {
+					const new_peer = this.AppUsersManager.getUser(user);
+					if (new_peer.id === from_peer.id) {
+						return (prev || '') + name + ' joined the group\n';
+					}
+					return (
+						(prev || '') + name + ' added ' + new_peer.first_name + ' ' + (new_peer.last_name || '') + '\n'
+					);
+				}, 0);
+				break;
+			case 'messageActionChatDeleteUser':
+				const deleted_peer = this.AppUsersManager.getUser(action.user_id);
+				if (from_peer.id === deleted_peer.id) {
+					result.text = name + ' left the group';
+				} else {
+					result.text = name + ' removed ' + deleted_peer.first_name;
+				}
+				break;
+			case 'messageActionChannelCreate':
+				result.text = 'Channel was created';
+				break;
+			case 'messageActionPinMessage':
+				result.text = name + ' pinned the message';
+				break;
+			case 'messageActionPhoneCall':
+				result.text = 'Incoming call';
+				result.duration = action.duration;
+				break;
+			case 'messageActionContactSignUp':
+				result.text = name + ' just joined the Telegram!';
+				break;
+		}
+
+		return result;
+	};
+
 	_getMessageText = message => {
 		let text = message.message;
 
 		if (!text || (message.media && message.media._ !== 'messageMediaEmpty')) {
 			if (message._ === 'messageService') {
-				text = 'Service message';
+				text = this._getServiceMessage(message).text;
 			} else {
 				const type = message.media && message.media._;
 				const getDocumentText = media => {

@@ -125,6 +125,8 @@ export const updateDialogPhoto = (id, photo) => {
 	if (topBar && topBar.getAttribute('user_id') == id) {
 		topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_PHOTO, { id }));
 	}
+	const rightSidebar = document.querySelector('.right-sidebar');
+	rightSidebar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_PHOTO, { id, avatar: photo }));
 };
 
 export const UPDATE_DIALOG_UNREAD = `UPDATE_DIALOG_UNREAD`;
@@ -157,7 +159,7 @@ export const updateDialogStatus = (id, status) => {
 	if (topBar && topBar.getAttribute('user_id') == id) {
 		topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, { id }));
 	}
-	const rightSidebar = document.getElementById('right-sidebar');
+	const rightSidebar = document.querySelector('.right-sidebar');
 	rightSidebar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, status));
 };
 
@@ -275,7 +277,7 @@ export const mapId = id => window.store.mapId[id];
 export const SET_ACTIVE_PEER = 'SET_ACTIVE_PEER';
 export const setActivePeer = peer => {
 	window.store.activePeer = peer;
-	document.getElementById('right-sidebar').dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER, peer));
+	document.querySelector('.right-sidebar').dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER, peer));
 };
 
 export const getActivePeer = () => {
@@ -289,7 +291,7 @@ export const setPeerMediaById = (id, media, update = false, dispatchEvent = true
 		console.log(`Filling peer ${id} with array of media promises`);
 		window.store.mapMaterails['media'][id].promisedStructure = media;
 		if (dispatchEvent) {
-			document.getElementById('right-sidebar').dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER_MEDIA, id));
+			document.querySelector('.right-sidebar').dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER_MEDIA, id));
 		}
 	}
 };
