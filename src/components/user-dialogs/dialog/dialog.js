@@ -23,6 +23,7 @@ export default class Dialog extends HTMLElement {
 	};
 
 	updateDialogUnreadListener = event => {
+		console.log('event', event);
 		event.preventDefault();
 		const { id, count } = event.detail;
 		const dialog = getDialog(id);
@@ -38,6 +39,9 @@ export default class Dialog extends HTMLElement {
 			this.rightBottom.classList.remove('dialog__unread-count');
 			this.rightBottom.classList.add('dialog_pinned');
 			this.rightBottom.innerHTML = pinnedSvg;
+		} else {
+			this.rightBottom.classList.remove('dialog__unread-count');
+			this.rightBottom.innerHTML = '';
 		}
 	};
 
