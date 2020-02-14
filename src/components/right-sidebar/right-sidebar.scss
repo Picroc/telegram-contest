@@ -3,7 +3,7 @@
     background: var(--white);
     z-index: 10;
     width: 25vw;
-    min-width: 300px;
+    min-width: 306px;
     transition: 0.1s;
     overflow: auto;
 
@@ -12,9 +12,14 @@
         min-width: 0;
     }
 
+    &__icon {
+        width: 20px;
+        height: 20px;
+    }
+
     display: grid;
     grid-template-columns: 60px 1fr 60px;
-    grid-template-rows: 60px 150px auto 60px auto;
+    grid-template-rows: 50px 150px auto 60px auto;
     grid-template-areas:
         "back title more"
         "info info info"
@@ -40,13 +45,13 @@
     &__info {
         grid-area: info;
 
-        align-self: center;
         display: grid;
         justify-items: center;
-
+        align-items: start;
     }
 
     &__name {
+        align-self: center;
         font-weight: bolder;
     }
 
@@ -100,6 +105,8 @@
         &__icon {
             align-self: center;
             justify-self: center;
+            width: 20px;
+            height: 20px;
         }
 
         &__text {
@@ -176,7 +183,7 @@
             display: grid;
             grid-template-columns: repeat(3,32%);
             grid-auto-rows: 100px;
-            column-gap: 2px;
+            column-gap: 3px;
             row-gap: 2px;
             justify-items: center;
 

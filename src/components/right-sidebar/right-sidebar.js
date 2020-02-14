@@ -15,6 +15,7 @@ import {
 	cashMedia,
 	cashMaterials,
 	getActivePeerId,
+	UPDATE_DIALOG_PHOTO,
 } from '../../store/store';
 import { getRightSidebarFieldsFromPeer, htmlToElement, capitalise, getName, createDiv } from '../../helpers/index';
 import infoSvg from './svg/info.js';
@@ -52,6 +53,7 @@ export default class RightSidebar extends HTMLElement {
 
 		this.addEventListener(UPDATE_DIALOG_STATUS, this.updateStatus);
 		this.addEventListener(SET_ACTIVE_PEER, this.loadPeerSidebar);
+		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updateAvatar);
 		// this.addEventListener(SET_ACTIVE_PEER_MEDIA, this.setMedia);
 	}
 
@@ -72,6 +74,14 @@ export default class RightSidebar extends HTMLElement {
 		statusElem.innerHTML = status;
 	};
 
+	updateAvatar = e => {
+		const { id, avatar } = e.detail;
+		const peerId = this.id.split('_')[1];
+		if (id == peerId) {
+			this.avatar.src = avatar;
+		}
+	};
+
 	loadPeerSidebar = e => {
 		const { fullPeer } = e.detail;
 		const setHTML = setInnerHTML.bind(this);
@@ -79,10 +89,11 @@ export default class RightSidebar extends HTMLElement {
 		const generalizedPeer = getRightSidebarFieldsFromPeer(fullPeer);
 		this.generalizedPeer = generalizedPeer;
 		const { notifications, name, avatar, id } = generalizedPeer;
+		if (avatar) {
+			this.avatar.src = avatar;
+		}
 		this.setMedia(id);
 		this.setMembers(id);
-		this.avatar.src = avatar || getDefaultAvatar();
-		this.peerId = id;
 		setHTML('.right-sidebar__name')(name);
 		switch (generalizedPeer.type) {
 			case 'user':
