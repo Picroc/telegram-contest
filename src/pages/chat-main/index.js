@@ -53,9 +53,11 @@ export default class ChatMain extends HTMLElement {
 			stopLoading(messageList);
 		}
 
-		for (const messageId of Object.keys(getAllMessages(peerId))
-			.filter(el => (startMessageId > 0 ? el < startMessageId : true))
-			.reverse()) {
+		const msgs = getAllMessages(peerId);
+		const keys = Object.keys(msgs);
+		const messages = keys.filter(el => (startMessageId > 0 ? el < startMessageId : true)).reverse();
+
+		for (const messageId of messages) {
 			messageList.appendChild(htmlToElement(`<chat-message id="${messageId}"></chat-message>`));
 		}
 
