@@ -59,6 +59,7 @@ export default class RightSidebar extends HTMLElement {
 
 	backButtonListener = e => {
 		this.classList.toggle('right-sidebar_hidden');
+		document.getElementById('right').classList.toggle('right_small');
 	};
 
 	moreButtonListener = e => {
@@ -88,14 +89,15 @@ export default class RightSidebar extends HTMLElement {
 		this.peerAttributes.innerHTML = '';
 		const generalizedPeer = getRightSidebarFieldsFromPeer(fullPeer);
 		this.generalizedPeer = generalizedPeer;
-		const { notifications, name, avatar, id } = generalizedPeer;
+		const { notifications, name, avatar, id, type } = generalizedPeer;
 		if (avatar) {
 			this.avatar.src = avatar;
 		}
 		this.setMedia(id);
 		this.setMembers(id);
 		setHTML('.right-sidebar__name')(name);
-		switch (generalizedPeer.type) {
+		switch (type) {
+			case 'channel':
 			case 'user':
 				this.loadUserAttributes(generalizedPeer);
 				this.loadTabs(['media', 'docs', 'links', 'audio']);
@@ -193,7 +195,6 @@ export default class RightSidebar extends HTMLElement {
 
 	showMaterial = materialName => {
 		Array.from(this.materials.children).forEach(elem => {
-			console.log('elem.id', elem.id);
 			elem.id == materialName ? elem.classList.remove('hide') : elem.classList.add('hide');
 		});
 	};
@@ -202,7 +203,6 @@ export default class RightSidebar extends HTMLElement {
 		const media = await peerIdToMediaMapper(id);
 		this.media.innerHTML = '';
 		console.log(`Resolving media promises for peer ${id}`);
-		console.log('media', media);
 		media.forEach(async ({ photo }, index) => {
 			const placeholder = htmlToElement(
 				`<div class="right-sidebar__general-materials__media_placeholder"></div>`
@@ -227,7 +227,6 @@ export default class RightSidebar extends HTMLElement {
 		this.members.innerHTML = '';
 		console.log(`Resolving members promises for peer ${id}`);
 		const { onlineCash, onlineUsers, offlineCash, offlineUsers } = users;
-		console.log('users', onlineCash, onlineUsers, offlineCash, offlineUsers);
 		if (!onlineCash) {
 			this.pasteMembersInDOMAndStore(onlineUsers, id, 'online');
 		}
