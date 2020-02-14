@@ -87,7 +87,7 @@ export default class UserDialogs extends HTMLElement {
 				id = to_id;
 			}
 			const dialog = getDialog(id);
-			if (dialog) {
+			if (!dialog) {
 				return;
 			}
 			const { archived, unreadCount, pinned } = dialog;
