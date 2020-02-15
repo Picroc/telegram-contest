@@ -823,7 +823,13 @@ export default class TelegramApi {
 		return promise;
 	};
 
-	searchPeerMessages = async (peer_id, text, filter = { _: 'inputMessagesFilterEmpty' }, limit = 100) => {
+	searchPeerMessages = async (
+		peer_id,
+		text,
+		filter = { _: 'inputMessagesFilterEmpty' },
+		limit = 100,
+		offset_id = 0
+	) => {
 		const peer = this.mapPeerToTruePeer(await this.getPeerByID(peer_id));
 
 		return this.invokeApi('messages.search', {
@@ -831,6 +837,8 @@ export default class TelegramApi {
 			q: text,
 			filter,
 			limit,
+			offset_id,
+			// add_offset: -limit,
 			hash: Math.floor(Math.random() * 1000),
 		});
 	};
@@ -856,20 +864,23 @@ export default class TelegramApi {
 		});
 	};
 
-	getPeerPhotos = async (peer_id, offset = 0, limit = 30) => {
-		return this.searchPeerMessages(peer_id, '', { _: 'inputMessagesFilterPhotos' }, limit).then(messages => {
-			const msg_photos = [];
+	getPeerPhotos = async (peer_id, offset_id = 0, limit = 30) => {
+		return this.searchPeerMessages(peer_id, '', { _: 'inputMessagesFilterPhotos' }, limit, offset_id).then(
+			messages => {
+				const msg_photos = [];
 
-			messages.messages.forEach(msg => {
-				msg_photos.push({
-					photo: msg.media.photo,
-					caption: msg.message,
-					id: msg.media.photo.id,
+				messages.messages.forEach(msg => {
+					msg_photos.push({
+						photo: msg.media.photo,
+						caption: msg.message,
+						id: msg.media.photo.id,
+						msg_id: msg.id,
+					});
 				});
-			});
 
-			return this._fillPhotosPromises(msg_photos);
-		});
+				return this._fillPhotosPromises(msg_photos);
+			}
+		);
 	};
 
 	getPeerDocuments = async (peer_id, offset = 0, limit = 100) => {
@@ -950,7 +961,7 @@ export default class TelegramApi {
 
 			return {
 				result: dialogsResult,
-				offset: Math.max(...dates),
+				offset: Math.min(...dates),
 			};
 		});
 	};
@@ -1793,6 +1804,8 @@ export default class TelegramApi {
 				photo_promises.push({
 					photo: this.getPhotoPreview(photo.photo),
 					caption: photo.caption,
+					id: photo.id,
+					msg_id: photo.msg_id,
 				});
 			}
 		});
