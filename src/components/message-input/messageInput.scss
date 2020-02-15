@@ -1,7 +1,6 @@
 .message-input {
   position: fixed;//absolute?
   bottom: 20px;
-  right: 100px;
   display: grid;
   grid-template-columns: 90% 10%;
   column-gap: 10px;
@@ -174,5 +173,25 @@ $send-button-size: 26px;
     border-bottom: 1px solid var(--gray);
     width: 135%;
     transform: translateY(2px);
+  }
+
+  .emoji__content {
+    font-size: 20px;
+    display: grid;
+    grid-template-columns: repeat(9,1fr);
+  }
+
+  .emoji_element {
+    cursor: pointer;
+  }
+
+  .emoji-set {
+
+    &_active {
+      svg {
+
+        fill: var(--primary);
+      }
+    }
   }
 }
