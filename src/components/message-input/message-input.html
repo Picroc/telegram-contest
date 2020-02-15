@@ -1,5 +1,16 @@
 
 <div class="message-input">
+        <div class="popup emoji__popup popup_hidden">
+            <div class="popup__tabs tabs"></div>
+            <div class="tabs__content">
+                <div class="tabs__content_emoji hide">
+                    <div class="emoji__content"></div>
+                    <div class="emoji__list"></div>
+                </div>
+                <div class="tabs__content_stickers hide"></div>
+                <div class="tabs__content_GIFs hide"></div>
+            </div>
+        </div>
         <div class="text-input">
             <div class="svg emoji-set"></div>
 
@@ -22,16 +33,31 @@
         </ul>
         <div class="svg voice-message"><div id="send-button" class="microphone"></div></div>
     </div>
-<div class="media-drop__paranja hide">
-    <div class="media-drop__pane">
-        <div class="media-drop__header">
-            <div class="media-drop__close-button">
+
+<div class="media-drop__paranja paranja hide">
+    <div class="media-drop__pane pane">
+        <div class="media-drop__header pane__header">
+            <div class="icon media-drop__close-button close-button">
                 <img src="../../static/images/close.svg" alt="" class="close-icon">
             </div>
             <h3 class="media-drop__text">Drag to Reposition</h3>
-            <div class="media-drop__accept-button">SEND</div>
+            <div anim="ripple" class="media-drop__accept-button accept-button">SEND</div>
         </div>
-        <div class="media-drop__image-place"></div>
-        <input type="text" placeholder="Add a caption..." class="media-drop__caption">
+        <div class="media-drop__image-place drop-place">Drag and Drop media here to send it...</div>
+        <input type="text" placeholder="Add a caption..." class="media-drop__caption caption">
+    </div>
+</div>
+
+<div class="file-drop__paranja paranja hide">
+    <div class="file-drop__pane pane">
+        <div class="file-drop__header pane__header">
+            <div class="icon file-drop__close-button close-button">
+                <img src="../../static/images/close.svg" alt="" class="close-icon">
+            </div>
+            <h3 class="file-drop__text">Drag to Reposition</h3>
+            <div anim="ripple" class="file-drop__accept-button accept-button">SEND</div>
+        </div>
+        <div class="file-drop__file-place drop-place">Drag and Drop files here to send it...</div>
+        <input type="text" placeholder="Add a caption..." class="file-drop__caption caption">
     </div>
 </div>
