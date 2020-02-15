@@ -130,7 +130,7 @@ export default class LoginPassword extends HTMLElement {
 					.then(res => {
 						addToUser('avatar', res);
 					})
-					.catch(err => console.log('err', err));
+					.catch(err => {});
 				router('chat-page');
 			})
 			.catch(err => {

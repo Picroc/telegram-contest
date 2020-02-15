@@ -86,7 +86,6 @@ export default class UserDialogs extends HTMLElement {
 		this.appendChild(this.normal);
 		telegramApi.subscribeToUpdates('dialogs', data => {
 			const { _: type } = data;
-			console.log('type', type);
 			switch (type) {
 				case 'newMessage':
 					this.updateMessage(data);
@@ -181,7 +180,6 @@ export default class UserDialogs extends HTMLElement {
 
 	updateListener = event => {
 		const dialogs = getDialogs(event.detail.length);
-		console.log('dialogs', dialogs);
 		dialogs.forEach(this.renderDialog);
 	};
 

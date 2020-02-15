@@ -77,7 +77,6 @@ export const telegramApi = new TelegramApi();
 telegramApi
 	.getUserInfo()
 	.then(user => {
-		console.log('HERE WE GO', user);
 		setUser(user);
 		if (user.id) {
 			router('chat-page');
@@ -90,16 +89,14 @@ telegramApi
 			router('login-form');
 		}
 	})
-	.catch(err => {
-		console.log('LOGIN ERR', err);
-	});
+	.catch(err => {});
 
 telegramApi
 	.getUserPhoto(1)
 	.then(res => {
 		addToUser('avatar', res);
 	})
-	.catch(err => console.log('err', err));
+	.catch(err => {});
 
 const changeState = transform => {
 	return function(...args) {

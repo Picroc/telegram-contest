@@ -98,7 +98,6 @@ export default class MessageInput extends HTMLElement {
 		Array.from(this.tabs.childNodes).forEach((element, index) => {
 			if (element.id !== 'underline' && element.id !== 'gray-line') {
 				const tabName = element.id.split('_')[1];
-				console.log('tabName', tabName);
 				const assosiatedEmojiElem = this.querySelector(`.tabs__content_${tabName}`);
 				if (element == e.target) {
 					e.target.classList.add('tab_active');
@@ -113,7 +112,6 @@ export default class MessageInput extends HTMLElement {
 	};
 
 	handleButton = e => {
-		console.log(e.code);
 		if (e.shiftKey && e.code == 'Enter') {
 			this.value += '\n';
 		} else if (e.code == 'Backspace') {
@@ -247,7 +245,6 @@ export default class MessageInput extends HTMLElement {
 
 	showAttachPopup = e => {
 		e.cancelBubble = true;
-		console.log(this.attachPopup);
 		this.attachPopup.classList.toggle('popup_hidden');
 		this.attachMedia.classList.toggle('icon_active');
 	};
@@ -269,10 +266,8 @@ export default class MessageInput extends HTMLElement {
 	};
 
 	sendMessage = e => {
-		console.log('Sending message', this.value);
 		const id = getActivePeerId();
 		telegramApi.sendMessage(id, this.value).then(res => {
-			console.log(res);
 			telegramApi.AppUpdatesManager.passUpdate(res);
 		});
 		this.value = '';

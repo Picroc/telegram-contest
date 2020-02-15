@@ -67,16 +67,14 @@ export default ({
 	}
 
 	const forward = (forwardFrom && `<div>Was forwarded from ${forwardFrom}</div>`) || '';
-	const reply =
-		(replyToMessageId &&
-			`<div class='chat-message__reply_${replyToMessageId}'>Reply to ${replyToMessageId}</div>`) ||
-		'';
+	const reply = (replyToMessageId && `<div class='chat-message__reply_${replyToMessageId}'></div>`) || '';
 	if (replyToMessageId) {
 		setZeroTimeout(async () => {
 			const reply_elem = document.querySelector(`.chat-message__reply_${replyToMessageId}`);
 			if (reply_elem) {
 				const results = await telegramApi.getReplyInfo(replyToMessageId);
-				reply_elem.innerHTML = `<div class='reply-field'><b>${results.title}</b>: ${results.message}</div>`;
+				reply_elem.innerHTML = `<div class='reply-field'><b>${results.title ||
+					(results.document && results.document.filename)}</b>: ${results.message || ''}</div>`;
 				// console.log('REPLY', results);
 			}
 		});

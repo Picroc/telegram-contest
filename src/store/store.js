@@ -302,7 +302,7 @@ export const SET_ACTIVE_PEER_MEDIA = 'SET_ACTIVE_PEER_MEDIA';
 export const setPeerMediaById = (id, media, update = false, dispatchEvent = true) => {
 	//TODO: по готовности эвентов обновлений прикрутить их проверку тут(нет)
 	if (update || !window.store.mapMediaId[id]) {
-		console.log(`Filling peer ${id} with array of media promises`);
+		// console.log(`Filling peer ${id} with array of media promises`);
 		window.store.mapMaterails['media'][id].promisedStructure = media;
 		if (dispatchEvent) {
 			document.querySelector('.right-sidebar').dispatchEvent(updateStoreEvent(SET_ACTIVE_PEER_MEDIA, id));
@@ -311,20 +311,20 @@ export const setPeerMediaById = (id, media, update = false, dispatchEvent = true
 };
 
 export const getPeerMediaById = id => {
-	console.log('getPeerMedia', window.store.mapMediaId[id]);
+	// console.log('getPeerMedia', window.store.mapMediaId[id]);
 	return window.store.mapMediaId[id];
 };
 
 export const peerIdToMaterialsMapper = type => id => {
 	if (!window.store.mapMaterails[type][id]) {
 		window.store.mapMaterails[type][id] = {};
-		console.log(`Getting promised ${type} fo id=${id} from API`);
+		// console.log(`Getting promised ${type} fo id=${id} from API`);
 		const promisedMaterialStructure = apiGetter(type)(id);
 		window.store.mapMaterails[type][id].promisedStructure = promisedMaterialStructure;
 		return promisedMaterialStructure;
 	} else if (window.store.mapMaterails[type][id].promisedStructure) {
 		//&& !window.store.mapMaterails[type][id].cashed
-		console.log(`Getting promised ${type} fo id=${id}`);
+		// console.log(`Getting promised ${type} fo id=${id}`);
 		return window.store.mapMaterails[type][id].promisedStructure;
 	}
 	// else if (window.store.mapMaterails[type][id].cashed) {

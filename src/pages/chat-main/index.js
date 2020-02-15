@@ -4,6 +4,7 @@ import './chatMain.scss';
 import { getActivePeer, getAllMessages, putMessage } from '../../store/store';
 import { telegramApi } from '../../App';
 import { startLoading, htmlToElement, onScrollTop, onScrollBottom } from '../../helpers/index';
+import AppMessagesManagerModule from '../../utils/TelegramApi/js/App/AppMessagesManager';
 
 export default class ChatMain extends HTMLElement {
 	render() {
@@ -11,6 +12,7 @@ export default class ChatMain extends HTMLElement {
 
 		const startMessageId = this.getAttribute('start-message');
 		const peerId = this.getAttribute('peer-id');
+		this.messagesManager = new AppMessagesManagerModule(peerId);
 		stopLoading(right);
 		this.innerHTML = `
 						<div class="all-messages"></div>
@@ -44,10 +46,10 @@ export default class ChatMain extends HTMLElement {
 
 		onScrollTop(this, async () => {
 			if (!this.loading) {
-				if (this.messagesList.children.length > 80) {
-					removeElements(this.messagesList, true, 30);
-					updateMessageIds();
-				}
+				// if (this.messagesList.children.length > 80) {
+				// 	removeElements(this.messagesList, true, 30);
+				// 	updateMessageIds();
+				// }
 				this.loading = true;
 				await this.getMessages(peerId, this.lastMessage);
 				setTimeout(() => {
@@ -57,10 +59,10 @@ export default class ChatMain extends HTMLElement {
 		});
 		onScrollBottom(this, async () => {
 			if (!this.loading) {
-				if (this.messagesList.children.length > 80) {
-					removeElements(this.messagesList, false, 30);
-					updateMessageIds();
-				}
+				// if (this.messagesList.children.length > 80) {
+				// 	removeElements(this.messagesList, false, 30);
+				// 	updateMessageIds();
+				// }
 				this.loading = true;
 				await this.getMessages(peerId, this.firstMessage, true, 30, -30, this.firstMessage);
 				setTimeout(() => {
@@ -95,6 +97,9 @@ export default class ChatMain extends HTMLElement {
 		}
 
 		newMessages.forEach(({ id: messageId }) => {
+			if (document.getElementById(messageId)) {
+				return;
+			}
 			if (prepend) {
 				messageList.prepend(htmlToElement(`<chat-message id="${messageId}"></chat-message>`));
 			} else {

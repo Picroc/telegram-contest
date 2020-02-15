@@ -245,9 +245,9 @@ export default class RightSidebar extends HTMLElement {
 	};
 
 	setMedia = async id => {
+		const documents = await telegramApi.getPeerDocuments(getActivePeerId(), 0, 10);
 		const media = await peerIdToMediaMapper(id);
 		this.media.innerHTML = '';
-		console.log(`Resolving media promises for peer ${id}`);
 		media.forEach(async ({ photo, msg_id }, index) => {
 			this.min_id = msg_id <= this.min_id ? msg_id : this.min_id;
 			const placeholder = htmlToElement(
@@ -343,7 +343,6 @@ export default class RightSidebar extends HTMLElement {
 				avatar = cashedAvatar;
 			}
 			status = this.statusTransform(status);
-			console.log('status', status);
 			user.cashedAvatar = avatar;
 			const elem = this.createMemberElem(avatar, name, status);
 			if (peerId == getActivePeerId()) {
