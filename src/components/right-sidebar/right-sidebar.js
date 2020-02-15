@@ -226,7 +226,7 @@ export default class RightSidebar extends HTMLElement {
 					this.underline.style.transform = 'translateX(' + index * 166 + '%)';
 				} else {
 					element.classList.remove('tab_active');
-					assosiatedMaterialsElem.classList.add('hide');
+					assosiatedMaterialsElem && assosiatedMaterialsElem.classList.add('hide');
 				}
 			}
 		});

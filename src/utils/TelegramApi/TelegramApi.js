@@ -595,7 +595,8 @@ export default class TelegramApi {
 							stickers: result.documents.map(doc => () =>
 								this.downloadDocument(doc).then(res => {
 									if (isAnimated) {
-										return this._getStickerData(res.bytes, doc.id);
+										// return this._getStickerData(res.bytes, doc.id);
+										return res;
 									} else {
 										return this._getImageData(res.bytes, doc.id);
 									}
@@ -638,7 +639,7 @@ export default class TelegramApi {
 	getAllStickersParsed = async () => {
 		const sets = await this.getAllStickers().then(this._parseStickerData);
 
-		// console.log(sets);
+		return sets;
 	};
 
 	getDocumentPreview = doc => {
