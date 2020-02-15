@@ -181,4 +181,35 @@ $send-button-size: 26px;
     width: 135%;
     transform: translateY(2px);
   }
+
+  .emoji__content {
+    font-size: 20px;
+    display: grid;
+    grid-template-columns: repeat(9,1fr);
+  }
+
+  .emoji_element {
+    cursor: pointer;
+  }
+
+  .emoji-set {
+
+    &_active {
+      svg {
+
+        fill: var(--primary);
+      }
+    }
+  }
+
+  .tabs__content_stickers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    overflow: scroll;
+    height: 280px;
+  }
+}
+
+.sticker_element {
+  cursor: pointer;
 }
