@@ -54,6 +54,15 @@
 
 .drop-place {
     place-self: center;
+    overflow: auto;
+    height: 200px;
+    width: 500px;
+    img {
+        width: auto;
+        height: 200px;
+        margin-right: 2px
+    }
+
 }
 
 .accept-button {
