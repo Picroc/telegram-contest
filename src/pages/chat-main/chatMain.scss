@@ -1,14 +1,31 @@
 chat-main {
   align-self: center;
   align-items: center;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  overflow: auto;
+  height: 85vh;
+  margin-bottom: 3vh;
+
+  &::-webkit-scrollbar {
+    background-color: transparent;
+    &-thumb {
+      height: 60px;
+
+      background-color: rgba(0, 0, 0, 0.25);
+    }
+    &-track {
+      background: transparent;
+    }
+  }
+
   .all-messages {
-    height: 80vh;
-    overflow: auto;
+    width: 60%;
     display: flex;
     flex-direction: column-reverse;
-    &::-webkit-scrollbar {
-      display: none;
-    }
   }
 }
 

@@ -86,19 +86,31 @@ export default class MessageInput extends HTMLElement {
 	}
 
 	getStickers = () => {
-		telegramApi.getAllStickersParsed().then(stickerpacksArray =>
-			stickerpacksArray[0].then(stickerpack => {
-				console.log('STICKERPACK', stickerpack);
-				stickerpack.stickers.forEach(stickerPromise => {
-					stickerPromise().then(sticker => {
-						const div = createDiv(`sticker_element stickerpack_${stickerpack.id}`);
-						div.addEventListener('click', this.sendSticker);
-						this.stickers.append(div);
-						telegramApi.setStickerToContainer(sticker, div, stickerpack.id);
+		const chatPage = document.getElementById('chat-page');
+		if (!chatPage.stickers) {
+			telegramApi.getAllStickersParsed().then(stickerpacksArray =>
+				stickerpacksArray[0].then(stickerpack => {
+					chatPage.stickers = stickerpack;
+					stickerpack.stickers.forEach(stickerPromise => {
+						stickerPromise().then(sticker => {
+							const div = createDiv(`sticker_element stickerpack_${stickerpack.id}`);
+							div.addEventListener('click', this.sendSticker);
+							this.stickers.append(div);
+							telegramApi.setStickerToContainer(sticker, div, stickerpack.id);
+						});
 					});
+				})
+			);
+		} else {
+			chatPage.stickers.forEach(stickerPromise => {
+				stickerPromise().then(sticker => {
+					const div = createDiv(`sticker_element stickerpack_${stickerpack.id}`);
+					div.addEventListener('click', this.sendSticker);
+					this.stickers.append(div);
+					telegramApi.setStickerToContainer(sticker, div, stickerpack.id);
 				});
-			})
-		);
+			});
+		}
 	};
 
 	sendSticker = e => {
@@ -164,7 +176,6 @@ export default class MessageInput extends HTMLElement {
 	};
 
 	handleButton = e => {
-		console.log(e.code);
 		if (e.shiftKey && e.code == 'Enter') {
 			this.value += '\n';
 		} else if (e.code == 'Backspace') {
@@ -393,6 +404,7 @@ export default class MessageInput extends HTMLElement {
 		} else {
 			console.log('Empty message, did not sent');
 		}
+
 		this.inputArea.innerHTML = '';
 		this.emptyInputHandler();
 	};

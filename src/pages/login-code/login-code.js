@@ -99,7 +99,6 @@ export default class LoginCode extends HTMLElement {
 				.signIn(phone, window.phone_code_hash, newText)
 				.then(res => {
 					telegramApi.getUserInfo().then(user => {
-						console.log('HERE WE GO', user);
 						setUser(user);
 					});
 					telegramApi
@@ -107,7 +106,7 @@ export default class LoginCode extends HTMLElement {
 						.then(res => {
 							addToUser('avatar', res);
 						})
-						.catch(err => console.log('err', err));
+						.catch(err => {});
 					router('chat-page');
 				})
 				.catch(err => {
@@ -117,7 +116,6 @@ export default class LoginCode extends HTMLElement {
 					} else if (err.type === 'SESSION_PASSWORD_NEEDED') {
 						router('login-password');
 					} else {
-						console.log(err);
 						this.showInvalid();
 					}
 				});

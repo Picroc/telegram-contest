@@ -4,6 +4,7 @@ import './chatMain.scss';
 import { getActivePeer, getAllMessages, putMessage } from '../../store/store';
 import { telegramApi } from '../../App';
 import { startLoading, htmlToElement, onScrollTop, onScrollBottom } from '../../helpers/index';
+import AppMessagesManagerModule from '../../utils/TelegramApi/js/App/AppMessagesManager';
 
 export default class ChatMain extends HTMLElement {
 	render() {
@@ -11,14 +12,17 @@ export default class ChatMain extends HTMLElement {
 
 		const startMessageId = this.getAttribute('start-message');
 		const peerId = this.getAttribute('peer-id');
+		this.messagesManager = new AppMessagesManagerModule(peerId);
 		stopLoading(right);
 		this.innerHTML = `
 						<div class="all-messages"></div>
 						<message-input></message-input>`;
 
 		this.messagesList = this.querySelector('.all-messages');
-		startLoading(this.messagesList);
 		this.getMessages(peerId, startMessageId, false, 100, -50).then(() => {
+			if (startMessageId === 'undefined') {
+				this.messagesList.firstChild.scrollIntoView();
+			}
 			document.getElementById(Number(startMessageId)).scrollIntoView({ block: 'center' });
 		});
 
@@ -39,14 +43,12 @@ export default class ChatMain extends HTMLElement {
 			this.lastMessage = this.messagesList.lastChild.id;
 		};
 
-		onScrollTop(this.messagesList, async () => {
+		onScrollTop(this, async () => {
 			if (!this.loading) {
-				const beforeScroll = this.messagesList.scrollTop;
-				if (this.messagesList.children.length > 80) {
-					removeElements(this.messagesList, true, 30);
-					updateMessageIds();
-				}
-				this.messagesList.scrollTop = beforeScroll;
+				// if (this.messagesList.children.length > 80) {
+				// 	removeElements(this.messagesList, true, 30);
+				// 	updateMessageIds();
+				// }
 				this.loading = true;
 				await this.getMessages(peerId, this.lastMessage);
 				setTimeout(() => {
@@ -54,12 +56,12 @@ export default class ChatMain extends HTMLElement {
 				}, 100);
 			}
 		});
-		onScrollBottom(this.messagesList, async () => {
+		onScrollBottom(this, async () => {
 			if (!this.loading) {
-				if (this.messagesList.children.length > 80) {
-					removeElements(this.messagesList, false, 30);
-					updateMessageIds();
-				}
+				// if (this.messagesList.children.length > 80) {
+				// 	removeElements(this.messagesList, false, 30);
+				// 	updateMessageIds();
+				// }
 				this.loading = true;
 				await this.getMessages(peerId, this.firstMessage, true, 30, -30, this.firstMessage);
 				setTimeout(() => {
@@ -74,7 +76,7 @@ export default class ChatMain extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return [''];
+		return ['start-message'];
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
@@ -94,6 +96,9 @@ export default class ChatMain extends HTMLElement {
 		}
 
 		newMessages.forEach(({ id: messageId }) => {
+			if (document.getElementById(messageId)) {
+				return;
+			}
 			if (prepend) {
 				messageList.prepend(htmlToElement(`<chat-message id="${messageId}"></chat-message>`));
 			} else {

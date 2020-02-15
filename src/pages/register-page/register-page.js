@@ -58,8 +58,6 @@ export default class RegisterPage extends HTMLElement {
 
 			const trans = e.dataTransfer;
 			const file = trans.files[0];
-
-			console.log(file);
 		});
 	}
 
@@ -108,13 +106,10 @@ export default class RegisterPage extends HTMLElement {
 		const phone = JSON.parse(this.getAttribute('phone')),
 			code = this.getAttribute('code');
 
-		console.log('PHONE', phone);
-
 		telegramApi
 			.signUp(phone, window.phone_code_hash, code, this.name.value, this.surname.value)
 			.then(res => {
 				return telegramApi.getUserInfo().then(user => {
-					console.log('HERE WE GO', user);
 					setUser(user);
 				});
 			})
@@ -132,7 +127,6 @@ export default class RegisterPage extends HTMLElement {
 									.catch(err => console.log('err', err));
 							})
 							.catch(err => {
-								console.log(err);
 								alert("Sorry, we couldn't process your photo. Try again another time.");
 
 								router('chat-page');
@@ -142,9 +136,7 @@ export default class RegisterPage extends HTMLElement {
 					router('chat-page');
 				}
 			})
-			.catch(err => {
-				console.log('ERR OCCURED', err);
-			});
+			.catch(err => {});
 	};
 
 	connectedCallback() {

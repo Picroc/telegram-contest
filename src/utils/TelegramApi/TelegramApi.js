@@ -93,17 +93,15 @@ export default class TelegramApi {
 
 		// To be removed
 		const updateTestHandler = payload => {
-			console.log(payload);
-
 			if (this.user.id === payload.from_id || payload.message_info.out) {
 				console.log('Got peer', this.user);
 			} else {
 				this.getPeerByID(payload.from_id)
 					.then(peer => {
-						console.log('Got peer', peer);
+						// console.log('Got peer', peer);
 					})
 					.catch(err => {
-						console.log('Peer not found', err);
+						// console.log('Peer not found', err);
 					});
 			}
 		};
@@ -172,7 +170,6 @@ export default class TelegramApi {
 			},
 			this.options
 		).then(result => {
-			console.log(this.options);
 			if (result._ === 'auth.authorizationSignUpRequired') {
 				throw 'PHONE_NUMBER_UNOCCUPIED';
 			}
@@ -329,6 +326,14 @@ export default class TelegramApi {
 				const { media } = data.messages[0];
 				if (media._ === 'messageMediaPhoto') {
 					payload.photo = this.getPhotoPreview(media.photo);
+				}
+				if (media._ === 'messageMediaDocument') {
+					payload.document = {
+						type: media.document.mime_type.split('/')[1] || 'raw',
+						photo: this.getDocumentPreview(media.document),
+						filename: media.document.attributes.filter(el => el._ === 'documentAttributeFilename')[0]
+							.file_name,
+					};
 				}
 			}
 		} else {
@@ -567,7 +572,7 @@ export default class TelegramApi {
 	};
 
 	_parseStickerData = async data => {
-		console.log('STICKERS', data);
+		// console.log('STICKERS', data);
 		if (data.sets) {
 			const result_sets = [];
 			data.sets.forEach(async stickerset => {
@@ -579,7 +584,7 @@ export default class TelegramApi {
 							access_hash: stickerset.access_hash,
 						},
 					}).then(result => {
-						console.log(result);
+						// console.log(result);
 
 						const isAnimated = this._checkFlag(stickerset.flags, 5) || stickerset.pFlags.animated;
 						let location = result.set.thumb && result.set.thumb.location;
@@ -634,7 +639,6 @@ export default class TelegramApi {
 	getAllStickersParsed = async () => {
 		const sets = await this.getAllStickers().then(this._parseStickerData);
 
-		console.log(sets);
 		return sets;
 	};
 
@@ -653,6 +657,10 @@ export default class TelegramApi {
 		if (thumb_size) {
 			thumb_size = thumb_size[2] || thumb_size[1] || thumb_size[0];
 			location.thumb_size = thumb_size.type;
+		} else {
+			return new Promise(resolve => {
+				resolve({});
+			});
 		}
 
 		location._ = 'inputDocumentFileLocation';
@@ -696,7 +704,7 @@ export default class TelegramApi {
 		return promise;
 	};
 
-	getMessagesFromPeer = async (peer, limit = 200, offsetId = 0, addOffset = 0, max_id = -1, min_id = -1) => {
+	getMessagesFromPeer = async (peer, limit = 200, offsetId = 0, addOffset = 0) => {
 		const messagesManager = new AppMessagesManagerModule(
 			peer.user_id || peer.channel_id || peer.chat_id || peer.id
 		);
@@ -717,24 +725,10 @@ export default class TelegramApi {
 			limit,
 			offset_id: offsetId,
 			add_offset: addOffset,
-			max_id,
-			min_id,
 		}).then(res => {
-			const messages = res.messages.map((msg, idx) => {
-				if (idx === 0) {
-					return { prepend: false, ...msg };
-				}
-				return {
-					prepend:
-						msg.from_id === res.messages[idx - 1].from_id &&
-						Math.abs(msg.date - res.messages[idx - 1].date) < 60,
-					...msg,
-				};
-			});
+			messagesManager.saveMessages(res.messages);
 
-			messagesManager.saveMessages(messages);
-
-			return { ...res, messages };
+			return res;
 		});
 	};
 
@@ -825,7 +819,13 @@ export default class TelegramApi {
 		return promise;
 	};
 
-	searchPeerMessages = async (peer_id, text, filter = { _: 'inputMessagesFilterEmpty' }, limit = 100) => {
+	searchPeerMessages = async (
+		peer_id,
+		text,
+		filter = { _: 'inputMessagesFilterEmpty' },
+		limit = 100,
+		offset_id = 0
+	) => {
 		const peer = this.mapPeerToTruePeer(await this.getPeerByID(peer_id));
 
 		return this.invokeApi('messages.search', {
@@ -833,6 +833,8 @@ export default class TelegramApi {
 			q: text,
 			filter,
 			limit,
+			offset_id,
+			// add_offset: -limit,
 			hash: Math.floor(Math.random() * 1000),
 		});
 	};
@@ -858,26 +860,44 @@ export default class TelegramApi {
 		});
 	};
 
-	getPeerPhotos = async (peer_id, offset = 0, limit = 30) => {
-		return this.searchPeerMessages(peer_id, '', { _: 'inputMessagesFilterPhotos' }, limit).then(messages => {
-			const msg_photos = [];
+	getPeerPhotos = async (peer_id, offset_id = 0, limit = 30) => {
+		return this.searchPeerMessages(peer_id, '', { _: 'inputMessagesFilterPhotos' }, limit, offset_id).then(
+			messages => {
+				const msg_photos = [];
 
-			messages.messages.forEach(msg => {
-				msg_photos.push({
-					photo: msg.media.photo,
-					caption: msg.message,
-					id: msg.media.photo.id,
+				messages.messages.forEach(msg => {
+					msg_photos.push({
+						photo: msg.media.photo,
+						caption: msg.message,
+						id: msg.media.photo.id,
+						msg_id: msg.id,
+					});
 				});
-			});
 
-			return this._fillPhotosPromises(msg_photos);
-		});
+				return this._fillPhotosPromises(msg_photos);
+			}
+		);
 	};
 
-	getPeerDocuments = async (peer_id, offset = 0, limit = 100) => {
-		return this.searchPeerMessages(peer_id, '', { _: 'inputMessagesFilterDocument' }, limit).then(messages => {
-			console.log('MSGS', messages);
-		});
+	getPeerDocuments = async (peer_id, offset_id = 0, limit = 100) => {
+		return this.searchPeerMessages(peer_id, '', { _: 'inputMessagesFilterDocument' }, limit, offset_id).then(
+			messages => {
+				const msg_docs = [];
+				console.log(messages.messages);
+
+				messages.messages.forEach(msg => {
+					msg_docs.push({
+						document: msg.media.document,
+						caption: msg.message,
+						id: msg.media.document.id,
+						msg_id: msg.id,
+						thumbs: msg.media.document.thumbs,
+					});
+				});
+
+				return this._fillDocumentsPromises(msg_docs);
+			}
+		);
 	};
 
 	// CHATS ------------------------------------------------------
@@ -927,7 +947,7 @@ export default class TelegramApi {
 			})(this._parseDialog(dialog, chats, messages, users));
 		});
 
-		dialog_items.sort((a, b) => a.time - b.time);
+		dialog_items.sort((a, b) => a.date - b.date);
 
 		return { dialog_items, archived_items };
 	};
@@ -952,7 +972,7 @@ export default class TelegramApi {
 
 			return {
 				result: dialogsResult,
-				offset: Math.max(...dates),
+				offset: Math.min(...dates),
 			};
 		});
 	};
@@ -1777,12 +1797,12 @@ export default class TelegramApi {
 	};
 
 	setStickerToContainer = (sticker, container, cacheId) => {
-		this._getStickerData(sticker.bytes, cacheId).then(st => {
-			lottie.loadAnimation({
+		return this._getStickerData(sticker.bytes, cacheId).then(st => {
+			return lottie.loadAnimation({
 				container: container,
 				renderer: 'svg',
 				loop: true,
-				autoplay: true,
+				autoplay: false,
 				animationData: st,
 			});
 		});
@@ -1795,6 +1815,8 @@ export default class TelegramApi {
 				photo_promises.push({
 					photo: this.getPhotoPreview(photo.photo),
 					caption: photo.caption,
+					id: photo.id,
+					msg_id: photo.msg_id,
 				});
 			}
 		});
@@ -1806,8 +1828,14 @@ export default class TelegramApi {
 		docs.forEach(doc => {
 			const new_doc = { ...doc };
 
+			// if (doc.thumbs) {
+			// 	new_doc.preview = this.getDocumentPreview(doc);
+			// }
+
 			doc_results.push(new_doc);
 		});
+
+		return doc_results;
 	};
 
 	_getImageData = async (bytes, id) => {
