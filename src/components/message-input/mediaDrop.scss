@@ -1,83 +1,60 @@
-.media-drop {
+.paranja {
+    position: absolute;
+    left: 0;
+    top: 0;
 
-    &__paranja {
-        position: absolute;
-        left: 0;
-        top: 0;
+    width: 100%;
+    height: 100%;
 
-        width: 100%;
-        height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+}
 
-        background: rgba(0, 0, 0, 0.3);
-    }
+.pane {
+    position: relative;
+    margin: auto;
+    background: white;
 
-    &__pane {
-        position: relative;
-        margin: auto;
-        background: white;
+    display: grid;
+    grid-template-rows: 60px 240px 100px;
 
-        display: grid;
-        grid-template-rows: 60px 240px 200px;
+    border-radius: 10px;
 
-        border-radius: 10px;
+    width: 500px;
+    height: 400px;
 
-        width: 500px;
-        height: 500px;
-
-        top: calc(60% - 250px);
-        padding: 0 15px;
-    }
+    top: calc(60% - 250px);
+    padding: 0 15px;
 
     &__header {
         display: grid;
-        grid-template-columns: 20px auto 60px;
-    }
-
-    &__accept-button {
-        width: 70px;
-        height: 35px;
-        color: white;
-        font-weight: bold;
-        background-color: var(--primary);
-        border-radius: 8px;
-        display: grid;
-        place-items: center;
+        align-items: center;
+        grid-template-columns: 50px auto 100px;
     }
 }
 
+.caption {
+    height: 64px;
+    border-radius: 16px;
+    border: 1px solid gray;
+    outline: none;
+    padding-left: 10px;
+}
 
+.drop-place {
+    place-self: center;
+}
 
-// .accept-button,
-// .close-button {
-//     position: absolute;
-//     background: rgb(79, 164, 246);
-//     width: 53px;
-//     height: 53px;
-
-//     display: flex;
-
-//     border-radius: 26px;
-
-//     & img {
-//         position: relative;
-//         margin: auto;
-//         vertical-align: middle;
-//         display: inline-block;
-//         filter: invert(1);
-//     }
-// }
-
-// .accept-button {
-//     bottom: 22px;
-//     right: 20px;
-// }
-
-// .close-button {
-//     top: 2px;
-//     left: 10px;
-//     background: transparent;
-
-//     & img {
-//         filter: none;
-//     }
-// }
+.accept-button {
+    cursor: pointer;
+    width: 70px;
+    height: 35px;
+    color: white;
+    font-weight: bold;
+    background-color: var(--primary);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    --ripple-background: var(--black);
+    --ripple-opacity: 0.08;
+    --ripple-duration: 600ms;
+}
