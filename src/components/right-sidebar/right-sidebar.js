@@ -69,7 +69,7 @@ export default class RightSidebar extends HTMLElement {
 		// this.addEventListener(SET_ACTIVE_PEER_MEDIA, this.setMedia);
 	}
 
-	handleMediaScroll = async function (event) {
+	handleMediaScroll = async function(event) {
 		if (this.loading) {
 			return;
 		}
@@ -164,7 +164,7 @@ export default class RightSidebar extends HTMLElement {
 			const label = notifications ? 'Enabled' : 'Disabled';
 			const checkbox = `<input type="checkbox" class="item__icon notifications__icon" name="notifications" id="notifications"${
 				notifications ? 'checked' : ''
-				}>`;
+			}>`;
 			const notificationsElem = this.createAttributeElem('notifications', 'Notifications', label, () => checkbox);
 			this.peerAttributes.appendChild(notificationsElem);
 		}
@@ -390,6 +390,9 @@ export default class RightSidebar extends HTMLElement {
 				}
 			});
 			const docElem = this.createDocElem(docIcon, doc.document.mime_type, file_name);
+			docElem.addEventListener('click', () => {
+				telegramApi.downloadDocument(doc.document, null, true);
+			});
 			this.docs.appendChild(docElem);
 		});
 	};
