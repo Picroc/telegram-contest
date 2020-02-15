@@ -5,7 +5,7 @@ import emojiSvg from './emoji';
 import sendArrow from './sendArrow.svg';
 import './mediaDrop.scss';
 import './messageInput.scss';
-import { setInnerHTML, setAttribute, htmlToElement, capitalise } from '../../helpers/index';
+import { setInnerHTML, setAttribute, htmlToElement, capitalise, createDiv } from '../../helpers/index';
 import { telegramApi } from '../../App';
 import { getActivePeerId } from '../../store/store';
 
@@ -65,17 +65,84 @@ export default class MessageInput extends HTMLElement {
 
 		setHTML('.emoji-set')(emojiSvg());
 		this.emoji = this.querySelector('.emoji-set');
-		this.emoji.addEventListener('mouseover', this.showEmoji);
-		this.emoji.addEventListener('mouseout', this.hideEmoji);
+		this.emoji.addEventListener('click', this.toggleEmoji);
 		this.emojiPopup = this.querySelector('.emoji__popup');
 		this.emojiPopup.addEventListener('click', e => (e.cancelBubble = true));
 		this.tabs = this.querySelector('.popup__tabs');
+		this.tabsContent = this.querySelector('.tabs__content');
+
+		this.activeTab = 'emoji';
 		this.loadTabs(['emoji', 'stickers', 'GIFs']);
 
-		this.value = '';
+		this.emojiContent = this.querySelector('.emoji__content');
+		this.fillEmojiContent();
+
 		this.sendButton = this.querySelector('#send-button');
 		this.sendButton.addEventListener('click', this.sendMessage);
+
+		this.dropZone = this.querySelector('.media-drop__paranja');
+		this.dropZone.addEventListener('ondragover', this.handeDrop);
+
+		this.stickers = this.querySelector('.tabs__content_stickers');
+
+		this.getStickers();
 	}
+
+	getStickers = () => {
+		telegramApi.getAllStickersParsed().then(stickerpacksArray =>
+			stickerpacksArray[0].then(stickerpack => {
+				console.log('STICKERPACK', stickerpack);
+				stickerpack.stickers.forEach(stickerPromise => {
+					stickerPromise().then(sticker => {
+						const div = createDiv(`sticker_element stickerpack_${stickerpack.id}`);
+						div.addEventListener('click', this.sendSticker);
+						this.stickers.append(div);
+						telegramApi.setStickerToContainer(sticker, div, stickerpack.id);
+					});
+				});
+				// stickerpack.stickers[0]().then(sticker => {
+				// 	console.log(sticker);
+				// 	this.stickers.append(div);
+				// 	console.log('sticker', sticker);
+				// 	console.log('div', div);
+				// 	console.log('stickerpack.id', stickerpack.id);
+
+				// 	div.addEventListener('click');
+				// 	// div.innerHTML = sticker;
+				// });
+			})
+		);
+	};
+
+	sendSticker = e => {
+		//not implemented
+	};
+
+	fillEmojiContent = () => {
+		const initialEmojiNum = 128512;
+		const emojiAmount = 80; //mb change later
+		for (let i = 0; i < emojiAmount; i++) {
+			const currentEmojiNum = initialEmojiNum + i;
+			const div = createDiv(`emoji_element emoji_${currentEmojiNum}`);
+			const emoji = String.fromCodePoint(currentEmojiNum);
+			div.innerHTML = emoji; //vi tolko glyante na etot govnokod
+			div.addEventListener('click', () => {
+				if (
+					this.inputArea.innerHTML.slice(
+						this.inputArea.innerHTML.length - 8,
+						this.inputArea.innerHTML.length
+					) == '<br><br>'
+				) {
+					this.inputArea.innerHTML = this.inputArea.innerHTML.slice(0, this.inputArea.innerHTML.length - 4);
+				}
+				this.inputArea.innerHTML += emoji;
+				this.inputHandler({ data: emoji });
+			});
+			this.emojiContent.append(div);
+		}
+		//codePointAt, fromCodePoint
+		//'\u{1F600}'
+	};
 
 	loadTabs = tabs => {
 		tabs.map(tab => {
@@ -98,7 +165,6 @@ export default class MessageInput extends HTMLElement {
 		Array.from(this.tabs.childNodes).forEach((element, index) => {
 			if (element.id !== 'underline' && element.id !== 'gray-line') {
 				const tabName = element.id.split('_')[1];
-				console.log('tabName', tabName);
 				const assosiatedEmojiElem = this.querySelector(`.tabs__content_${tabName}`);
 				if (element == e.target) {
 					e.target.classList.add('tab_active');
@@ -106,7 +172,7 @@ export default class MessageInput extends HTMLElement {
 					this.underline.style.transform = 'translateX(' + index * 220 + '%)';
 				} else {
 					element.classList.remove('tab_active');
-					assosiatedEmojiElem.classList.add('hide');
+					assosiatedEmojiElem && assosiatedEmojiElem.classList.add('hide');
 				}
 			}
 		});
@@ -247,7 +313,6 @@ export default class MessageInput extends HTMLElement {
 
 	showAttachPopup = e => {
 		e.cancelBubble = true;
-		console.log(this.attachPopup);
 		this.attachPopup.classList.toggle('popup_hidden');
 		this.attachMedia.classList.toggle('icon_active');
 	};
@@ -258,6 +323,12 @@ export default class MessageInput extends HTMLElement {
 
 	closeMediaDrop = () => {
 		this.mediaDrop.classList.add('hide');
+		const imgElems = this.mediaDrop.querySelectorAll('img');
+		imgElems.forEach(elem => {
+			if (elem.classList != 'close-icon') {
+				elem.remove();
+			}
+		});
 	};
 
 	showFileDrop = e => {
@@ -269,36 +340,50 @@ export default class MessageInput extends HTMLElement {
 	};
 
 	sendMessage = e => {
-		console.log('Sending message', this.value);
-		const id = getActivePeerId();
-		telegramApi.sendMessage(id, this.value).then(res => {
-			console.log(res);
-			telegramApi.AppUpdatesManager.passUpdate(res);
-		});
-		this.value = '';
+		if (this.inputArea.textContent != '') {
+			const result = this.inputArea.innerHTML
+				.replace('&nbsp;', ' ')
+				.replace(/<br>/g, '\n')
+				.replace('<div>\n</div>', '');
+			console.log('Sending message', result);
+			const id = getActivePeerId();
+			telegramApi.sendMessage(id, result).then(res => {
+				console.log(res);
+				telegramApi.AppUpdatesManager.passUpdate(res);
+			});
+		} else {
+			console.log('Empty message, did not sent');
+		}
 		this.inputArea.innerHTML = '';
+		this.emptyInputHandler();
 	};
 
-	showEmoji = e => {
-		e.target.style.fill = 'var(--primary)';
-		this.emojiPopup.classList.remove('popup_hidden');
+	toggleEmoji = e => {
+		e.cancelBubble = true;
+		this.emoji.classList.toggle('icon_active');
+		this.emojiPopup.classList.toggle('popup_hidden');
 	};
 
-	hideEmoji = e => {
-		// setTimeout(() => {//interval?
-		// 	e.target.style.fill = 'gray';
-		// 	this.emojiPopup.classList.add('popup_hidden');
-		// }, 500);
+	handleButton = e => {
+		if (e.shiftKey && e.code == 'Enter') {
+			// hello
+		} else if (e.code == 'Enter') {
+			e.cancelBubble = true;
+			document.execCommand('insertHTML', false, '');
+			e.preventDefault();
+			this.sendMessage('Enter');
+		}
 	};
 
 	inputHandler = e => {
-		const inputSymbol = e.data;
-		if (this.inputArea.textContent != '') {
+		if (this.inputArea.innerHTML == '<br>') {
+			this.inputArea.innerHTML = '';
+		}
+		if (this.inputArea.innerHTML != '') {
 			this.nonemptyInputHandler();
 		} else {
 			this.emptyInputHandler();
 		}
-		this.value += inputSymbol == null ? '' : inputSymbol;
 	};
 
 	nonemptyInputHandler = () => {
