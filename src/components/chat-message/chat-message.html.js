@@ -75,8 +75,9 @@ export default ({
 			const reply_elem = document.getElementById(`chat-message__reply_${replyToMessageId}`);
 			if (reply_elem) {
 				const results = await telegramApi.getReplyInfo(replyToMessageId);
-				reply_elem.innerHTML = `<div class='reply-field'><b>${results.title ||
-					(results.document && results.document.filename)}</b>: ${results.message || ''}</div>`;
+				reply_elem.innerHTML = `<div class='reply-field'><div class="reply-field__title">${results.title ||
+					(results.document && results.document.filename) ||
+					'Document'}</div>${results.message || ''}</div>`;
 				// console.log('REPLY', results);
 			}
 		});
