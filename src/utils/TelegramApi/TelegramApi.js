@@ -322,7 +322,7 @@ export default class TelegramApi {
 
 		const payload = {};
 
-		console.log(data);
+		// console.log(data);
 
 		if (!data.messages[0].message) {
 			if (data.messages[0].media) {

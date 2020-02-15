@@ -23,7 +23,7 @@ $hover-color: #f1f3f4;
 }
 
 .right_small {
-  width: 50vw !important;
+  width: calc(75vw - var(--right-sidebar-width)) !important;
 }
 
 #right {

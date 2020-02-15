@@ -8,7 +8,7 @@ import {
 	updateDialogUnread,
 	updateDialogShort,
 	updateDialogDate,
-	updateDialogStatus,
+	updateDialogOnlineStatus,
 } from '../../store/store';
 import {
 	htmlToElement,
@@ -60,7 +60,7 @@ export const loadDialog = component => elem => async (dialogId, messageId) => {
 	component.prevActive = elem;
 	component.prevId = id;
 	const rightSidebar = document.querySelector('.right-sidebar');
-	rightSidebar.id = `right-sidebar_${id}`;
+	rightSidebar.setAttribute('peer_id', id);
 	elem.classList.toggle('dialog_active');
 	const right = document.getElementById('right');
 	startLoading(right);
@@ -148,7 +148,7 @@ export default class UserDialogs extends HTMLElement {
 
 	updateStatus = data => {
 		const { user_id, online } = data;
-		updateDialogStatus(user_id, online);
+		updateDialogOnlineStatus(user_id, online);
 	};
 
 	setListener = event => {
