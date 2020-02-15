@@ -19,6 +19,7 @@ export default class MessageInput extends HTMLElement {
 		this.attachMedia = this.querySelector('.attach-media');
 		this.attachPopup = this.querySelector('.attach-media__popup');
 		this.attachMedia.addEventListener('click', this.showAttachPopup);
+		this.eventListenters = [];
 
 		this.sendMediaPopupBtn = this.querySelector('.attach-media__media');
 		this.sendMediaPopupBtn.addEventListener('click', this.showMediaDrop);
@@ -53,11 +54,12 @@ export default class MessageInput extends HTMLElement {
 
 		this.fileDropPane.addEventListener('dragenter', dragPrevent, false);
 		this.fileDropPane.addEventListener('dragover', dragPrevent, false);
-		this.mediaDropPane.addEventListener('dragenter', dragPrevent, false);
+		// this.mediaDropPane.addEventListener('dragenter', dragPrevent, false);
 		this.mediaDropPane.addEventListener('dragover', dragPrevent, false);
 
 		this.fileDropPane.addEventListener('drop', this.handleDrop);
 		this.mediaDropPane.addEventListener('drop', this.handleDrop);
+		this.dataCounter = 0;
 
 		this.inputArea = this.querySelector('.text-input__input');
 		this.inputArea.addEventListener('input', this.inputHandler);
@@ -80,12 +82,7 @@ export default class MessageInput extends HTMLElement {
 		this.sendButton = this.querySelector('#send-button');
 		this.sendButton.addEventListener('click', this.sendMessage);
 
-		this.dropZone = this.querySelector('.media-drop__paranja');
-		this.dropZone.addEventListener('ondragover', this.handeDrop);
-
 		this.stickers = this.querySelector('.tabs__content_stickers');
-
-		this.getStickers();
 	}
 
 	getStickers = () => {
@@ -142,8 +139,6 @@ export default class MessageInput extends HTMLElement {
 			});
 			this.emojiContent.append(div);
 		}
-		//codePointAt, fromCodePoint
-		//'\u{1F600}'
 	};
 
 	loadTabs = tabs => {
@@ -198,27 +193,61 @@ export default class MessageInput extends HTMLElement {
 
 		const transfer = e.dataTransfer;
 		const file = transfer.files[0];
-
-		if (file && e.target.classList.contains('file-drop__pane')) {
+		if (file && e.target.classList.contains('file-drop__file-place')) {
 			if (transfer.files.length > 1) {
 				this.handleFiles(Array.from(transfer.files));
 			} else {
 				this.handleFile(file);
 			}
+			this.handeDroppedElemets('file');
 		} else {
 			if (transfer.files.length > 1) {
 				this.handlePhotos(Array.from(transfer.files));
 			} else {
+				console.log('!!!');
+
 				this.handlePhoto(file);
 			}
+			this.handeDroppedElemets('photo');
 		}
 	};
 
-	handleFile = file => {
-		if (file) {
-			this.showFile(file);
-			this.fileDropAccept.addEventListener('click', () => this.uploadFile(file));
+	handeDroppedElemets = type => {
+		console.log('this.dataCounter', this.dataCounter);
+		let pane;
+		let keyword;
+		switch (type) {
+			case 'file':
+				pane = this.querySelector('.file-drop__pane');
+				keyword = 'Files';
+				break;
+			case 'photo':
+				pane = this.querySelector('.media-drop__pane');
+				keyword = 'Photos';
+				break;
 		}
+		const dropPlace = pane.querySelector('.drop-place');
+		if (this.dataCounter == 0) {
+			dropPlace.innerHTML = '';
+			keyword = keyword.slice(0, -1);
+		}
+		this.dataCounter = this.dataCounter + 1;
+		const droppedElem = pane.querySelector('.dropped_elem');
+		console.log('droppedElem', droppedElem);
+		droppedElem.className = '';
+		const text = pane.querySelector('.text');
+		dropPlace.appendChild(droppedElem);
+		text.innerHTML = `Send ${this.dataCounter} ${keyword}`;
+	};
+
+	handleFile = file => {
+		let listener;
+		if (file) {
+			listener = this.uploadFile(file);
+			this.showFile(file);
+			this.fileDropAccept.addEventListener('click', listener);
+		}
+		this.eventListenters.push(listener);
 	};
 
 	handleFiles = (files = []) => {
@@ -226,15 +255,17 @@ export default class MessageInput extends HTMLElement {
 			files.forEach(file => {
 				this.handleFile(file);
 			});
-			// this.fileDropAccept.addEventListener('click', () => this.uploadFiles(files));
 		}
 	};
 
 	handlePhoto = file => {
+		let listener;
 		if (file) {
+			listener = this.uploadPhoto(file);
 			this.showPhoto(file);
-			this.mediaDropAccept.addEventListener('click', () => this.uploadPhoto(file));
+			this.mediaDropAccept.addEventListener('click', listener);
 		}
+		this.eventListenters.push(listener);
 	};
 
 	handlePhotos = (files = []) => {
@@ -247,22 +278,24 @@ export default class MessageInput extends HTMLElement {
 	};
 
 	showFile = file => {
-		this.fileDropPlace.style = 'display: hidden';
-
-		this.fileDropPlace.append(htmlToElement(`<div>DOC ICON | ${file.type.split('/')[1]} | ${file.name}</div>`));
+		// this.fileDropPlace.style = 'display: hidden';
+		this.fileDropPane.append(
+			htmlToElement(`<div class='dropped_elem'>  DOC ICON | ${file.type.split('/')[1]} | ${file.name}</div>`)
+		);
 	};
 
 	showPhoto = file => {
 		const image = document.createElement('img');
 
-		image.style = 'width: 160px; height: 160px;';
+		// image.style = 'width: 160px; height: 160px;';
+		image.className = 'dropped_elem';
 
 		image.src = window.URL.createObjectURL(new Blob([file]));
 
 		this.mediaDropPane.append(image);
 	};
 
-	uploadFile = file => {
+	uploadFile = file => () => {
 		if (file) {
 			telegramApi
 				.sendFile(
@@ -274,7 +307,7 @@ export default class MessageInput extends HTMLElement {
 		}
 	};
 
-	uploadPhoto = file => {
+	uploadPhoto = file => () => {
 		if (file) {
 			telegramApi
 				.sendFile(
@@ -306,7 +339,7 @@ export default class MessageInput extends HTMLElement {
 			.then(this.closeFileDrop);
 	};
 
-	uploadPhotos = (files = []) => { };
+	uploadPhotos = (files = []) => {};
 
 	progressHandler = (current, all) => {
 		console.log('Uploading file', (current / all) * 100);
@@ -324,12 +357,17 @@ export default class MessageInput extends HTMLElement {
 
 	closeMediaDrop = () => {
 		this.mediaDrop.classList.add('hide');
-		const imgElems = this.mediaDrop.querySelectorAll('img');
-		imgElems.forEach(elem => {
-			if (elem.classList != 'close-icon') {
-				elem.remove();
-			}
+		const textElem = document.querySelector('.media-drop__text');
+		console.log('textElem', textElem);
+		textElem.innerHTML = 'Drag to Reposition';
+		this.mediaDropPlace.innerHTML = 'Drag and Drop media here to send it...';
+		this.mediaDropCaption.value = '';
+		this.dataCounter = 0;
+		console.log('this.dataCounter', this.dataCounter);
+		this.eventListenters.forEach(listener => {
+			this.mediaDropAccept.removeEventListener('click', listener);
 		});
+		this.eventListenters = [];
 	};
 
 	showFileDrop = e => {
@@ -338,10 +376,20 @@ export default class MessageInput extends HTMLElement {
 
 	closeFileDrop = () => {
 		this.fileDrop.classList.add('hide');
+		const textElem = document.querySelector('.file-drop__text');
+		console.log('textElem', textElem);
+		textElem.innerHTML = 'Drag to Reposition';
+		this.fileDropPlace.innerHTML = 'Drag and Drop file here to send it...';
+		this.fileDropCaption.value = '';
+		this.dataCounter = 0;
+		console.log('this.dataCounter', this.dataCounter);
+		this.eventListenters.forEach(listener => {
+			this.fileDropAccept.removeEventListener('click', listener);
+		});
+		this.eventListenters = [];
 	};
 
 	sendMessage = e => {
-
 		if (this.inputArea.textContent != '') {
 			const result = this.inputArea.innerHTML
 				.replace('&nbsp;', ' ')
