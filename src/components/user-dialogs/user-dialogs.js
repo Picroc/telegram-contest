@@ -97,7 +97,7 @@ export default class UserDialogs extends HTMLElement {
 			}
 		});
 
-		onScrollBottom(this, this.scrollHandler.bind(this));
+		onScrollBottom(this, this.scrollHandler);
 	}
 
 	updateMessage = data => {
@@ -152,19 +152,22 @@ export default class UserDialogs extends HTMLElement {
 	};
 
 	scrollHandler = event => {
-		if (!this.scrollTimeout) {
-			const load = ({ dialog_items: data, archived_items }) => {
-				appendDialogs(data);
-				appendArchives(archived_items);
-				window.updateRipple();
-			};
-
-			telegramApi.getDialogsParsed(50).then(load);
+		if (this.loading) {
+			return;
 		}
+		const load = ({ dialog_items: data, archived_items }) => {
+			appendDialogs(data);
+			appendArchives(archived_items);
+			window.updateRipple();
+		};
 
-		this.scrollTimeout = setTimeout(() => {
-			clearTimeout(this.scrollTimeout);
-		}, 500);
+		this.loading = true;
+		telegramApi
+			.getDialogsParsed(100)
+			.then(load)
+			.then(() => {
+				this.loading = false;
+			});
 	};
 
 	updateStatus = data => {

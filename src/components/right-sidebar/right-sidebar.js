@@ -38,6 +38,7 @@ export default class RightSidebar extends HTMLElement {
 		this.id = 'right-sidebar';
 		this.className = 'right-sidebar right-sidebar_hidden';
 		this.innerHTML = template;
+		this.min_id = 999999;
 
 		this.avatar = this.querySelector('.right-sidebar__avatar');
 		this.avatar.src = getDefaultAvatar();
@@ -67,10 +68,16 @@ export default class RightSidebar extends HTMLElement {
 		// this.addEventListener(SET_ACTIVE_PEER_MEDIA, this.setMedia);
 	}
 
-	handleMediaScroll = async function (event) {
+	handleMediaScroll = async function(event) {
+		if (this.loading) {
+			return;
+		}
+
+		this.loading = true;
 		const id = Number(this.getAttribute('peer_id'));
-		const media = await telegramApi.getPeerPhotos(id, this.media.childElementCount, 30);
-		media.forEach(async ({ photo }, index) => {
+		const media = await telegramApi.getPeerPhotos(id, this.min_id || 0, 30);
+		media.forEach(async ({ photo, msg_id }, index) => {
+			this.min_id = msg_id <= this.min_id ? msg_id : this.min_id;
 			const placeholder = htmlToElement(
 				`<div class="right-sidebar__general-materials__media_placeholder"></div>`
 			);
@@ -80,6 +87,7 @@ export default class RightSidebar extends HTMLElement {
 			placeholder.replaceWith(imageElement);
 			return imageElement;
 		});
+		this.loading = false;
 	};
 
 	backButtonListener = e => {
@@ -148,7 +156,7 @@ export default class RightSidebar extends HTMLElement {
 			const label = notifications ? 'Enabled' : 'Disabled';
 			const checkbox = `<input type="checkbox" class="item__icon notifications__icon" name="notifications" id="notifications"${
 				notifications ? 'checked' : ''
-				}>`;
+			}>`;
 			const notificationsElem = this.createAttributeElem('notifications', 'Notifications', label, () => checkbox);
 			this.peerAttributes.appendChild(notificationsElem);
 		}
@@ -240,7 +248,8 @@ export default class RightSidebar extends HTMLElement {
 		const media = await peerIdToMediaMapper(id);
 		this.media.innerHTML = '';
 		console.log(`Resolving media promises for peer ${id}`);
-		media.forEach(async ({ photo }, index) => {
+		media.forEach(async ({ photo, msg_id }, index) => {
+			this.min_id = msg_id <= this.min_id ? msg_id : this.min_id;
 			const placeholder = htmlToElement(
 				`<div class="right-sidebar__general-materials__media_placeholder"></div>`
 			);
