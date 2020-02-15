@@ -68,7 +68,7 @@ export default class RightSidebar extends HTMLElement {
 		// this.addEventListener(SET_ACTIVE_PEER_MEDIA, this.setMedia);
 	}
 
-	handleMediaScroll = async function(event) {
+	handleMediaScroll = async function (event) {
 		if (this.loading) {
 			return;
 		}
@@ -102,12 +102,16 @@ export default class RightSidebar extends HTMLElement {
 	updateStatus = e => {
 		const { id, status } = e.detail;
 		const { id: user_id } = getUser();
-		if (id != user_id) {
+		const activeId = getActivePeerId();
+		if (activeId == id && id != user_id) {
 			const statusElem = this.querySelector('.right-sidebar__status');
 			if (status == 'online') {
 				statusElem.classList.add('right-sidebar__status_online');
 			}
 			statusElem.innerHTML = status;
+		} else if (id == user_id) {
+			const statusElem = this.querySelector('.right-sidebar__status');
+			statusElem.innerHTM = '';
 		}
 	};
 
@@ -131,6 +135,8 @@ export default class RightSidebar extends HTMLElement {
 			this.avatar.classList.add('dialog__saved');
 			this.name.classList.add('right-sidebar__name_self');
 			this.name.innerHTML = 'Saved Messages';
+			const status = this.querySelector('.right-sidebar__status');
+			status.innerHTML = '';
 		} else {
 			this.avatar.classList.remove('dialog__saved');
 			this.name.classList.remove('right-sidebar__name_self');
@@ -156,7 +162,7 @@ export default class RightSidebar extends HTMLElement {
 			const label = notifications ? 'Enabled' : 'Disabled';
 			const checkbox = `<input type="checkbox" class="item__icon notifications__icon" name="notifications" id="notifications"${
 				notifications ? 'checked' : ''
-			}>`;
+				}>`;
 			const notificationsElem = this.createAttributeElem('notifications', 'Notifications', label, () => checkbox);
 			this.peerAttributes.appendChild(notificationsElem);
 		}
@@ -343,7 +349,6 @@ export default class RightSidebar extends HTMLElement {
 				avatar = cashedAvatar;
 			}
 			status = this.statusTransform(status);
-			console.log('status', status);
 			user.cashedAvatar = avatar;
 			const elem = this.createMemberElem(avatar, name, status);
 			if (peerId == getActivePeerId()) {
