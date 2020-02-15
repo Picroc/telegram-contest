@@ -7,7 +7,8 @@
   min-width: var(--right-sidebar-width);
 
   transition: 0.1s;
-  overflow: auto;
+  overflow-y: auto;
+  ovreflow-x: hidden;
 
   display: grid;
   grid-template-columns: 60px 1fr 60px;

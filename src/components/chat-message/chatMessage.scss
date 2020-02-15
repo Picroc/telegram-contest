@@ -63,6 +63,11 @@ $status-size: 16px;
   &_with {
     &_avatar {
       grid-template-columns: 60px 1fr;
+
+      .chat-message__reply {
+        grid-column: 2;
+      }
+
       .message {
         grid-column: 2;
         position: relative;
@@ -264,6 +269,54 @@ $status-size: 16px;
   padding-left: 10px;
   padding-right: 10px;
   border-radius: 16px;
+
+  svg {
+    position: relative;
+    text-align: center;
+  }
+
+  .doc {
+    &_mime {
+      top: 50%;
+      width: 54px;
+      transform: translateY(-100%);
+      color: var(--white);
+      position: absolute;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    &_pdf {
+		#Paper {
+			fill: #df3f40;
+		}
+
+		#Flipped {
+			fill: #b9191a
+		}
+    }
+
+    &_doc {
+		#Paper {
+			fill: #50a2e9;
+		}
+
+		#Flipped {
+			fill: #2a7cc3;
+		}
+    }
+
+    &_jpeg,
+    &_jpg {
+      fill: var(--black);
+	}
+	
+	&_zip,
+	&_rar {
+		fill: #fb8c00;
+	}
+  }
 
   background-color: var(--message-background);
 }
