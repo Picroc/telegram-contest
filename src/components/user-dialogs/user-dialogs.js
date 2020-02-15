@@ -9,6 +9,8 @@ import {
 	updateDialogShort,
 	updateDialogDate,
 	updateDialogOnlineStatus,
+	appendDialogs,
+	appendArchives,
 } from '../../store/store';
 import {
 	htmlToElement,
@@ -17,6 +19,7 @@ import {
 	createDiv,
 	getNotificationsModeBoolByPeer,
 	hide,
+	onScrollBottom,
 } from '../../helpers/index';
 import chatMain from '../../pages/chat-main/index';
 import './user-dialogs.scss';
@@ -93,6 +96,8 @@ export default class UserDialogs extends HTMLElement {
 					break;
 			}
 		});
+
+		onScrollBottom(this, this.scrollHandler.bind(this));
 	}
 
 	updateMessage = data => {
@@ -144,6 +149,22 @@ export default class UserDialogs extends HTMLElement {
 		if (!pinned) {
 			this.normal.prepend(dialogElem);
 		}
+	};
+
+	scrollHandler = event => {
+		if (!this.scrollTimeout) {
+			const load = ({ dialog_items: data, archived_items }) => {
+				appendDialogs(data);
+				appendArchives(archived_items);
+				window.updateRipple();
+			};
+
+			telegramApi.getDialogsParsed(50).then(load);
+		}
+
+		this.scrollTimeout = setTimeout(() => {
+			clearTimeout(this.scrollTimeout);
+		}, 500);
 	};
 
 	updateStatus = data => {

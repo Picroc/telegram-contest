@@ -6,6 +6,7 @@ import {
 	getDialog,
 	UPDATE_DIALOG_UNREAD,
 	UPDATE_DIALOG_ONLINE_STATUS,
+	UPDATE_DIALOG_STATUS,
 } from '../../../store/store';
 
 export default class Dialog extends HTMLElement {
@@ -23,14 +24,14 @@ export default class Dialog extends HTMLElement {
 		this.avatar = this.querySelector('.dialog__avatar-wrapper');
 		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updateDialogPhotoListener);
 		this.addEventListener(UPDATE_DIALOG_UNREAD, this.updateDialogUnreadListener);
-		this.addEventListener(UPDATE_DIALOG_ONLINE_STATUS, this.updateDialogOnlineStatusListener);
+		this.addEventListener(UPDATE_DIALOG_STATUS, this.updateDialogStatusListener);
 	}
 
 	updateDialogListener = event => {
 		this.render();
 	};
 
-	updateDialogOnlineStatusListener = ({ status }) => {
+	updateDialogStatusListener = ({ status }) => {
 		const {
 			dialog_peer: { _: type },
 		} = this.dialog;
