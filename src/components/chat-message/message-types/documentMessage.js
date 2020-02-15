@@ -61,10 +61,22 @@ export default class DocumentMessage extends HTMLElement {
 
 	getDocument(doc) {
 		// console.log('JUST DOC', doc);
+		const progress = (current, full) => {
+			setLoadingProgress(this.querySelector('.document-message__document'), (current / full) * 100);
+		};
 		this.addEventListener('click', () => {
-			telegramApi.downloadDocument(doc, null, true);
+			telegramApi.downloadDocument(doc, progress, true).then(() => {
+				const htmlSaved = this.querySelector('.document-message__document').innerHTML;
+				stopLoadingProgress(this.querySelector('.document-message__document'));
+				this.querySelector('.document-message__document').innerHTML = htmlSaved;
+				this.querySelector('.document-message__document')
+					.querySelector('.progress-ring')
+					.remove();
+			});
+			startLoadingProgress(this.querySelector('.document-message__document'), false, 54, false, 'black');
 		});
-		return `<div class='document-message__document'>${docIcon()} <p>${doc.attributes[0].file_name}</p></div>`;
+		return `<div class='document-message__document'>${docIcon()} <p>${doc.attributes[0].file_name ||
+			doc.attributes.filter(el => el._ === 'documentAttributeFilename')[0].file_name}</p></div>`;
 	}
 
 	getVideoDocument(doc) {
