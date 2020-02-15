@@ -19,7 +19,6 @@ const onTypeContacts = (value, searchCallback = () => {}) => {
 
 	currentSeacrhTimeout = setTimeout(() => {
 		tApi.searchPeers(value, 20).then(res => {
-			console.log(res);
 			searchCallback(res);
 		});
 	}, 1000);
@@ -97,7 +96,6 @@ export default class Menu extends HTMLElement {
 
 	archivesClick = e => {
 		const archives = document.getElementById('archives');
-		console.log(archives);
 		archives.classList.toggle('sidebar_hidden');
 	};
 

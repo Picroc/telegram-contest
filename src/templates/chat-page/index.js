@@ -73,7 +73,7 @@ const loadData = async () => {
 	const { id } = await telegramApi.getUserInfo();
 
 	const load = data => {
-		console.log('data', data);
+		// console.log('data', data);
 		data.forEach((user, i) => {
 			if (cached.filter(({ title }) => user.title === title).length > 0) {
 				return;
