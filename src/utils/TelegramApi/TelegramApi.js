@@ -343,21 +343,24 @@ export default class TelegramApi {
 		return payload;
 	};
 
-	sendFile = async params => {
-		params = params || {};
-		params.id = params.id || 0;
-		params.file = params.file || {};
-		params.caption = params.caption || '';
-
+	sendFile = async (
+		params = {
+			id: 0,
+			file: {},
+			caption: '',
+		},
+		inputType,
+		progressHandler = noop
+	) => {
 		const peer = this.mapPeerToTruePeer(await this.getPeerByID(params.id));
 
-		return this.MtpApiFileManager.uploadFile(params.file).then(inputFile => {
+		return this.MtpApiFileManager.uploadFile(params.file, progressHandler).then(inputFile => {
 			const file = params.file;
 
 			inputFile.name = file.name;
 
 			const inputMedia = {
-				_: 'inputMediaUploadedDocument',
+				_: inputType || 'inputMediaUploadedDocument',
 				file: inputFile,
 				mime_type: file.type,
 				attributes: [{ _: 'documentAttributeFilename', file_name: file.name }],
@@ -369,6 +372,45 @@ export default class TelegramApi {
 				message: params.caption,
 				random_id: [nextRandomInt(0xffffffff), nextRandomInt(0xffffffff)],
 			});
+		});
+	};
+
+	sendMultiFile = async (
+		params = {
+			id: 0,
+			data: [],
+		},
+		inputType,
+		progressHandler = noop
+	) => {
+		const peer = this.mapPeerToTruePeer(await this.getPeerByID(params.id));
+
+		const multi_media = [];
+
+		for (let i = 0; i < params.data.length; i++) {
+			const inputFile = await this.MtpApiFileManager.uploadFile(params.data[i].file, progressHandler);
+
+			const file = params.data[i].file;
+			inputFile.name = file.name;
+
+			const inputMedia = {
+				_: inputMedia || 'inputMediaUploadedDocument',
+				file: inputFile,
+				mime_type: file.type,
+				attributes: [{ _: 'documentAttributeFilename', file_name: file.name }],
+			};
+
+			multi_media.push({
+				_: 'inputSingleMedia',
+				media: inputMedia,
+				message: 'aas',
+				random_id: [nextRandomInt(0xffffffff), nextRandomInt(0xffffffff)],
+			});
+		}
+
+		return this.MtpApiManager.invokeApi('messages.sendMultiMedia', {
+			peer,
+			multi_media,
 		});
 	};
 
@@ -512,7 +554,96 @@ export default class TelegramApi {
 		return promise;
 	};
 
+	getAllStickers = async () => {
+		return this.invokeApi('messages.getAllStickers', {
+			hash: [nextRandomInt(0xffffffff), nextRandomInt(0xffffffff)],
+		});
+	};
+
+	_asyncForEach = async (array, callback) => {
+		for (let index = 0; index < array.length; index++) {
+			await callback(array[index], index, array);
+		}
+	};
+
+	_parseStickerData = async data => {
+		console.log('STICKERS', data);
+		if (data.sets) {
+			const result_sets = [];
+			data.sets.forEach(async stickerset => {
+				result_sets.push(
+					this.invokeApi('messages.getStickerSet', {
+						stickerset: {
+							_: 'inputStickerSetID',
+							id: stickerset.id,
+							access_hash: stickerset.access_hash,
+						},
+					}).then(result => {
+						console.log(result);
+
+						const isAnimated = this._checkFlag(stickerset.flags, 5) || stickerset.pFlags.animated;
+						let location = result.set.thumb && result.set.thumb.location;
+						const cached = this.MtpApiFileManager.getLocalFile(stickerset.id);
+
+						return {
+							set_info: result.set,
+							stickers: result.documents.map(doc => () =>
+								this.downloadDocument(doc).then(res => {
+									if (isAnimated) {
+										return this._getStickerData(res.bytes, doc.id);
+									} else {
+										return this._getImageData(res.bytes, doc.id);
+									}
+								})
+							),
+							previews: () =>
+								result.documents.map(doc => {
+									return this.getDocumentPreview(doc);
+								}),
+							set_preview: cached
+								? new Promise(resolve => {
+										resolve(cached);
+								  })
+								: location &&
+								  this.invokeApi('upload.getFile', {
+										offset: 0,
+										limit: 524288,
+										location: {
+											_: 'inputStickerSetThumb',
+											stickerset: {
+												_: 'inputStickerSetID',
+												id: stickerset.id,
+												access_hash: stickerset.access_hash,
+											},
+											volume_id: location.volume_id,
+											local_id: location.local_id,
+										},
+								  }).then(res => this._getImageData(res.bytes, stickerset.id)),
+							docs: result.documents,
+							isAnimated,
+							id: stickerset.id,
+						};
+					})
+				);
+			});
+			return result_sets;
+		}
+	};
+
+	getAllStickersParsed = async () => {
+		const sets = await this.getAllStickers().then(this._parseStickerData);
+
+		console.log(sets);
+	};
+
 	getDocumentPreview = doc => {
+		const cached = this.MtpApiFileManager.getLocalFile(doc.id);
+		if (cached) {
+			return new Promise(resolve => {
+				resolve(cached);
+			});
+		}
+
 		const location = { ...doc };
 		let limit = 524288;
 
@@ -524,14 +655,18 @@ export default class TelegramApi {
 
 		location._ = 'inputDocumentFileLocation';
 
-		return this.MtpApiManager.invokeApi('upload.getFile', {
+		const promise = this.MtpApiManager.invokeApi('upload.getFile', {
 			location: location,
 			offset: 0,
 			limit: limit,
+		}).then(res => {
+			return this._getImageData(res.bytes, doc.id);
 		});
+		this.MtpApiFileManager.saveDownloadingPromise(doc.id, promise);
+		return promise;
 	};
 
-	getPhotoPreview = photo => {
+	getPhotoPreview = (photo, customSize) => {
 		const cached = this.MtpApiFileManager.getLocalFile(photo.id);
 		if (cached) {
 			return new Promise(resolve => {
@@ -540,7 +675,7 @@ export default class TelegramApi {
 		}
 
 		let photo_size = photo.sizes;
-		photo_size = photo_size[3] || photo_size[2] || photo_size[1] || photo_size[0];
+		photo_size = photo_size[2] || photo_size[1] || photo_size[0];
 		const location = {
 			_: 'inputPhotoFileLocation',
 			id: photo.id,
@@ -657,6 +792,10 @@ export default class TelegramApi {
 			return;
 		}
 		const peer = await this.getPeerByID(peer_id);
+
+		if (!peer.photo) {
+			return;
+		}
 
 		const cached = this.MtpApiFileManager.getLocalFile(peer_id);
 
