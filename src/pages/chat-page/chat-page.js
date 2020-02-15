@@ -11,6 +11,7 @@ export default class ChatPage extends HTMLElement {
 	render() {
 		this.innerHTML = template;
 		this.className = 'chat-page';
+		this.id = 'chat-page';
 		this.loadData();
 	}
 
