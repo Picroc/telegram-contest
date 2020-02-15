@@ -351,12 +351,11 @@ export default class MessageInput extends HTMLElement {
 				console.log(res);
 				telegramApi.AppUpdatesManager.passUpdate(res);
 			});
-			this.inputArea.innerHTML = '';
 		} else {
-			this.inputArea.innerHTML = '';
-			this.emptyInputHandler();
 			console.log('Empty message, did not sent');
 		}
+		this.inputArea.innerHTML = '';
+		this.emptyInputHandler();
 	};
 
 	toggleEmoji = e => {
