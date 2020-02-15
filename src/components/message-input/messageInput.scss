@@ -10,7 +10,13 @@ message-input {
   display: grid;
   grid-template-columns: 1fr 60px;
   column-gap: 10px;
-  width: 40%;
+  width: calc(55% - 10vw);
+  min-width: 400px;
+
+  &_small {
+    width: calc(55% - var(--right-sidebar-width));
+  }
+
   svg {
     width: 60px;
     height: 60px;

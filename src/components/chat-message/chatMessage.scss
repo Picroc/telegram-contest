@@ -1,18 +1,18 @@
 $status-size: 16px;
 
 .chat-message {
-  max-width: 390px;
+  max-width: 35vw;
   margin: 6px;
   border-radius: 16px;
   display: grid;
 
   .message {
-    min-width: 200px;
+    min-width: 300px;
     display: inline-block;
     padding: 8px;
     height: min-content;
     border-radius: 16px;
-    max-width: 400px;
+    max-width: 35vw;
     word-break: break-all;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
       "Helvetica Neue", sans-serif;
@@ -108,6 +108,16 @@ $status-size: 16px;
     background-color: var(--message-background);
     padding-left: 10px;
     border-radius: 16px 16px 0 0;
+    .reply-field {
+      cursor: pointer;
+      border-left: 2px solid var(--reply-color);
+      padding: 0 4px;
+      margin-top: 8px;
+      margin-right: 4px;
+      &__title {
+        color: var(--reply-color);
+      }
+    }
 
     & + .message {
       border-top-left-radius: 0;
@@ -118,12 +128,14 @@ $status-size: 16px;
   &_in {
     --message-background: var(--white);
     --info-color: var(--gray);
+    --reply-color: var(--primary);
     align-self: flex-start;
   }
 
   &_out {
     --message-background: var(--light-green);
     --info-color: var(--green);
+    --reply-color: var(--green);
     align-self: flex-end;
     position: relative;
 
@@ -264,6 +276,8 @@ $status-size: 16px;
 }
 
 .document-message__document {
+  cursor: pointer;
+  user-select: none;
   padding-top: 5px;
   padding-bottom: 10px;
   padding-left: 10px;
@@ -288,34 +302,34 @@ $status-size: 16px;
     }
 
     &_pdf {
-		#Paper {
-			fill: #df3f40;
-		}
+      #Paper {
+        fill: #df3f40;
+      }
 
-		#Flipped {
-			fill: #b9191a
-		}
+      #Flipped {
+        fill: #b9191a;
+      }
     }
 
     &_doc {
-		#Paper {
-			fill: #50a2e9;
-		}
+      #Paper {
+        fill: #50a2e9;
+      }
 
-		#Flipped {
-			fill: #2a7cc3;
-		}
+      #Flipped {
+        fill: #2a7cc3;
+      }
     }
 
     &_jpeg,
     &_jpg {
       fill: var(--black);
-	}
-	
-	&_zip,
-	&_rar {
-		fill: #fb8c00;
-	}
+    }
+
+    &_zip,
+    &_rar {
+      fill: #fb8c00;
+    }
   }
 
   background-color: var(--message-background);

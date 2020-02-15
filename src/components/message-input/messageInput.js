@@ -12,6 +12,7 @@ import { getActivePeerId } from '../../store/store';
 export default class MessageInput extends HTMLElement {
 	render() {
 		this.innerHTML = template;
+		this.id = 'message-input';
 		window.updateRipple();
 		const setHTML = setInnerHTML.bind(this);
 
@@ -339,7 +340,7 @@ export default class MessageInput extends HTMLElement {
 			.then(this.closeFileDrop);
 	};
 
-	uploadPhotos = (files = []) => {};
+	uploadPhotos = (files = []) => { };
 
 	progressHandler = (current, all) => {
 		console.log('Uploading file', (current / all) * 100);
