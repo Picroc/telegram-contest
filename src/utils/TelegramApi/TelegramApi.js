@@ -349,7 +349,7 @@ export default class TelegramApi {
 			file: {},
 			caption: '',
 		},
-		inputType = 'inputMediaUploadedDocument',
+		inputType,
 		progressHandler = noop
 	) => {
 		const peer = this.mapPeerToTruePeer(await this.getPeerByID(params.id));
@@ -360,7 +360,7 @@ export default class TelegramApi {
 			inputFile.name = file.name;
 
 			const inputMedia = {
-				_: inputType,
+				_: inputType || 'inputMediaUploadedDocument',
 				file: inputFile,
 				mime_type: file.type,
 				attributes: [{ _: 'documentAttributeFilename', file_name: file.name }],
@@ -372,6 +372,45 @@ export default class TelegramApi {
 				message: params.caption,
 				random_id: [nextRandomInt(0xffffffff), nextRandomInt(0xffffffff)],
 			});
+		});
+	};
+
+	sendMultiFile = async (
+		params = {
+			id: 0,
+			data: [],
+		},
+		inputType,
+		progressHandler = noop
+	) => {
+		const peer = this.mapPeerToTruePeer(await this.getPeerByID(params.id));
+
+		const multi_media = [];
+
+		for (let i = 0; i < params.data.length; i++) {
+			const inputFile = await this.MtpApiFileManager.uploadFile(params.data[i].file, progressHandler);
+
+			const file = params.data[i].file;
+			inputFile.name = file.name;
+
+			const inputMedia = {
+				_: inputMedia || 'inputMediaUploadedDocument',
+				file: inputFile,
+				mime_type: file.type,
+				attributes: [{ _: 'documentAttributeFilename', file_name: file.name }],
+			};
+
+			multi_media.push({
+				_: 'inputSingleMedia',
+				media: inputMedia,
+				message: 'aas',
+				random_id: [nextRandomInt(0xffffffff), nextRandomInt(0xffffffff)],
+			});
+		}
+
+		return this.MtpApiManager.invokeApi('messages.sendMultiMedia', {
+			peer,
+			multi_media,
 		});
 	};
 
