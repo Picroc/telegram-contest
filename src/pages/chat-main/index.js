@@ -3,7 +3,7 @@ import './messages.scss';
 import './chatMain.scss';
 import { getActivePeer, getAllMessages, putMessage } from '../../store/store';
 import { telegramApi } from '../../App';
-import { startLoading, htmlToElement } from '../../helpers/index';
+import { startLoading, htmlToElement, onScrollTop, onScrollBottom } from '../../helpers/index';
 
 export default class ChatMain extends HTMLElement {
 	render() {
@@ -18,17 +18,53 @@ export default class ChatMain extends HTMLElement {
 
 		this.messagesList = this.querySelector('.all-messages');
 		startLoading(this.messagesList);
-		this.getMessages(peerId, startMessageId);
+		this.getMessages(peerId, startMessageId, false, 100, -50).then(() => {
+			document.getElementById(Number(startMessageId)).scrollIntoView({ block: 'center' });
+		});
 
 		this.loading = false;
 
-		this.messagesList.addEventListener('scroll', async () => {
-			if (this.messagesList.scrollTop < 500 && !this.loading) {
-				console.log('Hello');
+		telegramApi.subscribeToUpdates('messages', res => {
+			this.getMessages(peerId, this.firstMessage, true, 1, -2);
+		});
+
+		const removeElements = (element, fromStart = true, number) => {
+			for (let i = 0; i < number; i++) {
+				element.removeChild(fromStart ? element.firstChild : element.lastChild);
+			}
+		};
+
+		const updateMessageIds = () => {
+			this.firstMessage = this.messagesList.firstChild.id;
+			this.lastMessage = this.messagesList.lastChild.id;
+		};
+
+		onScrollTop(this.messagesList, async () => {
+			if (!this.loading) {
+				const beforeScroll = this.messagesList.scrollTop;
+				if (this.messagesList.children.length > 80) {
+					removeElements(this.messagesList, true, 30);
+					updateMessageIds();
+				}
+				this.messagesList.scrollTop = beforeScroll;
 				this.loading = true;
-				console.log('First', this.firstMessage, 'Last', this.lastMessage);
 				await this.getMessages(peerId, this.lastMessage);
-				this.loading = false;
+				setTimeout(() => {
+					this.loading = false;
+				}, 100);
+			}
+		});
+		onScrollBottom(this.messagesList, async () => {
+			if (!this.loading) {
+				if (this.messagesList.children.length > 80) {
+					removeElements(this.messagesList, false, 30);
+					updateMessageIds();
+				}
+				this.loading = true;
+				await this.getMessages(peerId, this.firstMessage, true, 30, -30, this.firstMessage);
+				setTimeout(() => {
+					this.loading = false;
+				}, 100);
 			}
 		});
 	}
@@ -38,42 +74,45 @@ export default class ChatMain extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['peer-id', 'start-message'];
+		return [''];
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		// this.render();
+		this.render();
 	}
 
-	getMessages = async (peerId, startMessageId) => {
-		await this.fetchMessages({ offsetId: startMessageId });
+	getMessages = async (peerId, startMessageId, prepend = false, limit = 30, addOffset, min_id) => {
+		let newMessages = await this.fetchMessages({ offsetId: startMessageId, limit, addOffset, min_id });
 		const messageList = this.messagesList;
 
 		if (messageList.classList.contains('loading')) {
 			stopLoading(messageList);
 		}
 
-		const msgs = getAllMessages(peerId);
-		const keys = Object.keys(msgs);
-		const messages = keys.filter(el => (startMessageId > 0 ? el < startMessageId : true)).reverse();
-
-		for (const messageId of messages) {
-			messageList.appendChild(htmlToElement(`<chat-message id="${messageId}"></chat-message>`));
+		if (prepend) {
+			newMessages = newMessages.reverse();
 		}
+
+		newMessages.forEach(({ id: messageId }) => {
+			if (prepend) {
+				messageList.prepend(htmlToElement(`<chat-message id="${messageId}"></chat-message>`));
+			} else {
+				messageList.append(htmlToElement(`<chat-message id="${messageId}"></chat-message>`));
+			}
+		});
 
 		this.firstMessage = this.messagesList.firstChild.id;
 		this.lastMessage = this.messagesList.lastChild.id;
-
-		console.log('INFO', this.firstMessage, this.lastMessage);
 	};
 
-	fetchMessages = async ({ limit = 30, offsetId = 0, offsetDate = 0 }) => {
+	fetchMessages = async ({ limit = 30, offsetId = 0, addOffset = 0, max_id, min_id }) => {
 		const peer = getActivePeer();
 		const peerId = peerToId(peer);
-		const { messages } = await telegramApi.getMessagesFromPeer(peer, limit, offsetId, offsetDate);
+		const { messages } = await telegramApi.getMessagesFromPeer(peer, limit, offsetId, addOffset, max_id, min_id);
 		for (const message of messages) {
 			const { id } = message;
 			putMessage(peerId)(id)(message);
 		}
+		return messages;
 	};
 }

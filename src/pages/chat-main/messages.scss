@@ -4,7 +4,7 @@ $status-size: 15px;
   margin-top: 60px;
   overflow: auto;
   display: flex;
-  flex-direction: column-reverse;
+  // flex-direction: column-reverse;
   width: 600px;
   height: 85vh;
   &::-webkit-scrollbar {

@@ -66,7 +66,7 @@ export const loadDialog = component => elem => async (dialogId, messageId) => {
 	startLoading(right);
 	const fullPeer = await telegramApi.getFullPeer(id);
 	setActivePeer({ fullPeer: { ...fullPeer, avatar, id }, ...peer });
-	right.innerHTML = `<top-bar user_id="${id}"></top-bar><chat-main peer-id="${id}"></chat-main>`;
+	right.innerHTML = `<top-bar user_id="${id}"></top-bar><chat-main start-message='${messageId}' peer-id="${id}"></chat-main>`;
 };
 
 export default class UserDialogs extends HTMLElement {

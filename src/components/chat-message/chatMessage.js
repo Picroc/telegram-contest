@@ -3,13 +3,14 @@ import { getMessage, getActivePeerId, getUser, getActivePeer } from '../../store
 import './chatMessage.scss';
 import { clsx, tc, htmlToElement } from '../../helpers/index';
 import { telegramApi } from '../../App';
+import AppMessagesManagerModule from '../../utils/TelegramApi/js/App/AppMessagesManager';
 
 export default class ChatMessage extends HTMLElement {
 	render = async () => {
 		const peerId = getActivePeerId();
 		const { _: type } = getActivePeer();
 		const messageId = this.getAttribute('id');
-		const message = getMessage(peerId)(messageId);
+		const message = new AppMessagesManagerModule(peerId).getMessage(messageId);
 		const { from_id, media, flags, date, _: messageType } = message;
 		const { out, channel_post: post, ...pflags } = telegramApi._checkMessageFlags(flags);
 		const withAvatar = !out && !(type === 'peerUser' || post || messageType === 'messageService');
@@ -25,8 +26,10 @@ export default class ChatMessage extends HTMLElement {
 		);
 		let time = new Date(date * 1000);
 		time = `${time.getHours()}:${time.getMinutes() > 9 ? time.getMinutes() : '0' + time.getMinutes()}`;
-		this.innerHTML = `${makeTemplate({ ...message, ...pflags, time, out, withAvatar })}`;
-		const avatar = await telegramApi.getPeerPhoto(from_id);
+		this.innerHTML = `${makeTemplate({ ...message, ...pflags, time, withAvatar })}`;
+		const avatar = await telegramApi.getPeerPhoto(from_id).catch(err => {
+			console.log('SOME ERR', err, from_id, message, post);
+		});
 		if (withAvatar) {
 			this.prepend(htmlToElement(`<img class="chat-message__avatar avatar avatar_small" src=${avatar}></img>`));
 		}
