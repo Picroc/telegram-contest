@@ -1,17 +1,26 @@
+message-input {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .message-input {
-  position: fixed;//absolute?
+  position: fixed; //absolute? nope
   bottom: 20px;
-  right: 100px;
   display: grid;
-  grid-template-columns: 90% 10%;
+  grid-template-columns: 1fr 60px;
   column-gap: 10px;
-  width: 570px;
+  width: 40%;
+  svg {
+    width: 60px;
+    height: 60px;
+  }
 }
 
 .text-input {
-  position: relative;//for xvostik
+  position: relative; //for xvostik
   display: grid;
-  grid-template-columns: 10% auto 10%;
+  grid-template-columns: 60px 1fr 60px;
   place-items: center;
   background-color: var(--white);
   border-radius: 0.5em 0.5em 0 0.5em;
@@ -46,7 +55,8 @@
     overflow: hidden;
     // white-space: normal;
 
-    &::before {//copypaste from web telega
+    &::before {
+      //copypaste from web telega
       content: attr(placeholder);
       color: #9aa2ab;
       display: block;
@@ -57,7 +67,6 @@
   }
 }
 .attach-media {
-
   &__popup {
     right: 55px;
     bottom: 65px;
@@ -68,7 +77,6 @@
       justify-content: flex-start;
       width: 200px;
     }
-
   }
 
   &__img {
@@ -76,14 +84,13 @@
     height: 24px;
     padding-right: 25px;
   }
-
 }
 
 .voice-message {
   cursor: pointer;
   background-color: white;
   padding: 16px !important;
-  border-radius: 2.5em;
+  border-radius: 50%;
   fill: var(--white);
 
   & svg {
@@ -130,7 +137,6 @@ $send-button-size: 26px;
   bottom: 63px;
 
   .tabs {
-
     display: grid;
     grid-template-columns: repeat(3, 25%);
     grid-template-rows: 20px 10px;

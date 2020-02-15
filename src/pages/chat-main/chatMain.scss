@@ -1,9 +1,14 @@
 chat-main {
   align-self: center;
   align-items: center;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: auto;
+  height: 90vh;
+  margin-bottom: calc(10vh - 30px);
   .all-messages {
-    height: 80vh;
-    overflow: auto;
+    width: 60%;
     display: flex;
     flex-direction: column-reverse;
     &::-webkit-scrollbar {
