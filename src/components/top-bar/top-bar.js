@@ -43,7 +43,7 @@ export default class TopBar extends HTMLElement {
 		const rightSidebar = document.querySelector('.right-sidebar');
 		rightSidebar.classList.toggle('right-sidebar_hidden');
 		document.getElementById('right').classList.toggle('right_small');
-		document.getElementById('message-input').children[0].classList.toggle('message-input_small');
+		document.getElementById('message-input').classList.toggle('message-input_small');
 	};
 
 	unitCheck = unit => {

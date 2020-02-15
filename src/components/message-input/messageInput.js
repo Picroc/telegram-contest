@@ -13,6 +13,7 @@ export default class MessageInput extends HTMLElement {
 	render() {
 		this.innerHTML = template;
 		this.id = 'message-input';
+		this.className = 'message-input';
 		window.updateRipple();
 		const setHTML = setInnerHTML.bind(this);
 
