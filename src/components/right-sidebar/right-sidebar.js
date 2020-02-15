@@ -1,5 +1,6 @@
 import template from './right-sidebar.html';
 import './right-sidebar.scss';
+import docIcon from './doc';
 import { setInnerHTML, setAttribute } from '../../helpers';
 import {
 	UPDATE_DIALOG_ONLINE_STATUS,
@@ -68,7 +69,7 @@ export default class RightSidebar extends HTMLElement {
 		// this.addEventListener(SET_ACTIVE_PEER_MEDIA, this.setMedia);
 	}
 
-	handleMediaScroll = async function(event) {
+	handleMediaScroll = async function (event) {
 		if (this.loading) {
 			return;
 		}
@@ -102,12 +103,16 @@ export default class RightSidebar extends HTMLElement {
 	updateStatus = e => {
 		const { id, status } = e.detail;
 		const { id: user_id } = getUser();
-		if (id != user_id) {
+		const activeId = getActivePeerId();
+		if (activeId == id && id != user_id) {
 			const statusElem = this.querySelector('.right-sidebar__status');
 			if (status == 'online') {
 				statusElem.classList.add('right-sidebar__status_online');
 			}
 			statusElem.innerHTML = status;
+		} else if (id == user_id) {
+			const statusElem = this.querySelector('.right-sidebar__status');
+			statusElem.innerHTM = '';
 		}
 	};
 
@@ -115,7 +120,7 @@ export default class RightSidebar extends HTMLElement {
 		const { id, avatar } = e.detail;
 		const peerId = Number(this.getAttribute('peer_id'));
 		if (id == peerId) {
-			this.avatar.src = avatar;
+			this.avatar.src = avatar || getDefaultAvatar();
 		}
 	};
 
@@ -127,10 +132,12 @@ export default class RightSidebar extends HTMLElement {
 		this.generalizedPeer = generalizedPeer;
 		const { notifications, name, avatar, id, type, self } = generalizedPeer;
 		if (self) {
-			this.avatar.innerHTML = avatar;
+			this.avatar.innerHTML = avatar || getDefaultAvatar();
 			this.avatar.classList.add('dialog__saved');
 			this.name.classList.add('right-sidebar__name_self');
 			this.name.innerHTML = 'Saved Messages';
+			const status = this.querySelector('.right-sidebar__status');
+			status.innerHTML = '';
 		} else {
 			this.avatar.classList.remove('dialog__saved');
 			this.name.classList.remove('right-sidebar__name_self');
@@ -139,6 +146,7 @@ export default class RightSidebar extends HTMLElement {
 		}
 		this.setMedia(id);
 		this.setMembers(id);
+		this.setDocs(id);
 		switch (type) {
 			case 'channel':
 			case 'user':
@@ -156,7 +164,7 @@ export default class RightSidebar extends HTMLElement {
 			const label = notifications ? 'Enabled' : 'Disabled';
 			const checkbox = `<input type="checkbox" class="item__icon notifications__icon" name="notifications" id="notifications"${
 				notifications ? 'checked' : ''
-			}>`;
+				}>`;
 			const notificationsElem = this.createAttributeElem('notifications', 'Notifications', label, () => checkbox);
 			this.peerAttributes.appendChild(notificationsElem);
 		}
@@ -367,6 +375,36 @@ export default class RightSidebar extends HTMLElement {
 				<div class="member__name-and-status__status ${status}">${status}</div>
 			</div>
     	</div>`);
+	};
+
+	setDocs = async id => {
+		this.docs.innerHTML = '';
+		const docs = await telegramApi.getPeerDocuments(id);
+		// this.docs
+		console.log('docs', docs);
+		docs.forEach(doc => {
+			let file_name;
+			doc.document.attributes.forEach(attr => {
+				if (attr.file_name) {
+					file_name = attr.file_name;
+				}
+			});
+			const docElem = this.createDocElem(docIcon, doc.document.mime_type, file_name);
+			this.docs.appendChild(docElem);
+		});
+	};
+
+	// createDocElem = doc => {
+	// 	return htmlToElement(`<div class='document-message__document'><p>${doc.attributes[0].file_name}</p></div>`);
+	// };
+	createDocElem = (icon, name, info) => {
+		return htmlToElement(`<div class="doc">
+			${icon()}
+			<div class="doc__name-and-info">
+				<div class="doc__name-and-info__name">${name}</div>
+				<div class="doc__name-and-info__info">${info}</div>
+			</div>
+		</div>`);
 	};
 
 	connectedCallback() {

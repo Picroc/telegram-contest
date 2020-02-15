@@ -7,7 +7,8 @@
   min-width: var(--right-sidebar-width);
 
   transition: 0.1s;
-  overflow: auto;
+  overflow-y: auto;
+  ovreflow-x: hidden;
 
   display: grid;
   grid-template-columns: 60px 1fr 60px;
@@ -104,6 +105,7 @@
     align-items: center;
     row-gap: 20px;
     margin-bottom: 5%;
+    word-break: break-all;
   }
 
   .attributes {
@@ -247,9 +249,24 @@
         grid-template-columns: 50px auto;
       }
     }
+    &__docs {
+      grid-auto-rows: 60px;
+      display: grid;
+      margin-left: 5px;
+      overflow-x: hidden;
+    }
   }
 }
 
 .online {
   color: var(--primary);
+}
+
+.doc {
+  display: grid;
+  grid-template-columns: 80px auto;
+
+  &__name-and-info {
+
+  }
 }

@@ -60,10 +60,13 @@ export default class DocumentMessage extends HTMLElement {
 	}
 
 	getDocument(doc) {
+
 		// console.log('JUST DOC', doc);
 		const progress = (current, full) => {
 			setLoadingProgress(this.querySelector('.document-message__document'), (current / full) * 100);
 		};
+		const mime = doc.mime_type.slice(doc.mime_type.indexOf('/') + 1);
+
 		this.addEventListener('click', () => {
 			telegramApi.downloadDocument(doc, progress, true).then(() => {
 				const htmlSaved = this.querySelector('.document-message__document').innerHTML;
@@ -75,7 +78,8 @@ export default class DocumentMessage extends HTMLElement {
 			});
 			startLoadingProgress(this.querySelector('.document-message__document'), false, 54, false, 'black');
 		});
-		return `<div class='document-message__document'>${docIcon()} <p>${doc.attributes[0].file_name ||
+
+		return `<div class='document-message__document'>${docIcon(mime)} <p>${doc.attributes[0].file_name ||
 			doc.attributes.filter(el => el._ === 'documentAttributeFilename')[0].file_name}</p></div>`;
 	}
 
@@ -148,9 +152,15 @@ export default class DocumentMessage extends HTMLElement {
 			telegramApi
 				.setStickerToContainer(data, this.querySelector(`.chat-message_animated-sticker`), id)
 				.then(anim => {
-					// anim.play();
-					this.querySelector(`.chat-message_animated-sticker`).addEventListener('mouseover', () => {
+					const sticker = this.querySelector(`.chat-message_animated-sticker`);
+					sticker.addEventListener('mouseenter', () => {
+						clearTimeout(sticker.stopped);
 						anim.play();
+					});
+					sticker.addEventListener('mouseleave', () => {
+						sticker.stopped = setTimeout(() => {
+							anim.stop();
+						}, 500);
 					});
 				});
 			this.querySelector('.chat-message_animated-sticker img').remove();
