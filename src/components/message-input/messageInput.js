@@ -89,29 +89,31 @@ export default class MessageInput extends HTMLElement {
 	}
 
 	getStickers = () => {
-		telegramApi.getAllStickersParsed().then(stickerpacksArray =>
-			stickerpacksArray[0].then(stickerpack => {
-				console.log('STICKERPACK', stickerpack);
-				stickerpack.stickers.forEach(stickerPromise => {
-					stickerPromise().then(sticker => {
-						const div = createDiv(`sticker_element stickerpack_${stickerpack.id}`);
-						div.addEventListener('click', this.sendSticker);
-						this.stickers.append(div);
-						telegramApi.setStickerToContainer(sticker, div, stickerpack.id);
+		const chatPage = document.getElementById('chat-page');
+		if (!chatPage.stickers) {
+			telegramApi.getAllStickersParsed().then(stickerpacksArray =>
+				stickerpacksArray[0].then(stickerpack => {
+					chatPage.stickers = stickerpack;
+					stickerpack.stickers.forEach(stickerPromise => {
+						stickerPromise().then(sticker => {
+							const div = createDiv(`sticker_element stickerpack_${stickerpack.id}`);
+							div.addEventListener('click', this.sendSticker);
+							this.stickers.append(div);
+							telegramApi.setStickerToContainer(sticker, div, stickerpack.id);
+						});
 					});
+				})
+			);
+		} else {
+			chatPage.stickers.forEach(stickerPromise => {
+				stickerPromise().then(sticker => {
+					const div = createDiv(`sticker_element stickerpack_${stickerpack.id}`);
+					div.addEventListener('click', this.sendSticker);
+					this.stickers.append(div);
+					telegramApi.setStickerToContainer(sticker, div, stickerpack.id);
 				});
-				// stickerpack.stickers[0]().then(sticker => {
-				// 	console.log(sticker);
-				// 	this.stickers.append(div);
-				// 	console.log('sticker', sticker);
-				// 	console.log('div', div);
-				// 	console.log('stickerpack.id', stickerpack.id);
-
-				// 	div.addEventListener('click');
-				// 	// div.innerHTML = sticker;
-				// });
-			})
-		);
+			});
+		}
 	};
 
 	sendSticker = e => {
@@ -305,7 +307,7 @@ export default class MessageInput extends HTMLElement {
 			.then(this.closeFileDrop);
 	};
 
-	uploadPhotos = (files = []) => {};
+	uploadPhotos = (files = []) => { };
 
 	progressHandler = (current, all) => {
 		console.log('Uploading file', (current / all) * 100);
