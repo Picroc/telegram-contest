@@ -194,4 +194,15 @@ $send-button-size: 26px;
       }
     }
   }
+
+  .tabs__content_stickers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    overflow: scroll;
+    height: 280px;
+  }
+}
+
+.sticker_element {
+  cursor: pointer;
 }

@@ -134,12 +134,17 @@ const getPhotoTemplate = photo => {
 		startLoading(document.getElementById(id));
 		telegramApi.getPhotoPreview(photo).then(data => {
 			const container = document.getElementById(id);
+			if (!container) {
+				return;
+			}
 			const img = document.createElement('img');
 			img.style = 'width: 100%; height: 100%';
 			img.src = data;
 
 			stopLoading(container);
+			container.innerHTML = '';
 			container.appendChild(img);
+			container.classList.add('size_normal');
 		});
 	});
 	return `<div id="${id}" style="width: ${width}px;height: ${height}px;background: #fafafa"></div>`;

@@ -1,5 +1,6 @@
-import { getDialog } from '../store/store';
+import { getDialog, getUser } from '../store/store';
 import { telegramApi } from '../App';
+import { saved } from '../components/user-dialogs/dialog/dialog.html';
 
 export const cc = (cls, condition = true) => ({ class: cls, condition });
 export const tc = (cls1, cls2, conditional) => cc(conditional ? cls1 : cls2);
@@ -24,7 +25,7 @@ export const clsx = (...clss) =>
 
 export const subscribe = element => {
 	const el = typeof element === 'string' ? document.querySelector(element) : element;
-	return function(...args) {
+	return function (...args) {
 		el.addEventListener(...args);
 	};
 };
@@ -36,7 +37,7 @@ export const htmlToElement = html => {
 	return template.content.firstChild;
 };
 
-export const setInnerHTML = function(selector) {
+export const setInnerHTML = function (selector) {
 	return value => {
 		this.querySelector(selector).innerHTML = value;
 	};
@@ -57,7 +58,7 @@ const toggleActive = force => elem => {
 
 export const hide = toggleHide(true);
 export const show = toggleHide(false);
-export const setAttribute = function(selector) {
+export const setAttribute = function (selector) {
 	return attribute => value => {
 		this.querySelector(selector).setAttribute(attribute, value);
 	};
@@ -174,6 +175,7 @@ export const getNotificationsModeBoolByPeer = peer => {
 
 export const getRightSidebarFieldsFromPeer = peer => {
 	const generalizedPeer = {};
+	console.log('peer', peer);
 	if (peer._ === 'userFull') {
 		generalizedPeer.type = 'user';
 		generalizedPeer.name = getName(peer.user.first_name, peer.user.last_name);
@@ -181,7 +183,9 @@ export const getRightSidebarFieldsFromPeer = peer => {
 		generalizedPeer.username = peer.user.username;
 		generalizedPeer.phone = peer.user.phone || '';
 	} else if (peer._ === 'messages.chatFull') {
-		if (telegramApi._checkFlag(peer.chats[0].flags, 8)) {
+		if (peer.chats[0]._ === 'chat') {
+			generalizedPeer.type = 'groupChat';
+		} else if (telegramApi._checkFlag(peer.chats[0].flags, 8)) {
 			generalizedPeer.type = 'groupChat';
 		} else {
 			generalizedPeer.type = 'channel';
@@ -189,10 +193,26 @@ export const getRightSidebarFieldsFromPeer = peer => {
 		generalizedPeer.name = peer.chats[0].title;
 		generalizedPeer.about = peer.full_chat.about;
 		generalizedPeer.link = (peer.full_chat.username && 't.me/' + peer.full_chat.username) || '';
+	} else {
+		generalizedPeer.type = 'groupChat';
+		generalizedPeer.name = peer.chats[0].title;
+		generalizedPeer.about = peer.full_chat.about;
+		generalizedPeer.link = (peer.full_chat.username && 't.me/' + peer.full_chat.username) || '';
 	}
 	generalizedPeer.notifications = getNotificationsModeBoolByPeer(peer);
 	generalizedPeer.avatar = peer.avatar;
 	generalizedPeer.id = peer.id;
+
+	if (peer.user && peer.user.pFlags.self) {
+		generalizedPeer.about = null;
+		generalizedPeer.link = null;
+		generalizedPeer.bio = null;
+		generalizedPeer.username = null;
+		generalizedPeer.phone = null;
+		generalizedPeer.notifications = null;
+		generalizedPeer.self = true;
+		generalizedPeer.avatar = saved;
+	}
 
 	return generalizedPeer;
 };

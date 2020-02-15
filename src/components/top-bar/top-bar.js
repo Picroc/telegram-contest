@@ -5,8 +5,8 @@ import {
 	mapId,
 	UPDATE_DIALOG_PHOTO,
 	getDialog,
-	updateDialogStatus,
-	UPDATE_DIALOG_STATUS,
+	updateDialogOnlineStatus,
+	UPDATE_DIALOG_ONLINE_STATUS,
 } from '../../store/store.js';
 import { telegramApi } from '../../App.js';
 import { reverse } from '../../helpers/index.js';
@@ -27,12 +27,12 @@ export default class TopBar extends HTMLElement {
 		this.searchIcon = this.querySelector('.top-bar__search');
 		this.avatar = this.querySelector('.top-bar__avatar img');
 		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updatePhotoListener);
-		this.addEventListener(UPDATE_DIALOG_STATUS, this.updateDialogStatusListener);
+		this.addEventListener(UPDATE_DIALOG_ONLINE_STATUS, this.updateDialogOnlineStatusListener);
 		this.searchIcon.addEventListener('click', this.searchClick);
 		this.addEventListener('click', this.showRightSideBar);
 	};
 
-	updateDialogStatusListener = e => {
+	updateDialogOnlineStatusListener = e => {
 		const { id } = event.detail;
 		if (id == this.getAttribute('user_id')) {
 			this.online.innerHTML = getDialog(id).onlineStatus;
@@ -98,7 +98,7 @@ export default class TopBar extends HTMLElement {
 			})
 			.then(() => {
 				if (onlineStatus) {
-					updateDialogStatus(id, onlineStatus);
+					updateDialogOnlineStatus(id, onlineStatus);
 				}
 			});
 	};

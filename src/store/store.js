@@ -150,17 +150,31 @@ export const updateDialogDate = (id, date) => {
 	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_DATE, { id, date }));
 };
 
-export const UPDATE_DIALOG_STATUS = `UPDATE_DIALOG_STATUS`;
-export const updateDialogStatus = (id, status) => {
+export const UPDATE_DIALOG_ONLINE_STATUS = `UPDATE_DIALOG_ONLINE_STATUS`;
+export const updateDialogOnlineStatus = (id, status) => {
 	const dialog = getDialog(id);
+	if (!dialog) {
+		return;
+	}
 	dialog.onlineStatus = status;
-	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, { id, status }));
+	document
+		.getElementById(`dialog_${id}`)
+		.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_ONLINE_STATUS, { id, status }));
 	const topBar = document.querySelector('top-bar');
 	if (topBar && topBar.getAttribute('user_id') == id) {
-		topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, { id, status }));
+		topBar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_ONLINE_STATUS, { id, status }));
 	}
 	const rightSidebar = document.querySelector('.right-sidebar');
-	rightSidebar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, status));
+	rightSidebar.dispatchEvent(updateStoreEvent(UPDATE_DIALOG_ONLINE_STATUS, { id, status }));
+};
+
+export const UPDATE_DIALOG_STATUS = 'UPDATE_DIALOG_STATUS';
+export const updateDialogStatus = (id, status) => {
+	const dialog = getDialog(id);
+	if (!dialog) {
+		return;
+	}
+	document.getElementById(`dialog_${id}`).dispatchEvent(updateStoreEvent(UPDATE_DIALOG_STATUS, { id, status }));
 };
 
 export const getDialogs = (offset = 0) => window.store.dialogs.slice(offset);

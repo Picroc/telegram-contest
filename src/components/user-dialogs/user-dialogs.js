@@ -8,7 +8,9 @@ import {
 	updateDialogUnread,
 	updateDialogShort,
 	updateDialogDate,
-	updateDialogStatus,
+	updateDialogOnlineStatus,
+	appendDialogs,
+	appendArchives,
 } from '../../store/store';
 import {
 	htmlToElement,
@@ -17,6 +19,7 @@ import {
 	createDiv,
 	getNotificationsModeBoolByPeer,
 	hide,
+	onScrollBottom,
 } from '../../helpers/index';
 import chatMain from '../../pages/chat-main/index';
 import './user-dialogs.scss';
@@ -60,7 +63,7 @@ export const loadDialog = component => elem => async (dialogId, messageId) => {
 	component.prevActive = elem;
 	component.prevId = id;
 	const rightSidebar = document.querySelector('.right-sidebar');
-	rightSidebar.id = `right-sidebar_${id}`;
+	rightSidebar.setAttribute('peer_id', id);
 	elem.classList.toggle('dialog_active');
 	const right = document.getElementById('right');
 	startLoading(right);
@@ -93,6 +96,8 @@ export default class UserDialogs extends HTMLElement {
 					break;
 			}
 		});
+
+		onScrollBottom(this, this.scrollHandler.bind(this));
 	}
 
 	updateMessage = data => {
@@ -146,9 +151,25 @@ export default class UserDialogs extends HTMLElement {
 		}
 	};
 
+	scrollHandler = event => {
+		if (!this.scrollTimeout) {
+			const load = ({ dialog_items: data, archived_items }) => {
+				appendDialogs(data);
+				appendArchives(archived_items);
+				window.updateRipple();
+			};
+
+			telegramApi.getDialogsParsed(50).then(load);
+		}
+
+		this.scrollTimeout = setTimeout(() => {
+			clearTimeout(this.scrollTimeout);
+		}, 500);
+	};
+
 	updateStatus = data => {
 		const { user_id, online } = data;
-		updateDialogStatus(user_id, online);
+		updateDialogOnlineStatus(user_id, online);
 	};
 
 	setListener = event => {

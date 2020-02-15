@@ -5,6 +5,7 @@ import {
 	updateDialogPhoto,
 	getDialog,
 	UPDATE_DIALOG_UNREAD,
+	UPDATE_DIALOG_ONLINE_STATUS,
 	UPDATE_DIALOG_STATUS,
 } from '../../../store/store';
 

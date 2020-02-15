@@ -25,6 +25,9 @@ export default class MessageInput extends HTMLElement {
 
 		this.mediaDrop = this.querySelector('.media-drop__paranja');
 		this.mediaDropExit = this.mediaDrop.querySelector('.media-drop__close-button');
+		this.mediaDropAccept = this.mediaDrop.querySelector('.media-drop__accept-button');
+		this.mediaDropPlace = this.mediaDrop.querySelector('.media-drop__media-place');
+		this.mediaDropCaption = this.mediaDrop.querySelector('.media-drop__caption');
 		this.mediaDropExit.addEventListener('click', this.closeMediaDrop);
 		this.mediaDrop.addEventListener('click', this.closeMediaDrop);
 		this.mediaDropPane = this.querySelector('.media-drop__pane');
@@ -35,10 +38,26 @@ export default class MessageInput extends HTMLElement {
 
 		this.fileDrop = this.querySelector('.file-drop__paranja');
 		this.fileDropExit = this.fileDrop.querySelector('.file-drop__close-button');
+		this.fileDropPlace = this.fileDrop.querySelector('.file-drop__file-place');
+		this.fileDropCaption = this.fileDrop.querySelector('.file-drop__caption');
+		this.fileDropAccept = this.fileDrop.querySelector('.file-drop__accept-button');
 		this.fileDropExit.addEventListener('click', this.closeFileDrop);
 		this.fileDrop.addEventListener('click', this.closeFileDrop);
 		this.fileDropPane = this.querySelector('.file-drop__pane');
 		this.fileDropPane.addEventListener('click', e => (e.cancelBubble = true));
+
+		const dragPrevent = e => {
+			e.stopPropagation();
+			e.preventDefault();
+		};
+
+		this.fileDropPane.addEventListener('dragenter', dragPrevent, false);
+		this.fileDropPane.addEventListener('dragover', dragPrevent, false);
+		this.mediaDropPane.addEventListener('dragenter', dragPrevent, false);
+		this.mediaDropPane.addEventListener('dragover', dragPrevent, false);
+
+		this.fileDropPane.addEventListener('drop', this.handleDrop);
+		this.mediaDropPane.addEventListener('drop', this.handleDrop);
 
 		this.inputArea = this.querySelector('.text-input__input');
 		this.inputArea.addEventListener('input', this.inputHandler);
@@ -60,7 +79,44 @@ export default class MessageInput extends HTMLElement {
 
 		this.sendButton = this.querySelector('#send-button');
 		this.sendButton.addEventListener('click', this.sendMessage);
+
+		this.dropZone = this.querySelector('.media-drop__paranja');
+		this.dropZone.addEventListener('ondragover', this.handeDrop);
+
+		this.stickers = this.querySelector('.tabs__content_stickers');
+
+		this.getStickers();
 	}
+
+	getStickers = () => {
+		telegramApi.getAllStickersParsed().then(stickerpacksArray =>
+			stickerpacksArray[0].then(stickerpack => {
+				console.log('STICKERPACK', stickerpack);
+				stickerpack.stickers.forEach(stickerPromise => {
+					stickerPromise().then(sticker => {
+						const div = createDiv(`sticker_element stickerpack_${stickerpack.id}`);
+						div.addEventListener('click', this.sendSticker);
+						this.stickers.append(div);
+						telegramApi.setStickerToContainer(sticker, div, stickerpack.id);
+					});
+				});
+				// stickerpack.stickers[0]().then(sticker => {
+				// 	console.log(sticker);
+				// 	this.stickers.append(div);
+				// 	console.log('sticker', sticker);
+				// 	console.log('div', div);
+				// 	console.log('stickerpack.id', stickerpack.id);
+
+				// 	div.addEventListener('click');
+				// 	// div.innerHTML = sticker;
+				// });
+			})
+		);
+	};
+
+	sendSticker = e => {
+		//not implemented
+	};
 
 	fillEmojiContent = () => {
 		const initialEmojiNum = 128512;
@@ -122,6 +178,139 @@ export default class MessageInput extends HTMLElement {
 		});
 	};
 
+	handleButton = e => {
+		console.log(e.code);
+		if (e.shiftKey && e.code == 'Enter') {
+			this.value += '\n';
+		} else if (e.code == 'Backspace') {
+			this.value = this.value.slice(0, -1);
+		} else if (e.code == 'Enter') {
+			e.cancelBubble = true;
+			e.preventDefault();
+			this.sendMessage();
+		}
+	};
+
+	handleDrop = e => {
+		e.stopPropagation();
+		e.preventDefault();
+
+		const transfer = e.dataTransfer;
+		const file = transfer.files[0];
+
+		if (file && e.target.classList.contains('file-drop__pane')) {
+			if (transfer.files.length > 1) {
+				this.handleFiles(Array.from(transfer.files));
+			} else {
+				this.handleFile(file);
+			}
+		} else {
+			if (transfer.files.length > 1) {
+				this.handlePhotos(Array.from(transfer.files));
+			} else {
+				this.handlePhoto(file);
+			}
+		}
+	};
+
+	handleFile = file => {
+		if (file) {
+			this.showFile(file);
+			this.fileDropAccept.addEventListener('click', () => this.uploadFile(file));
+		}
+	};
+
+	handleFiles = (files = []) => {
+		if (files) {
+			files.forEach(file => {
+				this.handleFile(file);
+			});
+			// this.fileDropAccept.addEventListener('click', () => this.uploadFiles(files));
+		}
+	};
+
+	handlePhoto = file => {
+		if (file) {
+			this.showPhoto(file);
+			this.mediaDropAccept.addEventListener('click', () => this.uploadPhoto(file));
+		}
+	};
+
+	handlePhotos = (files = []) => {
+		if (files) {
+			files.forEach(file => {
+				this.handlePhoto(file);
+			});
+			// this.mediaDropAccept.addEventListener('click', () => this.uploadPhotos(files));
+		}
+	};
+
+	showFile = file => {
+		this.fileDropPlace.style = 'display: hidden';
+
+		this.fileDropPlace.append(htmlToElement(`<div>DOC ICON | ${file.type.split('/')[1]} | ${file.name}</div>`));
+	};
+
+	showPhoto = file => {
+		const image = document.createElement('img');
+
+		image.style = 'width: 160px; height: 160px;';
+
+		image.src = window.URL.createObjectURL(new Blob([file]));
+
+		this.mediaDropPane.append(image);
+	};
+
+	uploadFile = file => {
+		if (file) {
+			telegramApi
+				.sendFile(
+					{ file, id: getActivePeerId(), caption: this.fileDropCaption.value },
+					'',
+					this.progressHandler
+				)
+				.then(this.closeFileDrop);
+		}
+	};
+
+	uploadPhoto = file => {
+		if (file) {
+			telegramApi
+				.sendFile(
+					{ file, id: getActivePeerId(), caption: this.mediaDropCaption.value },
+					'inputMediaUploadedPhoto',
+					this.progressHandler
+				)
+				.then(this.closeMediaDrop);
+		}
+	};
+
+	uploadFiles = (files = []) => {
+		const data = files.map(file => ({
+			file: file,
+			caption: this.fileDropCaption.value,
+		}));
+
+		telegramApi.sendMultiFile({ id: getActivePeerId(), data }, '', this.progressHandler).then(this.closeFileDrop);
+	};
+
+	uploadPhotos = (files = []) => {
+		const data = files.map(file => ({
+			file: file,
+			caption: this.fileDropCaption.value,
+		}));
+
+		telegramApi
+			.sendMultiFile({ id: getActivePeerId(), data }, 'inputMediaUploadedPhoto', this.progressHandler)
+			.then(this.closeFileDrop);
+	};
+
+	uploadPhotos = (files = []) => {};
+
+	progressHandler = (current, all) => {
+		console.log('Uploading file', (current / all) * 100);
+	};
+
 	showAttachPopup = e => {
 		e.cancelBubble = true;
 		this.attachPopup.classList.toggle('popup_hidden');
@@ -134,6 +323,12 @@ export default class MessageInput extends HTMLElement {
 
 	closeMediaDrop = () => {
 		this.mediaDrop.classList.add('hide');
+		const imgElems = this.mediaDrop.querySelectorAll('img');
+		imgElems.forEach(elem => {
+			if (elem.classList != 'close-icon') {
+				elem.remove();
+			}
+		});
 	};
 
 	showFileDrop = e => {
