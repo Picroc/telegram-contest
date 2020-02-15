@@ -68,7 +68,6 @@ export default class DocumentMessage extends HTMLElement {
 	}
 
 	getVideoDocument(doc) {
-		console.log(doc);
 		const attrs = doc.attributes.filter(el => el._ === 'documentAttributeVideo')[0];
 		const isRound = telegramApi._checkFlag(attrs.flags, 0);
 		setZeroTimeout(() => {
@@ -132,24 +131,32 @@ export default class DocumentMessage extends HTMLElement {
 		const { id, file_reference: fileReference, date, size, thumbs, attributes } = doc;
 		const { type, w, h, bytes } = thumbs[0];
 		const [{ w: width, h: height }, { alt: altEmoji, stickerset: stickerSet }] = attributes;
-		const stickerPreviewUrl = `data:image/png;base64,${btoa(String.fromCharCode(...new Uint8Array(bytes)))}`;
+		const stickerPreviewUrl = window.URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
 		telegramApi.downloadDocument(doc).then(data => {
-			telegramApi.setStickerToContainer(data, this.querySelector(`.chat-message_animated-sticker`), id);
+			telegramApi
+				.setStickerToContainer(data, this.querySelector(`.chat-message_animated-sticker`), id)
+				.then(anim => {
+					// anim.play();
+					this.querySelector(`.chat-message_animated-sticker`).addEventListener('mouseover', () => {
+						anim.play();
+					});
+				});
 			this.querySelector('.chat-message_animated-sticker img').remove();
 		});
 		return `<div class="chat-message_animated-sticker"><img src="${stickerPreviewUrl}" alt=${altEmoji}></div>`;
 	}
 
-	getSticker({ id, access_hash, file_reference: fileReference, date, size, thumbs, attributes }) {
+	getSticker(doc) {
+		const { id, attributes, thumbs } = doc;
 		const { bytes } = thumbs[0];
 		const scale = 300 / 512;
 		let { w, h } = attributes[0];
 		const { alt: altEmoji } = attributes[1];
 		w *= scale;
 		h *= scale;
-		const stickerUrl = window.URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
+		// const stickerUrl = window.URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
 		// if (!bytes) {
-		telegramApi.getDocumentPreview({ id, file_reference: fileReference, access_hash, thumbs }).then(res => {
+		telegramApi.getDocumentPreview(doc).then(res => {
 			let img = this.querySelector('img');
 			if (!img) {
 				img = document.createElement('img');
@@ -160,27 +167,10 @@ export default class DocumentMessage extends HTMLElement {
 				return;
 			}
 
-			img.src = window.URL.createObjectURL(new Blob([res.bytes], { type: 'image/png' }));
+			img.src = res;
 			img.style = `width: ${w}px; height: ${h}px`;
 		});
-		telegramApi.getDocumentPreview({ id, file_reference: fileReference, access_hash }).then(res => {
-			let img = this.querySelector('img');
-			if (!img) {
-				img = document.createElement('img');
-				this.querySelector('.chat-message_sticker').innerHTML = '';
-				this.querySelector('.chat-message_sticker').appendChild(img);
-			}
-
-			img.src = window.URL.createObjectURL(new Blob([res.bytes], { type: 'image/png' }));
-			img.style = `width: ${w}px; height: ${h}px`;
-
-			img.classList.add('chat-message_sticker_full');
-		});
-		return `<div id='${id}' class="chat-message_sticker">${
-			bytes
-				? `<img style='width: ${w}px; height: ${h}px;' src="${stickerUrl}" alt=${altEmoji}>`
-				: `<div style='width: ${w}px; height: ${h}px;'></div>`
-		}</div>`;
+		return `<div id='${id}' class="chat-message_sticker">${`<div style='width: ${w}px; height: ${h}px;'></div>`}</div>`;
 	}
 
 	getAnimationItem = (data, options) => () =>

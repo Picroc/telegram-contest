@@ -1,5 +1,4 @@
 import { forEach, isObject } from '../Etc/Helper';
-import { safeReplaceObject } from '../lib/utils';
 
 export default class AppMessagesManagerModule {
 	messages = {};
@@ -26,7 +25,7 @@ export default class AppMessagesManagerModule {
 		if (!this.messages[message.id]) {
 			this.messages[message.id] = message;
 		} else {
-			safeReplaceObject(this.messages[message.id], message);
+			this.messages[message.id] = message;
 		}
 
 		cachedMessages[this.chatPeer].messages = this.messages;

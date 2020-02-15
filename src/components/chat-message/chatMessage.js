@@ -27,9 +27,7 @@ export default class ChatMessage extends HTMLElement {
 		let time = new Date(date * 1000);
 		time = `${time.getHours()}:${time.getMinutes() > 9 ? time.getMinutes() : '0' + time.getMinutes()}`;
 		this.innerHTML = `${makeTemplate({ ...message, ...pflags, time, withAvatar })}`;
-		const avatar = await telegramApi.getPeerPhoto(from_id).catch(err => {
-			console.log('SOME ERR', err, from_id, message, post);
-		});
+		const avatar = await telegramApi.getPeerPhoto(from_id).catch(err => {});
 		if (withAvatar) {
 			this.prepend(htmlToElement(`<img class="chat-message__avatar avatar avatar_small" src=${avatar}></img>`));
 		}

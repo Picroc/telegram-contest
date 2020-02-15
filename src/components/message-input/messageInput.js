@@ -181,7 +181,6 @@ export default class MessageInput extends HTMLElement {
 	};
 
 	handleButton = e => {
-		console.log(e.code);
 		if (e.shiftKey && e.code == 'Enter') {
 			this.value += '\n';
 		} else if (e.code == 'Backspace') {
@@ -342,6 +341,7 @@ export default class MessageInput extends HTMLElement {
 	};
 
 	sendMessage = e => {
+
 		if (this.inputArea.textContent != '') {
 			const result = this.inputArea.innerHTML
 				.replace('&nbsp;', ' ')
@@ -356,6 +356,7 @@ export default class MessageInput extends HTMLElement {
 		} else {
 			console.log('Empty message, did not sent');
 		}
+
 		this.inputArea.innerHTML = '';
 		this.emptyInputHandler();
 	};

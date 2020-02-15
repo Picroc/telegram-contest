@@ -202,6 +202,6 @@ export default (elem, rt) => {
 			}
 		})
 		.catch(err => {
-			console.log(err);
+			// console.log(err);
 		});
 };
