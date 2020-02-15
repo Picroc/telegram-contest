@@ -123,3 +123,56 @@ $send-button-size: 26px;
     }
   }
 }
+
+.emoji__popup {
+  width: 300px;
+  height: 300px;
+  bottom: 63px;
+
+  .tabs {
+
+    display: grid;
+    grid-template-columns: repeat(3, 25%);
+    grid-template-rows: 20px 10px;
+    align-items: center;
+    justify-items: center;
+    justify-content: space-around;
+    position: relative;
+  }
+
+  .tab {
+    cursor: pointer;
+    color: var(--dark-gray);
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: bold;
+
+    &_active {
+      color: var(--primary);
+    }
+  }
+
+  .underline {
+    display: block;
+    width: 60%;
+    background: var(--primary);
+    border-radius: 20px;
+    height: 0.5vh;
+    z-index: 1;
+    transition: all 0.4s ease-in;
+    grid-row: 2;
+    grid-column: 1;
+
+    // &_big {
+    //   width: 100%;
+    // }
+  }
+
+  .gray-line {
+    grid-column: 1/4;
+    grid-row: 2;
+    border-bottom: 1px solid var(--gray);
+    width: 135%;
+    transform: translateY(2px);
+  }
+}
