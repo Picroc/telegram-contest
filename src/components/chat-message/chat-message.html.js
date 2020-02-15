@@ -51,9 +51,9 @@ export default ({
 		const { _: mediaType, photo = {}, photos = [] } = media;
 		const messageInfo = !message
 			? `<div class="${clsx(
-				'message__info',
-				!message && hasMedia && 'message__info_media_no-message'
-			)}">${time}${outIcon}</div>`
+					'message__info',
+					!message && hasMedia && 'message__info_media_no-message'
+			  )}">${time}${outIcon}</div>`
 			: '';
 
 		if (mediaType === 'messageMediaPhoto') {
@@ -67,7 +67,20 @@ export default ({
 	}
 
 	const forward = (forwardFrom && `<div>Was forwarded from ${forwardFrom}</div>`) || '';
-	const reply = (replyToMessageId && `<div class='chat-message__reply'>Reply to ${replyToMessageId}</div>`) || '';
+	const reply =
+		(replyToMessageId &&
+			`<div class='chat-message__reply_${replyToMessageId}'>Reply to ${replyToMessageId}</div>`) ||
+		'';
+	if (replyToMessageId) {
+		setZeroTimeout(async () => {
+			const reply_elem = document.querySelector(`.chat-message__reply_${replyToMessageId}`);
+			if (reply_elem) {
+				const results = await telegramApi.getReplyInfo(replyToMessageId);
+				reply_elem.innerHTML = `<div class='reply-field'><b>${results.title}</b>: ${results.message}</div>`;
+				// console.log('REPLY', results);
+			}
+		});
+	}
 
 	const formattedMessage = getFormattedMessage({ message, entities, time, outIcon });
 

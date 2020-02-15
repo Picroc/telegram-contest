@@ -71,7 +71,10 @@ export default class MessageInput extends HTMLElement {
 	sendMessage = e => {
 		console.log('Sending message', this.value);
 		const id = getActivePeerId();
-		telegramApi.sendMessage(id, this.value);
+		telegramApi.sendMessage(id, this.value).then(res => {
+			console.log(res);
+			telegramApi.AppUpdatesManager.passUpdate(res);
+		});
 		this.inputArea.innerHTML = '';
 	};
 

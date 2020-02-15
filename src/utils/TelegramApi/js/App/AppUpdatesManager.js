@@ -3,6 +3,7 @@ import { telegramApi } from '../../../../App';
 import { Config } from '../lib/config';
 import { dT } from '../lib/utils';
 import AppUsersManagerModule from './AppUsersManager';
+import AppMessagesManagerModule from './AppMessagesManager';
 
 export default class AppUpdatesManagerModule {
 	subscribed = {
@@ -43,6 +44,15 @@ export default class AppUpdatesManagerModule {
 		this.MtpNetworkerFactory.subscribe('updateHandler', updatesHandler);
 	}
 
+	passUpdate = data => {
+		console.log('Got event', data);
+		if (data._ === 'updateShort' || data._ === 'updates') {
+			this._parseUpdate(data);
+		} else if (data._ === 'updateShortMessage' || data._ === 'updateShortChatMessage') {
+			this._parseUpdate({ update: data });
+		}
+	};
+
 	subscribe = (type, handler) => {
 		if (!type || !this.subscribed[type] || typeof handler !== 'function') {
 			return;
@@ -52,7 +62,7 @@ export default class AppUpdatesManagerModule {
 	};
 
 	_parseUpdate = data => {
-		// console.log('Got update!', data);
+		console.log('Got update!', data);
 		const switchUpdate = update => {
 			switch (update._) {
 				case 'updateNewMessage':
@@ -160,6 +170,16 @@ export default class AppUpdatesManagerModule {
 	_handleNewChatMessage = async message => {
 		const { from_id, chat_id, date, id, flags } = message;
 
+		const dialog = telegramApi.AppChatsManager.getDialog(chat_id);
+		if (!dialog.deleted) {
+			telegramApi.AppChatsManager.saveDialog({
+				...dialog,
+				id,
+			});
+		}
+
+		new AppMessagesManagerModule(chat_id).saveMessage(message);
+
 		const payload = {
 			_: 'newMessage',
 			from_id,
@@ -176,6 +196,16 @@ export default class AppUpdatesManagerModule {
 
 	_handleNewUserMessage = async message => {
 		const { user_id, date, id, flags } = message;
+
+		const dialog = telegramApi.AppChatsManager.getDialog(user_id);
+		if (!dialog.deleted) {
+			telegramApi.AppChatsManager.saveDialog({
+				...dialog,
+				top_message: id,
+			});
+		}
+
+		new AppMessagesManagerModule(user_id).saveMessage(message);
 
 		const payload = {
 			_: 'newMessage',
@@ -215,6 +245,18 @@ export default class AppUpdatesManagerModule {
 		};
 
 		// console.log(payload);
+
+		const dialog = telegramApi.AppChatsManager.getDialog(to_id);
+
+		if (!dialog.deleted) {
+			telegramApi.AppChatsManager.saveDialog({
+				...dialog,
+				top_message: message.id,
+			});
+		}
+
+		const messageManager = new AppMessagesManagerModule(to_id);
+		messageManager.saveMessage(message);
 
 		this._dispatchForDialogs(payload);
 		this._dispatchForMessages(payload);

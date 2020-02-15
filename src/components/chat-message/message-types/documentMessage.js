@@ -5,6 +5,7 @@ import { startLoadingProgress, setLoadingProgress, stopLoadingProgress, clsx } f
 
 import docIcon from './doc';
 import { outSvg, outNotReadSvg } from '../../user-dialogs/dialog/dialog.html';
+import AppMessagesManagerModule from '../../../utils/TelegramApi/js/App/AppMessagesManager';
 
 export default class DocumentMessage extends HTMLElement {
 	constructor() {
@@ -19,7 +20,7 @@ export default class DocumentMessage extends HTMLElement {
 			date,
 			outRead,
 			flags,
-		} = getMessage(this.peerId)(this.id);
+		} = new AppMessagesManagerModule(this.peerId).getMessage(this.id);
 		const { out } = telegramApi._checkMessageFlags(flags);
 
 		const outIcon = out ? (outRead ? outSvg : outNotReadSvg) : '';
@@ -179,7 +180,7 @@ export default class DocumentMessage extends HTMLElement {
 			bytes
 				? `<img style='width: ${w}px; height: ${h}px;' src="${stickerUrl}" alt=${altEmoji}>`
 				: `<div style='width: ${w}px; height: ${h}px;'></div>`
-			}</div>`;
+		}</div>`;
 	}
 
 	getAnimationItem = (data, options) => () =>

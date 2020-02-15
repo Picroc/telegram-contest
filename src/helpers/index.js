@@ -198,18 +198,24 @@ export const getRightSidebarFieldsFromPeer = peer => {
 };
 
 export const onScrollTop = (element, callback) => {
+	let lastScroll = 0;
 	element.addEventListener('scroll', () => {
-		if (element.scrollTop < 500) {
+		const lt = window.pageYOffset || element.scrollTop;
+		if (element.scrollTop < 500 && lastScroll > lt) {
 			callback();
 		}
+		lastScroll = lt;
 	});
 };
 
 export const onScrollBottom = (element, callback) => {
+	let lastScroll = 0;
 	element.addEventListener('scroll', () => {
-		if (element.scrollTop + element.clientHeight >= element.scrollHeight - 300) {
+		const lt = window.pageYOffset || element.scrollTop;
+		if (element.scrollTop + element.clientHeight >= element.scrollHeight - 500 && lastScroll < lt) {
 			callback();
 		}
+		lastScroll = lt;
 	});
 };
 
