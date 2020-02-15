@@ -18,7 +18,9 @@ export default class ChatMain extends HTMLElement {
 
 		this.messagesList = this.querySelector('.all-messages');
 		startLoading(this.messagesList);
-		this.getMessages(peerId, startMessageId);
+		this.getMessages(peerId, startMessageId, false, 100, -50).then(() => {
+			document.getElementById(Number(startMessageId)).scrollIntoView({ block: 'center' });
+		});
 
 		this.loading = false;
 
@@ -40,8 +42,7 @@ export default class ChatMain extends HTMLElement {
 		onScrollTop(this.messagesList, async () => {
 			if (!this.loading) {
 				const beforeScroll = this.messagesList.scrollTop;
-				if (this.messagesList.children.length > 60) {
-					// console.log('Gonna cut from ', this.messagesList.children[0], 'to', this.messagesList.children[30]);
+				if (this.messagesList.children.length > 80) {
 					removeElements(this.messagesList, true, 30);
 					updateMessageIds();
 				}
@@ -55,14 +56,12 @@ export default class ChatMain extends HTMLElement {
 		});
 		onScrollBottom(this.messagesList, async () => {
 			if (!this.loading) {
-				// const beforeScroll = this.messagesList.scrollTop;
-				if (this.messagesList.children.length > 60) {
+				if (this.messagesList.children.length > 80) {
 					removeElements(this.messagesList, false, 30);
 					updateMessageIds();
 				}
 				this.loading = true;
-				await this.getMessages(peerId, this.firstMessage, true, 30, -30);
-				// this.messagesList.scrollTop = beforeScroll;
+				await this.getMessages(peerId, this.firstMessage, true, 30, -30, this.firstMessage);
 				setTimeout(() => {
 					this.loading = false;
 				}, 100);
@@ -82,8 +81,8 @@ export default class ChatMain extends HTMLElement {
 		this.render();
 	}
 
-	getMessages = async (peerId, startMessageId, prepend = false, limit = 30, addOffset) => {
-		let newMessages = await this.fetchMessages({ offsetId: startMessageId, limit, addOffset });
+	getMessages = async (peerId, startMessageId, prepend = false, limit = 30, addOffset, min_id) => {
+		let newMessages = await this.fetchMessages({ offsetId: startMessageId, limit, addOffset, min_id });
 		const messageList = this.messagesList;
 
 		if (messageList.classList.contains('loading')) {
@@ -110,11 +109,10 @@ export default class ChatMain extends HTMLElement {
 		const peer = getActivePeer();
 		const peerId = peerToId(peer);
 		const { messages } = await telegramApi.getMessagesFromPeer(peer, limit, offsetId, addOffset, max_id, min_id);
-		// console.log('MESSAGES', messages);
-		// for (const message of messages) {
-		// 	const { id } = message;
-		// 	putMessage(peerId)(id)(message);
-		// }
+		for (const message of messages) {
+			const { id } = message;
+			putMessage(peerId)(id)(message);
+		}
 		return messages;
 	};
 }

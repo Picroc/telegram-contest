@@ -564,7 +564,7 @@ export default class TelegramApi {
 			peer.user_id || peer.channel_id || peer.chat_id || peer.id
 		);
 
-		min_id = addOffset < 0 ? offsetId : -1;
+		// min_id = addOffset < 0 ? offsetId : -1;
 
 		// console.log('Calling', offsetId, addOffset, limit, max_id, min_id);
 
