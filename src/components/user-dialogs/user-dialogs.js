@@ -8,6 +8,7 @@ import {
 	updateDialogUnread,
 	updateDialogShort,
 	updateDialogDate,
+	updateDialogStatus,
 } from '../../store/store';
 import {
 	htmlToElement,
@@ -65,7 +66,7 @@ export const loadDialog = component => elem => async (dialogId, messageId) => {
 	startLoading(right);
 	const fullPeer = await telegramApi.getFullPeer(id);
 	setActivePeer({ fullPeer: { ...fullPeer, avatar, id }, ...peer });
-	right.innerHTML = `<top-bar user_id="${id}"></top-bar><chat-main peer-id="${id}"></chat-main>`;
+	right.innerHTML = `<top-bar user_id="${id}"></top-bar><chat-main start-message='${messageId}' peer-id="${id}"></chat-main>`;
 };
 
 export default class UserDialogs extends HTMLElement {
@@ -82,9 +83,14 @@ export default class UserDialogs extends HTMLElement {
 		this.appendChild(this.normal);
 		telegramApi.subscribeToUpdates('dialogs', data => {
 			const { _: type } = data;
+			console.log('type', type);
 			switch (type) {
 				case 'newMessage':
 					this.updateMessage(data);
+					break;
+				case 'userStatus':
+					this.updateStatus(data);
+					break;
 			}
 		});
 	}
@@ -138,6 +144,11 @@ export default class UserDialogs extends HTMLElement {
 		if (!pinned) {
 			this.normal.prepend(dialogElem);
 		}
+	};
+
+	updateStatus = data => {
+		const { user_id, online } = data;
+		updateDialogStatus(user_id, online);
 	};
 
 	setListener = event => {

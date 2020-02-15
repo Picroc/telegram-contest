@@ -19,6 +19,7 @@ export default ({
 	media = null,
 	entities = null,
 	out = false,
+	outRead = false,
 	post = false,
 	silent = false,
 	mentioned = false,
@@ -37,6 +38,7 @@ export default ({
 	post_author: postAuthor = '',
 }) => {
 	const hasMedia = !!media;
+	const outIcon = out ? (outRead ? outSvg : outNotReadSvg) : '';
 
 	let photoMedia = '';
 	if (hasMedia) {
@@ -49,9 +51,9 @@ export default ({
 		const { _: mediaType, photo = {}, photos = [] } = media;
 		const messageInfo = !message
 			? `<div class="${clsx(
-				'message__info',
-				!message && hasMedia && 'message__info_media_no-message'
-			)}">${time}</div>`
+					'message__info',
+					!message && hasMedia && 'message__info_media_no-message'
+			  )}">${time}${outIcon}</div>`
 			: '';
 
 		if (mediaType === 'messageMediaPhoto') {
@@ -65,9 +67,22 @@ export default ({
 	}
 
 	const forward = (forwardFrom && `<div>Was forwarded from ${forwardFrom}</div>`) || '';
-	const reply = (replyToMessageId && `<div class='chat-message__reply'>Reply to ${replyToMessageId}</div>`) || '';
+	const reply =
+		(replyToMessageId &&
+			`<div class='chat-message__reply_${replyToMessageId}'>Reply to ${replyToMessageId}</div>`) ||
+		'';
+	if (replyToMessageId) {
+		setZeroTimeout(async () => {
+			const reply_elem = document.querySelector(`.chat-message__reply_${replyToMessageId}`);
+			if (reply_elem) {
+				const results = await telegramApi.getReplyInfo(replyToMessageId);
+				reply_elem.innerHTML = `<div class='reply-field'><b>${results.title}</b>: ${results.message}</div>`;
+				// console.log('REPLY', results);
+			}
+		});
+	}
 
-	const formattedMessage = getFormattedMessage({ message, entities, time });
+	const formattedMessage = getFormattedMessage({ message, entities, time, outIcon });
 
 	// TODO add handlers for reply & message
 	return `
@@ -132,7 +147,7 @@ const getPhotoTemplate = photo => {
 };
 
 // TODO implement formatted message
-const getFormattedMessage = ({ message, entities = [], time, out, outRead }) => {
+const getFormattedMessage = ({ message, entities = [], time, outIcon }) => {
 	if (!message) {
 		return '';
 	}
@@ -155,7 +170,7 @@ const getFormattedMessage = ({ message, entities = [], time, out, outRead }) => 
 	const messageInfo = `<div class="${clsx(
 		'message__info',
 		!message && hasMedia && 'message__info_media_no-message'
-	)}">${time}</div>`;
+	)}">${time}${outIcon}</div>`;
 	return (message && `<div class="message">${formatted} ${messageInfo}</div>`) || '';
 };
 

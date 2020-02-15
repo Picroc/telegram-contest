@@ -4,6 +4,52 @@ import './login-code.scss';
 import { router, telegramApi } from '../../App';
 import { getUser, addToUser, setUser } from '../../store/store';
 
+import { idle, track as peek } from '../../utils/anim-monkey';
+
+import lottie from 'lottie-web';
+
+const getAnimationItem = (elem, data, options) => () =>
+	lottie.loadAnimation({
+		container: document.querySelector(elem),
+		renderer: 'svg',
+		loop: options.loop || false,
+		autoplay: options.auto || false,
+		animationData: data,
+	});
+
+const translateAnimation = (to, time) => {
+	window.current_animation.play();
+	window.current_animation.addEventListener('loopComplete', () => {
+		window.current_animation.destroy();
+		window.current_animation = to();
+		time && window.current_animation.goToAndStop(time, true);
+	});
+	setTimeout(() => {
+		window.current_animation.destroy();
+		window.current_animation = to();
+		time && window.current_animation.goToAndStop(time, true);
+	}, 500);
+};
+
+const getSegments = value => {
+	switch (value) {
+		case 0:
+			return [0, 15];
+		case 1:
+			return [15, 30];
+		case 2:
+			return [30, 45];
+		case 3:
+			return [45, 60];
+		case 4:
+			return [60, 75];
+		case 5:
+			return [75, 90];
+		case 6:
+			return [90, 100];
+	}
+};
+
 export default class LoginCode extends HTMLElement {
 	constructor() {
 		super();
@@ -13,6 +59,33 @@ export default class LoginCode extends HTMLElement {
 		this.innerHTML = template;
 		this.code = this.querySelector('.login-code__code');
 		this.code.addEventListener('input', this.validateCode);
+
+		const monkey_idle = getAnimationItem('.cd-tgsticker', idle, {
+			auto: true,
+			loop: true,
+		});
+		const monkey_peek = getAnimationItem('.cd-tgsticker', peek, {
+			auto: false,
+		});
+
+		window.current_animation = monkey_idle();
+
+		this.code.addEventListener('focus', ({ target }) => {
+			translateAnimation(monkey_peek, Math.max(target.value.length, 1) + 25);
+		});
+
+		this.code.addEventListener('focusout', () => {
+			translateAnimation(monkey_idle);
+		});
+
+		this.code.addEventListener('input', event => {
+			const segments =
+				event.target.value.length > prev_input
+					? getSegments(event.target.value.length)
+					: getSegments(event.target.value.length).reverse();
+			window.current_animation.playSegments(segments, true);
+			prev_input = event.target.value.length;
+		});
 	}
 
 	validateCode = event => {

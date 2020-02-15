@@ -24,7 +24,7 @@ export const clsx = (...clss) =>
 
 export const subscribe = element => {
 	const el = typeof element === 'string' ? document.querySelector(element) : element;
-	return function (...args) {
+	return function(...args) {
 		el.addEventListener(...args);
 	};
 };
@@ -36,7 +36,7 @@ export const htmlToElement = html => {
 	return template.content.firstChild;
 };
 
-export const setInnerHTML = function (selector) {
+export const setInnerHTML = function(selector) {
 	return value => {
 		this.querySelector(selector).innerHTML = value;
 	};
@@ -57,7 +57,7 @@ const toggleActive = force => elem => {
 
 export const hide = toggleHide(true);
 export const show = toggleHide(false);
-export const setAttribute = function (selector) {
+export const setAttribute = function(selector) {
 	return attribute => value => {
 		this.querySelector(selector).setAttribute(attribute, value);
 	};
@@ -195,6 +195,28 @@ export const getRightSidebarFieldsFromPeer = peer => {
 	generalizedPeer.id = peer.id;
 
 	return generalizedPeer;
+};
+
+export const onScrollTop = (element, callback) => {
+	let lastScroll = 0;
+	element.addEventListener('scroll', () => {
+		const lt = window.pageYOffset || element.scrollTop;
+		if (element.scrollTop < 500 && lastScroll > lt) {
+			callback();
+		}
+		lastScroll = lt;
+	});
+};
+
+export const onScrollBottom = (element, callback) => {
+	let lastScroll = 0;
+	element.addEventListener('scroll', () => {
+		const lt = window.pageYOffset || element.scrollTop;
+		if (element.scrollTop + element.clientHeight >= element.scrollHeight - 500 && lastScroll < lt) {
+			callback();
+		}
+		lastScroll = lt;
+	});
 };
 
 export const sanitize = value => {
