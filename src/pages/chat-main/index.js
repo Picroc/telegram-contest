@@ -17,7 +17,6 @@ export default class ChatMain extends HTMLElement {
 						<message-input></message-input>`;
 
 		this.messagesList = this.querySelector('.all-messages');
-		startLoading(this.messagesList);
 		this.getMessages(peerId, startMessageId, false, 100, -50).then(() => {
 			if (startMessageId === 'undefined') {
 				this.messagesList.firstChild.scrollIntoView();

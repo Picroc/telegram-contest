@@ -5,15 +5,25 @@ chat-main {
   flex-direction: column;
   width: 100%;
   overflow: auto;
-  height: 90vh;
-  margin-bottom: calc(10vh - 30px);
+  height: 85vh;
+  margin-bottom: 3vh;
+
+  &::-webkit-scrollbar {
+    background-color: transparent;
+    &-thumb {
+      height: 60px;
+
+      background-color: rgba(0, 0, 0, 0.25);
+    }
+    &-track {
+      background: transparent;
+    }
+  }
+
   .all-messages {
     width: 60%;
     display: flex;
     flex-direction: column-reverse;
-    &::-webkit-scrollbar {
-      display: none;
-    }
   }
 }
 

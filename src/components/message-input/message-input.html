@@ -1,63 +1,64 @@
-
 <div class="message-input">
-        <div class="popup emoji__popup popup_hidden">
-            <div class="popup__tabs tabs"></div>
-            <div class="tabs__content">
-                <div class="tabs__content_emoji hide">
-                    <div class="emoji__content"></div>
-                    <div class="emoji__list"></div>
-                </div>
-                <div class="tabs__content_stickers hide"></div>
-                <div class="tabs__content_GIFs hide"></div>
-            </div>
-        </div>
-        <div class="text-input">
-            <div class="svg emoji-set"></div>
+	<div class="popup emoji__popup popup_hidden hide">
+		<div class="popup__tabs tabs"></div>
+		<div class="tabs__content">
+			<div class="tabs__content_emoji hide">
+				<div class="emoji__content"></div>
+				<div class="emoji__list"></div>
+			</div>
+			<div class="tabs__content_stickers hide"></div>
+			<div class="tabs__content_GIFs hide"></div>
+		</div>
+	</div>
+	<div class="text-input">
+		<div class="svg emoji-set"></div>
 
-            <div contenteditable="true" class="text-input__input" placeholder="Message"></div>
-            <div class="svg attach-media"></div>
-         </div>
-         <ul class="attach-media__popup popup popup_hidden">
-            <li class="attach-media__media popup-item">
-                <img src="./svg/photo.svg" alt="" class="media__img attach-media__img">
-                <div class="media__text attach-media__text">Photo or Video</div>
-            </li>
-            <li class="attach-media__document popup-item">
-                <img src="./svg/document.svg" alt="" class="document__img attach-media__img">
-                <div class="document__text attach-media__text">Document</div>
-            </li>
-            <li class="attach-media__poll popup-item">
-                <img src="./svg/poll.svg" alt="" class="poll__img attach-media__img">
-                <div class="poll__text attach-media__text">Poll</div>
-            </li>
-        </ul>
-        <div class="svg voice-message"><div id="send-button" class="microphone"></div></div>
-    </div>
+		<div contenteditable="true" class="text-input__input" placeholder="Message"></div>
+		<div class="svg attach-media"></div>
+	</div>
+	<ul class="attach-media__popup popup popup_hidden">
+		<li class="attach-media__media popup-item">
+			<img src="./svg/photo.svg" alt="" class="media__img attach-media__img">
+			<div class="media__text attach-media__text">Photo or Video</div>
+		</li>
+		<li class="attach-media__document popup-item">
+			<img src="./svg/document.svg" alt="" class="document__img attach-media__img">
+			<div class="document__text attach-media__text">Document</div>
+		</li>
+		<li class="attach-media__poll popup-item">
+			<img src="./svg/poll.svg" alt="" class="poll__img attach-media__img">
+			<div class="poll__text attach-media__text">Poll</div>
+		</li>
+	</ul>
+	<div class="svg voice-message">
+		<div id="send-button" class="microphone"></div>
+	</div>
+</div>
 
 <div class="media-drop__paranja paranja hide">
-    <div class="media-drop__pane pane">
-        <div class="media-drop__header pane__header">
-            <div class="icon media-drop__close-button close-button">
-                <img src="../../static/images/close.svg" alt="" class="close-icon">
-            </div>
-            <h3 class="media-drop__text">Drag to Reposition</h3>
-            <div anim="ripple" class="media-drop__accept-button accept-button">SEND</div>
-        </div>
-        <div class="media-drop__image-place drop-place">Drag and Drop media here to send it...</div>
-        <input type="text" placeholder="Add a caption..." class="media-drop__caption caption">
-    </div>
+	<div class="media-drop__pane pane">
+		<div class="media-drop__header pane__header">
+			<div class="icon media-drop__close-button close-button">
+				<img src="../../static/images/close.svg" alt="" class="close-icon">
+			</div>
+			<h3 class="media-drop__text">Drag to Reposition</h3>
+			<div anim="ripple" class="media-drop__accept-button accept-button">SEND</div>
+		</div>
+		<div class="media-drop__image-place drop-place">Drag and Drop media here to send it...</div>
+		<input type="text" placeholder="Add a caption..." class="media-drop__caption caption">
+	</div>
 </div>
 
 <div class="file-drop__paranja paranja hide">
-    <div class="file-drop__pane pane">
-        <div class="file-drop__header pane__header">
-            <div class="icon file-drop__close-button close-button">
-                <img src="../../static/images/close.svg" alt="" class="close-icon">
-            </div>
-            <h3 class="file-drop__text">Drag to Reposition</h3>
-            <div anim="ripple" class="file-drop__accept-button accept-button">SEND</div>
-        </div>
-        <div class="file-drop__file-place drop-place">Drag and Drop files here to send it...</div>
-        <input type="text" placeholder="Add a caption..." class="file-drop__caption caption">
-    </div>
+	<div class="file-drop__pane pane">
+		<div class="file-drop__header pane__header">
+			<div class="icon file-drop__close-button close-button">
+				<img src="../../static/images/close.svg" alt="" class="close-icon">
+			</div>
+			<h3 class="file-drop__text">Drag to Reposition</h3>
+			<div anim="ripple" class="file-drop__accept-button accept-button">SEND</div>
+		</div>
+		<div class="file-drop__file-place drop-place">Drag and Drop files here to send it...</div>
+		<input type="text" placeholder="Add a caption..." class="file-drop__caption caption">
+	</div>
 </div>
