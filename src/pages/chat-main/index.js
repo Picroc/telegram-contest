@@ -29,7 +29,12 @@ export default class ChatMain extends HTMLElement {
 		this.loading = false;
 
 		telegramApi.subscribeToUpdates('messages', res => {
-			this.getMessages(peerId, this.firstMessage, true, 1, -2);
+			if (res.to_id !== peerId) {
+				return;
+			}
+			this.getMessages(peerId, this.firstMessage, true, 5, -5, this.firstMessage).then(() => {
+				this.scrollBy({ top: 100 });
+			});
 		});
 
 		const removeElements = (element, fromStart = true, number) => {

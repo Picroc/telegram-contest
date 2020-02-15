@@ -72,7 +72,7 @@ export const startLoading = elem => {
 	elem.classList.add('loading');
 };
 
-export const startLoadingProgress = (elem, spin = true, size = 120, clear = true) => {
+export const startLoadingProgress = (elem, spin = true, size = 120, clear = true, color) => {
 	if (clear) {
 		elem.innerHTML = '';
 	}
@@ -92,7 +92,7 @@ export const startLoadingProgress = (elem, spin = true, size = 120, clear = true
 		height="${size}">
 	   <circle
 		 class="progress-ring__circle"
-		 stroke="${spin ? 'black' : 'white'}"
+		 stroke="${color || spin ? 'black' : 'white'}"
 		 stroke-opacity="0.4"
 		 stroke-width="4"
 		 fill="transparent"
