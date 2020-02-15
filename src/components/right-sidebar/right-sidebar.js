@@ -2,7 +2,7 @@ import template from './right-sidebar.html';
 import './right-sidebar.scss';
 import { setInnerHTML, setAttribute } from '../../helpers';
 import {
-	UPDATE_DIALOG_STATUS,
+	UPDATE_DIALOG_ONLINE_STATUS,
 	getActivePeer,
 	getPeerMediaById,
 	SET_ACTIVE_PEER,
@@ -16,8 +16,16 @@ import {
 	cashMaterials,
 	getActivePeerId,
 	UPDATE_DIALOG_PHOTO,
+	getUser,
 } from '../../store/store';
-import { getRightSidebarFieldsFromPeer, htmlToElement, capitalise, getName, createDiv } from '../../helpers/index';
+import {
+	getRightSidebarFieldsFromPeer,
+	htmlToElement,
+	capitalise,
+	getName,
+	createDiv,
+	onScrollBottom,
+} from '../../helpers/index';
 import infoSvg from './svg/info.js';
 import phoneSvg from './svg/phone.js';
 import usernameSvg from './svg/username.js';
@@ -31,7 +39,7 @@ export default class RightSidebar extends HTMLElement {
 		this.className = 'right-sidebar right-sidebar_hidden';
 		this.innerHTML = template;
 
-		this.avatar = this.querySelector('.right-sidebar__avatar_img');
+		this.avatar = this.querySelector('.right-sidebar__avatar');
 		this.avatar.src = getDefaultAvatar();
 
 		this.peerAttributes = this.querySelector('.right-sidebar__attributes');
@@ -41,6 +49,8 @@ export default class RightSidebar extends HTMLElement {
 		this.materials = this.querySelector('.right-sidebar__general-materials');
 		this.members = this.querySelector('.right-sidebar__general-materials__members');
 		this.media = this.querySelector('.right-sidebar__general-materials__media');
+		this.name = this.querySelector('.right-sidebar__name');
+		onScrollBottom(this, this.handleMediaScroll.bind(this));
 		this.docs = this.querySelector('.right-sidebar__general-materials__docs');
 		this.links = this.querySelector('.right-sidebar__general-materials__links');
 		this.audio = this.querySelector('.right-sidebar__general-materials__audio');
@@ -51,11 +61,26 @@ export default class RightSidebar extends HTMLElement {
 		this.backButton = this.querySelector('.right-sidebar__back');
 		this.backButton.addEventListener('click', this.backButtonListener);
 
-		this.addEventListener(UPDATE_DIALOG_STATUS, this.updateStatus);
+		this.addEventListener(UPDATE_DIALOG_ONLINE_STATUS, this.updateStatus);
 		this.addEventListener(SET_ACTIVE_PEER, this.loadPeerSidebar);
 		this.addEventListener(UPDATE_DIALOG_PHOTO, this.updateAvatar);
 		// this.addEventListener(SET_ACTIVE_PEER_MEDIA, this.setMedia);
 	}
+
+	handleMediaScroll = async function (event) {
+		const id = Number(this.getAttribute('peer_id'));
+		const media = await telegramApi.getPeerPhotos(id, this.media.childElementCount, 30);
+		media.forEach(async ({ photo }, index) => {
+			const placeholder = htmlToElement(
+				`<div class="right-sidebar__general-materials__media_placeholder"></div>`
+			);
+			this.media.appendChild(placeholder);
+			const image = await photo;
+			const imageElement = this.createMediaElem(image, id, index);
+			placeholder.replaceWith(imageElement);
+			return imageElement;
+		});
+	};
 
 	backButtonListener = e => {
 		this.classList.toggle('right-sidebar_hidden');
@@ -67,35 +92,45 @@ export default class RightSidebar extends HTMLElement {
 	};
 
 	updateStatus = e => {
-		const status = e.detail;
-		const statusElem = this.querySelector('.right-sidebar__status');
-		if (status == 'online') {
-			statusElem.classList.add('right-sidebar__status_online');
+		const { id, status } = e.detail;
+		const { id: user_id } = getUser();
+		if (id != user_id) {
+			const statusElem = this.querySelector('.right-sidebar__status');
+			if (status == 'online') {
+				statusElem.classList.add('right-sidebar__status_online');
+			}
+			statusElem.innerHTML = status;
 		}
-		statusElem.innerHTML = status;
 	};
 
 	updateAvatar = e => {
 		const { id, avatar } = e.detail;
-		const peerId = this.id.split('_')[1];
+		const peerId = Number(this.getAttribute('peer_id'));
 		if (id == peerId) {
 			this.avatar.src = avatar;
 		}
 	};
 
-	loadPeerSidebar = e => {
+	loadPeerSidebar = async e => {
 		const { fullPeer } = e.detail;
 		const setHTML = setInnerHTML.bind(this);
 		this.peerAttributes.innerHTML = '';
 		const generalizedPeer = getRightSidebarFieldsFromPeer(fullPeer);
 		this.generalizedPeer = generalizedPeer;
-		const { notifications, name, avatar, id, type } = generalizedPeer;
-		if (avatar) {
-			this.avatar.src = avatar;
+		const { notifications, name, avatar, id, type, self } = generalizedPeer;
+		if (self) {
+			this.avatar.innerHTML = avatar;
+			this.avatar.classList.add('dialog__saved');
+			this.name.classList.add('right-sidebar__name_self');
+			this.name.innerHTML = 'Saved Messages';
+		} else {
+			this.avatar.classList.remove('dialog__saved');
+			this.name.classList.remove('right-sidebar__name_self');
+			this.avatar.innerHTML = `<img src="${await avatar}" class="avatar avatar_big"/>`;
+			this.name.innerHTML = name;
 		}
 		this.setMedia(id);
 		this.setMembers(id);
-		setHTML('.right-sidebar__name')(name);
 		switch (type) {
 			case 'channel':
 			case 'user':
@@ -109,12 +144,14 @@ export default class RightSidebar extends HTMLElement {
 				this.showMaterial('members');
 				break;
 		}
-		const label = notifications ? 'Enabled' : 'Disabled';
-		const checkbox = `<input type="checkbox" class="item__icon notifications__icon" name="notifications" id="notifications"${
-			notifications ? 'checked' : ''
-		}>`;
-		const notificationsElem = this.createAttributeElem('notifications', 'Notifications', label, () => checkbox);
-		this.peerAttributes.appendChild(notificationsElem);
+		if (!self) {
+			const label = notifications ? 'Enabled' : 'Disabled';
+			const checkbox = `<input type="checkbox" class="item__icon notifications__icon" name="notifications" id="notifications"${
+				notifications ? 'checked' : ''
+				}>`;
+			const notificationsElem = this.createAttributeElem('notifications', 'Notifications', label, () => checkbox);
+			this.peerAttributes.appendChild(notificationsElem);
+		}
 	};
 
 	loadUserAttributes = generalizedPeer => {
@@ -215,29 +252,80 @@ export default class RightSidebar extends HTMLElement {
 		});
 	};
 
-	createMediaElem = (media, peerId, mediaIndex) => {
+	createMediaElem = (media, peerId) => {
 		return htmlToElement(
-			`<img src="${media}" class="right-sidebar__general-materials__media-element" id="peer_${peerId}_media_${mediaIndex}"/>`
+			`<img src="${media}" class="right-sidebar__general-materials__media-element" id="peer_${peerId}_media_${this.media.childElementCount}"/>`
 		);
+	};
+
+	statusTransform = ({ was_online: lastSeen, _: type }) => {
+		switch (type) {
+			case 'userStatusRecently':
+				return `last seen recently`;
+
+			case 'userStatusOffline':
+				return this.lastSeenTransform(lastSeen);
+
+			case 'userStatusOnline':
+				return 'online';
+		}
+	};
+
+	lastSeenTransform = lastSeen => {
+		const unixShift = 1000;
+		const now = new Date().getTime() / unixShift;
+		const diff = Math.abs(now - lastSeen);
+		const step = 60;
+		let time;
+		let unit;
+		if (diff < step) {
+			return `last seen just now`;
+		} else if (diff < step ** 2) {
+			unit = new Date(diff * unixShift).getMinutes();
+			time = 'minute';
+		} else if (diff < step ** 2 * 24) {
+			unit = new Date(lastSeen * unixShift).getHours();
+			time = 'hour';
+		} else if (diff < step ** 2 * 24 * 7) {
+			unit = new Date(lastSeen * unixShift).getDay();
+			time = 'day';
+		} else if (diff < step ** 2 * 24 * 7 * 4) {
+			unit = new Date(lastSeen * unixShift).getHours();
+			time = 'week';
+		} else if (diff < step ** 2 * 24 * 7 * 4 * 12) {
+			unit = new Date(lastSeen * unixShift).getHours();
+			time = 'month';
+		} else {
+			time = `long time`;
+		}
+		time = unit + ' ' + time + this.unitCheck(unit);
+		return `last seen ${time} ago`;
 	};
 
 	setMembers = async id => {
 		const users = await peerIdToMembersMapper(id);
 
 		this.members.innerHTML = '';
-		console.log(`Resolving members promises for peer ${id}`);
 		const { onlineCash, onlineUsers, offlineCash, offlineUsers } = users;
 		if (!onlineCash) {
-			this.pasteMembersInDOMAndStore(onlineUsers, id, 'online');
+			this.pasteMembersInDOMAndStore(onlineUsers, id);
 		}
 		if (!offlineCash) {
-			this.pasteMembersInDOMAndStore(offlineUsers, id, 'offline', true);
+			this.pasteMembersInDOMAndStore(offlineUsers, id);
 		}
+	};
+
+	unitCheck = unit => {
+		if (unit > 1) {
+			return 's';
+		}
+
+		return '';
 	};
 
 	pasteMembersInDOMAndStore = async (userArr, peerId, status, cashInStore = false) => {
 		const usersToCash = userArr.map(async user => {
-			const { first_name, last_name, id, cashedAvatar } = user;
+			let { first_name, last_name, id, cashedAvatar, status } = user;
 			const name = getName(first_name, last_name);
 			let avatar;
 			if (!cashedAvatar) {
@@ -245,6 +333,8 @@ export default class RightSidebar extends HTMLElement {
 			} else {
 				avatar = cashedAvatar;
 			}
+			status = this.statusTransform(status);
+			console.log('status', status);
 			user.cashedAvatar = avatar;
 			const elem = this.createMemberElem(avatar, name, status);
 			if (peerId == getActivePeerId()) {
@@ -260,15 +350,15 @@ export default class RightSidebar extends HTMLElement {
 	};
 
 	createMemberElem = (avatar, name, status) => {
-		return htmlToElement(`<div class="right-sidebar__general-materials__participants__participant">
-        <div class="participants__avatar-wrapper">
-            <img src="${avatar}" alt="avatar" class="participants__avatar avatar avatar_small">
-        </div>
-        <div class="participants__name-and-status">
-            <div class="participants__name-and-status__name">${name}</div>
-            <div class="participants__name-and-status__status ${status}">${status}</div>
-        </div>
-    </div>`);
+		return htmlToElement(`<div class="member">
+			<div class="member__avatar-wrapper">
+				<img src="${avatar}" alt="avatar" class="member__avatar avatar avatar_small">
+			</div>
+			<div class="member__name-and-status">
+				<div class="member__name-and-status__name">${name}</div>
+				<div class="member__name-and-status__status ${status}">${status}</div>
+			</div>
+    	</div>`);
 	};
 
 	connectedCallback() {
