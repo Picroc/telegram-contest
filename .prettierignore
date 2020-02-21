@@ -1,2 +1,3 @@
 telegramApi.min.js
 telegramApiBackup.min.js
+./src/utils/TelegramApi/js/Etc/angular/$websocket.js

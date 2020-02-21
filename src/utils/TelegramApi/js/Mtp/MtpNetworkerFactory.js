@@ -23,6 +23,7 @@ import '../lib/polyfill';
 import CryptoWorkerModule from '../Etc/CryptoWorker';
 import $http from '../Etc/angular/$http';
 import MtpDcConfiguratorModule from './MtpDcConfigurator';
+import WebSocketManager from '../Etc/angular/$websocket';
 
 export default function MtpNetworkerFactoryModule() {
 	let updatesProcessor;
@@ -74,9 +75,12 @@ export default function MtpNetworkerFactoryModule() {
 			this.pendingResends = [];
 			this.connectionInited = false;
 
-			$interval(this.checkLongPoll.bind(this), 10000);
+			const url = this.MtpDcConfigurator.chooseServer(this.dcID, this.upload);
+			this.SocketManager = new WebSocketManager(url);
 
-			this.checkLongPoll();
+			// $interval(this.checkLongPoll.bind(this), 10000);
+
+			// this.checkLongPoll();
 		}
 
 		updateSession = () => {
@@ -685,6 +689,7 @@ export default function MtpNetworkerFactoryModule() {
 		};
 
 		sendEncryptedRequest = (message, options) => {
+			console.log('Goin to send message', message);
 			const self = this;
 			options = options || {};
 			// console.log(dT(), 'Send encrypted'/*, message*/);
@@ -721,39 +726,46 @@ export default function MtpNetworkerFactoryModule() {
 					url: url,
 				};
 
-				try {
-					options = extend(options || {}, {
-						responseType: 'arraybuffer',
-						transformRequest: null,
-					});
-					requestPromise = $http.post(url, requestData, options);
-				} catch (e) {
-					requestPromise = Promise.reject(e);
-				}
-				return requestPromise.then(
-					result => {
-						if (!result.data || !result.data.byteLength) {
-							return Promise.reject(baseError);
-						}
-						return result;
-					},
-					error => {
-						if (error.status == 404 && (error.data || '').indexOf('nginx/0.3.33') != -1) {
-							this.Storage.remove('dc' + self.dcID + '_server_salt', 'dc' + self.dcID + '_auth_key').then(
-								() => {
-									window.location.reload();
-								}
-							);
-						}
-						if (!error.message && !error.type) {
-							error = extend(baseError, {
-								type: 'NETWORK_BAD_REQUEST',
-								originalError: error,
-							});
-						}
-						return Promise.reject(error);
-					}
-				);
+				options = extend(options || {}, {
+					responseType: 'arraybuffer',
+					transformRequest: null,
+				});
+				console.log('{}{}{}{}{}{}SENDING SOCKET');
+				this.SocketManager.sendData(requestData);
+
+				// try {
+				// 	options = extend(options || {}, {
+				// 		responseType: 'arraybuffer',
+				// 		transformRequest: null,
+				// 	});
+				// 	requestPromise = $http.post(url, requestData, options);
+				// } catch (e) {
+				// 	requestPromise = Promise.reject(e);
+				// }
+				// return requestPromise.then(
+				// 	result => {
+				// 		if (!result.data || !result.data.byteLength) {
+				// 			return Promise.reject(baseError);
+				// 		}
+				// 		return result;
+				// 	},
+				// 	error => {
+				// 		if (error.status == 404 && (error.data || '').indexOf('nginx/0.3.33') != -1) {
+				// 			this.Storage.remove('dc' + self.dcID + '_server_salt', 'dc' + self.dcID + '_auth_key').then(
+				// 				() => {
+				// 					window.location.reload();
+				// 				}
+				// 			);
+				// 		}
+				// 		if (!error.message && !error.type) {
+				// 			error = extend(baseError, {
+				// 				type: 'NETWORK_BAD_REQUEST',
+				// 				originalError: error,
+				// 			});
+				// 		}
+				// 		return Promise.reject(error);
+				// 	}
+				// );
 			});
 		};
 

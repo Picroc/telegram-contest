@@ -25,6 +25,7 @@ import {
 } from './vendor/leemon';
 
 import RandomBytes from 'randombytes';
+import { dT } from './utils';
 
 export const random = arr => {
 	const ln = arr.length;
@@ -335,7 +336,7 @@ export function addPadding(bytes, blockSize, zeroes) {
 }
 
 export function aesEncryptSync(bytes, keyBytes, ivBytes) {
-	// console.log(dT(), 'AES encrypt start', len/*, bytesToHex(keyBytes), bytesToHex(ivBytes)*/)
+	// console.log(dT(), 'AES encrypt start', bytesToHex(keyBytes), bytesToHex(ivBytes));
 	bytes = addPadding(bytes);
 
 	const encryptedWords = CryptoJS.AES.encrypt(bytesToWords(bytes), bytesToWords(keyBytes), {
@@ -351,7 +352,7 @@ export function aesEncryptSync(bytes, keyBytes, ivBytes) {
 }
 
 export function aesDecryptSync(encryptedBytes, keyBytes, ivBytes) {
-	// console.log(dT(), 'AES decrypt start', encryptedBytes.length)
+	// console.log(dT(), 'AES decrypt start', encryptedBytes.length);
 	const decryptedWords = CryptoJS.AES.decrypt({ ciphertext: bytesToWords(encryptedBytes) }, bytesToWords(keyBytes), {
 		iv: bytesToWords(ivBytes),
 		padding: CryptoJS.pad.NoPadding,
