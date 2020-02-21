@@ -1,3 +1,5 @@
+import { ModeOfOperationCTR } from './aes-ctr';
+
 export default class Abridged {
 	protocol = 0xefefefef;
 	fromHexString = hexString => new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
@@ -31,19 +33,20 @@ export default class Abridged {
 		let reversed = random.slice();
 		reversed = reversed.reverse();
 
-		this.encryptKey = await crypto.subtle.importKey('raw', random.slice(8, 40), 'AES-CTR', false, ['encrypt']);
+		this.encryptKey = random.slice(8, 40);
 		this.encryptIV = random.slice(40, 56);
 
-		this.decryptKey = await crypto.subtle.importKey('raw', reversed.slice(8, 40), 'AES-CTR', false, ['decrypt']);
+		this.decryptKey = random.slice(8, 40);
 		this.decryptIV = reversed.slice(40, 56);
 
-		const encryptedInit = new Uint8Array(await this.obfuscate(random));
-		console.log('Encrypted init', encryptedInit);
+		this.encrypt = new ModeOfOperationCTR(this.encryptKey, this.encryptIV);
+		this.decrypt = new ModeOfOperationCTR(this.decryptKey, this.decryptIV);
+
+		const encryptedInit = this.obfuscate(random);
 		random[56] = encryptedInit[56];
 		random[57] = encryptedInit[57];
 		random[58] = encryptedInit[58];
 		random[59] = encryptedInit[59];
-		console.log('Random', random);
 		return random;
 	};
 
@@ -51,17 +54,14 @@ export default class Abridged {
 		// return this.fromHexString(
 		// 	'ef68a6c7fad8a21db81e5da7d80df21165da02d003792abbde559d9a5924213c8e56dd0e0a69b5ca420190e61205f5cd00b3d4f2aee7530833a275bc0a5c9fcd7a5f3b497d7ce4635ee263e1784301135111e36fb6b9726c26869321c4efdc1ef25e083350c9f57ebe38825f21172c8b2dd8d47bd23c69c276a739a61213f5d272759f3d6ee02fc33eb3f531a3e69b8de9fbe4f519390193fa1e59e885e5b61509492ae05a5e3b494b2165a7f0d2a0bfc004ee15f204da25ec79338fed103efef1438a9dd861335d40'
 		// );
-		console.log('Encrypting message', input);
 		const bytes = new Uint8Array(input.buffer);
 		let message, offset;
 		const len = bytes.length / 4;
 		if (len < 127) {
-			console.log('Simple message', len);
 			message = new Uint8Array(bytes.length + 1);
 			message[0] = len;
 			offset = 1;
 		} else {
-			console.log('Complex message', len);
 			message = new Uint8Array(bytes.length + 4);
 			message[0] = 127;
 			message[1] = 255 & len;
@@ -72,36 +72,16 @@ export default class Abridged {
 
 		message.set(bytes, offset);
 
-		console.log('Message to send', message);
-		const encrypted_message = await this.obfuscate(message);
-		console.log('Obfuscated', encrypted_message);
-		return new Uint8Array(encrypted_message);
+		const encrypted_message = this.obfuscate(message);
+		return encrypted_message;
 		// return message;
 	}
 
 	obfuscate(data) {
-		// return this.aesEncryptSync(data, this.encryptKey, this.encryptIV);
-		return crypto.subtle.encrypt(
-			{
-				name: 'AES-CTR',
-				counter: this.encryptIV,
-				length: 64,
-			},
-			this.encryptKey,
-			data
-		);
+		return this.encrypt.encrypt(data);
 	}
 
 	deobfuscate(data) {
-		// return this.aesDecryptSync(data, this.decryptKey, this.decryptIV);
-		return crypto.subtle.decrypt(
-			{
-				name: 'AES-CTR',
-				counter: this.decryptIV,
-				length: 64,
-			},
-			this.decryptKey,
-			data
-		);
+		return this.decrypt.decrypt(data);
 	}
 }

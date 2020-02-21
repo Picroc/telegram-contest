@@ -33,19 +33,11 @@ export default class MtpAuthorizerModule {
 	CryptoWorker = new CryptoWorkerModule();
 	MtpDcConfigurator = new MtpDcConfiguratorModule();
 
-	pendingCallbacks = {};
+	pendingCallbacks = [];
 
 	handleWebSocket = data => {
-		const deserializer = new TLDeserialization(data.buffer, { mtproto: true });
-		const auth_key_id = deserializer.fetchLong('auth_key_id');
-		const msg_id = deserializer.fetchLong('msg_id');
-		const msg_len = deserializer.fetchInt('msg_len');
-		const obj = deserializer.fetchObject('resPQ');
-
-		console.log('Got message from server', deserializer, auth_key_id, msg_id, msg_len, obj);
-
-		if (this.pendingCallbacks[msg_id]) {
-			this.pendingCallbacks[msg_id](data);
+		if (this.pendingCallbacks.length > 0) {
+			this.pendingCallbacks.shift()({ data: data.buffer });
 		}
 	};
 
@@ -91,7 +83,7 @@ export default class MtpAuthorizerModule {
 				pendingPromise = resolve;
 			});
 
-			this.pendingCallbacks[msg_id] = pendingPromise;
+			this.pendingCallbacks.push(pendingPromise);
 		} catch (e) {
 			Config.Modes.debug && console.log('SMTH wrong with http');
 			requestPromise = Promise.reject(extend(baseError, { originalError: e }));

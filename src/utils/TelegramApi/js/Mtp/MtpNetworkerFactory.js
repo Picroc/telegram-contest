@@ -50,6 +50,14 @@ export default function MtpNetworkerFactoryModule() {
 		Storage = StorageModule();
 		CryptoWorker = new CryptoWorkerModule();
 
+		pendingPromises = [];
+
+		handlePromise = data => {
+			if (this.pendingPromises.length > 0) {
+				this.pendingPromises.shift()({ data: data.buffer });
+			}
+		};
+
 		constructor(dcID, authKey, serverSalt, options) {
 			options = options || {};
 
@@ -76,7 +84,7 @@ export default function MtpNetworkerFactoryModule() {
 			this.connectionInited = false;
 
 			const url = this.MtpDcConfigurator.chooseServer(this.dcID, this.upload);
-			this.SocketManager = new WebSocketManager(url);
+			this.SocketManager = new WebSocketManager(url, this.handlePromise);
 
 			// $interval(this.checkLongPoll.bind(this), 10000);
 
@@ -733,39 +741,44 @@ export default function MtpNetworkerFactoryModule() {
 				console.log('{}{}{}{}{}{}SENDING SOCKET');
 				this.SocketManager.sendData(requestData);
 
-				// try {
-				// 	options = extend(options || {}, {
-				// 		responseType: 'arraybuffer',
-				// 		transformRequest: null,
-				// 	});
-				// 	requestPromise = $http.post(url, requestData, options);
-				// } catch (e) {
-				// 	requestPromise = Promise.reject(e);
-				// }
-				// return requestPromise.then(
-				// 	result => {
-				// 		if (!result.data || !result.data.byteLength) {
-				// 			return Promise.reject(baseError);
-				// 		}
-				// 		return result;
-				// 	},
-				// 	error => {
-				// 		if (error.status == 404 && (error.data || '').indexOf('nginx/0.3.33') != -1) {
-				// 			this.Storage.remove('dc' + self.dcID + '_server_salt', 'dc' + self.dcID + '_auth_key').then(
-				// 				() => {
-				// 					window.location.reload();
-				// 				}
-				// 			);
-				// 		}
-				// 		if (!error.message && !error.type) {
-				// 			error = extend(baseError, {
-				// 				type: 'NETWORK_BAD_REQUEST',
-				// 				originalError: error,
-				// 			});
-				// 		}
-				// 		return Promise.reject(error);
-				// 	}
-				// );
+				try {
+					options = extend(options || {}, {
+						responseType: 'arraybuffer',
+						transformRequest: null,
+					});
+					// requestPromise = $http.post(url, requestData, options);
+					let pendingPromise;
+					requestPromise = new Promise(resolve => {
+						pendingPromise = resolve;
+					});
+					this.pendingPromises.push(pendingPromise);
+				} catch (e) {
+					requestPromise = Promise.reject(e);
+				}
+				return requestPromise.then(
+					result => {
+						if (!result.data || !result.data.byteLength) {
+							return Promise.reject(baseError);
+						}
+						return result;
+					},
+					error => {
+						if (error.status == 404 && (error.data || '').indexOf('nginx/0.3.33') != -1) {
+							this.Storage.remove('dc' + self.dcID + '_server_salt', 'dc' + self.dcID + '_auth_key').then(
+								() => {
+									window.location.reload();
+								}
+							);
+						}
+						if (!error.message && !error.type) {
+							error = extend(baseError, {
+								type: 'NETWORK_BAD_REQUEST',
+								originalError: error,
+							});
+						}
+						return Promise.reject(error);
+					}
+				);
 			});
 		};
 
