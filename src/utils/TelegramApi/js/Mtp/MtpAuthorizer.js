@@ -21,6 +21,7 @@ import CryptoWorkerModule from '../Etc/CryptoWorker';
 import MtpSecureRandom from './MtpSecureRandom';
 import MtpDcConfiguratorModule from './MtpDcConfigurator';
 import { Config } from '../lib/config';
+import WebSocketManager from '../Etc/angular/$websocket';
 
 export default class MtpAuthorizerModule {
 	chromeMatches = navigator.userAgent.match(/Chrome\/(\d+(\.\d+)?)/);
@@ -32,13 +33,22 @@ export default class MtpAuthorizerModule {
 	CryptoWorker = new CryptoWorkerModule();
 	MtpDcConfigurator = new MtpDcConfiguratorModule();
 
+	pendingCallbacks = [];
+
+	handleWebSocket = data => {
+		if (this.pendingCallbacks.length > 0) {
+			this.pendingCallbacks.shift()({ data: data.buffer });
+		}
+	};
+
 	mtpSendPlainRequest = (dcID, requestBuffer) => {
 		const requestLength = requestBuffer.byteLength,
 			requestArray = new Int32Array(requestBuffer);
 
 		const header = new TLSerialization();
+		const msg_id = this.MtpTimeManager.generateID();
 		header.storeLongP(0, 0, 'auth_key_id'); // Auth key
-		header.storeLong(this.MtpTimeManager.generateID(), 'msg_id'); // Msg_id
+		header.storeLong(msg_id, 'msg_id'); // Msg_id
 		header.storeInt(requestLength, 'request_length');
 
 		const headerBuffer = header.getBuffer(),
@@ -51,15 +61,29 @@ export default class MtpAuthorizerModule {
 		resultArray.set(headerArray);
 		resultArray.set(requestArray, headerArray.length);
 
-		const requestData = this.xhrSendBuffer ? resultBuffer : resultArray;
+		const requestData = resultArray;
 		let requestPromise;
 		const url = this.MtpDcConfigurator.chooseServer(dcID);
 		const baseError = { code: 406, type: 'NETWORK_BAD_RESPONSE', url: url };
+
+		this.socket = new WebSocketManager(url, this.handleWebSocket);
+
 		try {
-			requestPromise = $http.post(url, requestData, {
-				responseType: 'arraybuffer',
-				transformRequest: null,
+			// requestPromise = $http.post(url, requestData, {
+			// 	responseType: 'arraybuffer',
+			// 	transformRequest: null,
+			// });
+
+			this.socket.sendData(requestData);
+			// this.socket.sendTestRequest();
+			// this.socket.sendAuthMessage();
+			// this.socket.getTestRequest();
+			let pendingPromise;
+			requestPromise = new Promise(resolve => {
+				pendingPromise = resolve;
 			});
+
+			this.pendingCallbacks.push(pendingPromise);
 		} catch (e) {
 			Config.Modes.debug && console.log('SMTH wrong with http');
 			requestPromise = Promise.reject(extend(baseError, { originalError: e }));

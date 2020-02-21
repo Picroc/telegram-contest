@@ -25,8 +25,8 @@ export default function MtpSingleInstanceServiceModule() {
 			IdleManager.start();
 
 			// $interval(checkInstance, 5000);
-			setInterval(checkInstance, 5000);
-			checkInstance();
+			// setInterval(checkInstance, 5000);
+			// checkInstance();
 
 			try {
 				// $(window).on('beforeunload', clearInstance);

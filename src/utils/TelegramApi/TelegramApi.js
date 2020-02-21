@@ -66,16 +66,16 @@ export default class TelegramApi {
 					{ id: 3, host: '149.154.175.117', port: 443 },
 				],
 				production: [
-					{ id: 1, host: '149.154.175.50', port: 443 },
-					{ id: 2, host: '149.154.167.50', port: 443 },
-					{ id: 3, host: '149.154.175.100', port: 443 },
-					{ id: 4, host: '149.154.167.91', port: 443 },
-					{ id: 5, host: '149.154.171.5', port: 443 },
+					{ id: 1, host: 'pluto.web.telegram.org', port: 80 },
+					{ id: 2, host: 'venus.web.telegram.org', port: 80 },
+					{ id: 3, host: 'aurora.web.telegram.org', port: 80 },
+					{ id: 4, host: 'vesta.web.telegram.org', port: 80 },
+					{ id: 5, host: 'flora.web.telegram.org', port: 80 },
 				],
 			},
 			mode: {
 				test: false,
-				debug: false,
+				debug: true,
 			},
 		});
 

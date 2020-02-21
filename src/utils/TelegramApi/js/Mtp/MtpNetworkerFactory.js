@@ -23,6 +23,7 @@ import '../lib/polyfill';
 import CryptoWorkerModule from '../Etc/CryptoWorker';
 import $http from '../Etc/angular/$http';
 import MtpDcConfiguratorModule from './MtpDcConfigurator';
+import WebSocketManager from '../Etc/angular/$websocket';
 
 export default function MtpNetworkerFactoryModule() {
 	let updatesProcessor;
@@ -49,6 +50,14 @@ export default function MtpNetworkerFactoryModule() {
 		Storage = StorageModule();
 		CryptoWorker = new CryptoWorkerModule();
 
+		pendingPromises = [];
+
+		handlePromise = data => {
+			if (this.pendingPromises.length > 0) {
+				this.pendingPromises.shift()({ data: data.buffer });
+			}
+		};
+
 		constructor(dcID, authKey, serverSalt, options) {
 			options = options || {};
 
@@ -74,9 +83,12 @@ export default function MtpNetworkerFactoryModule() {
 			this.pendingResends = [];
 			this.connectionInited = false;
 
-			$interval(this.checkLongPoll.bind(this), 10000);
+			const url = this.MtpDcConfigurator.chooseServer(this.dcID, this.upload);
+			this.SocketManager = new WebSocketManager(url, this.handlePromise);
 
-			this.checkLongPoll();
+			// $interval(this.checkLongPoll.bind(this), 10000);
+
+			// this.checkLongPoll();
 		}
 
 		updateSession = () => {
@@ -685,6 +697,7 @@ export default function MtpNetworkerFactoryModule() {
 		};
 
 		sendEncryptedRequest = (message, options) => {
+			console.log('Goin to send message', message);
 			const self = this;
 			options = options || {};
 			// console.log(dT(), 'Send encrypted'/*, message*/);
@@ -721,12 +734,24 @@ export default function MtpNetworkerFactoryModule() {
 					url: url,
 				};
 
+				options = extend(options || {}, {
+					responseType: 'arraybuffer',
+					transformRequest: null,
+				});
+				console.log('{}{}{}{}{}{}SENDING SOCKET');
+				this.SocketManager.sendData(requestData);
+
 				try {
 					options = extend(options || {}, {
 						responseType: 'arraybuffer',
 						transformRequest: null,
 					});
-					requestPromise = $http.post(url, requestData, options);
+					// requestPromise = $http.post(url, requestData, options);
+					let pendingPromise;
+					requestPromise = new Promise(resolve => {
+						pendingPromise = resolve;
+					});
+					this.pendingPromises.push(pendingPromise);
 				} catch (e) {
 					requestPromise = Promise.reject(e);
 				}
